@@ -32,4 +32,20 @@ class Helper {
         var date = calendar?.dateFromComponents(comps!)
         return date!
     }
+    
+    class func isiPhone() -> Bool {
+        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+            return false
+        }
+        return true
+    }
+    
+    class func isRetinaDevice() -> Bool {
+        let mainScreen = UIScreen.mainScreen()
+        if mainScreen.respondsToSelector(Selector("displayLinkWithTarget:selector:")) && mainScreen.scale >= 2.0 {
+            return true
+        }
+        
+        return false
+    }
 }

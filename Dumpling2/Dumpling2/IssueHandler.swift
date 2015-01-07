@@ -29,11 +29,11 @@ class IssueHandler {
         if let issueDict: NSDictionary = fullJSON?.objectFromJSONString() as? NSDictionary {
             //if there is an issue with this issue id, remove all its content first (articles, assets)
             if currentIssue != nil {
-                deleteArticlesFor(currentIssue.appleId)
+                Article.deleteArticlesFor(currentIssue.globalId)
             }
             
             //now write the issue content into the database
-            updateIssueMetadata(issueDict, issueId: currentIssue.appleId)
+            updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
             
             //TODO: add all articles for this issue
         }
@@ -47,21 +47,24 @@ class IssueHandler {
     }
 
     
-    // MARK: Add/Update objects
-    class func updateIssueMetadata(issue: NSDictionary, issueId: NSString?) {
+    // MARK: Add/Update Issues, Assets and Articles
+    
+    //Add or create issue details
+    class func updateIssueMetadata(issue: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
+        
+        var results = Issue.objectsWhere("globalId = \(globalId)")
         var currentIssue: Issue!
         
-        //Adds or updates issue into database and returns the issueId if operation is successful
-        //empty string otherwise
-        if (issueId != nil) {
-            //From an older issue, update the details of the issue
-            currentIssue = Issue.objectsWhere("appleId = \(issueId)").firstObject() as Issue
+        if results.count > 0 {
+            //older issue
+            currentIssue = results.firstObject() as Issue
         }
         else {
             //Create a new issue
             currentIssue = Issue()
             currentIssue.metadata = issue.valueForKey("metadata") as String
+            currentIssue.globalId = issue.valueForKey("global_id") as String
         }
         
         currentIssue.title = issue.valueForKey("title") as String
@@ -69,75 +72,91 @@ class IssueHandler {
         currentIssue.lastUpdateDate = issue.valueForKey("last_updated") as String
         currentIssue.displayDate = issue.valueForKey("display_date") as String
         currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as String)
-        currentIssue.appleId = issueId!
+        currentIssue.appleId = issue.valueForKey("apple_id") as String
         
-        
-        //TODO: Add all assets of the issue (which do not have an associated article)
-        
-    }
-    
-    
-    // MARK: Remove objects
-    
-    //Delete articles and assets for a specific issue
-    class func deleteArticlesFor(appleId: NSString) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "issue.appleId = %@", appleId)
-        var articles = Article.objectsWithPredicate(predicate)
-        
-        var articleIds = NSMutableArray()
-        //go through each article and delete all assets associated with it
-        for article in articles {
-            let article = article as Article
-            articleIds.addObject(article.id)
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(currentIssue)
+        realm.commitWriteTransaction()
+
+        //Add all assets of the issue (which do not have an associated article)
+        var orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as NSArray
+        if orderedArray.count > 0 {
+            for (index, assetDict) in enumerate(orderedArray) {
+                //create asset
+                Asset.createAsset(assetDict as NSDictionary, issue: currentIssue, articleId: "", placement: index+1)
+            }
         }
         
-        deleteAssetsForIssue(appleId)
-        deleteAssetsForArticles(articleIds)
+        //define cover image for issue
+        if let firstAsset = Asset.getFirstAssetFor(currentIssue.globalId, articleId: "") {
+            currentIssue.coverImageId = firstAsset.globalId
+        }
         
-        //Delete articles
-        realm.beginWriteTransaction()
-        realm.deleteObjects(articles)
-        realm.commitWriteTransaction()
+        //Now add all articles into the database
+        var articles = issue.objectForKey("articles") as NSArray
+        for (index, articleDict) in enumerate(articles) {
+            //Insert article for issueId x with placement y
+            createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
+            
+            //Also check here if article is featured or not
+        }
+        
+        return 0
     }
     
     
-    //Delete all assets for a single article
-    class func deleteAssetsFor(articleId: NSString) {
+    //Add article
+    class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
         let realm = RLMRealm.defaultRealm()
+
+        var currentArticle = Article()
+        currentArticle.globalId = article.objectForKey("global_id") as String
+        currentArticle.title = article.objectForKey("title") as String
+        currentArticle.body = article.objectForKey("body") as String
+        currentArticle.articleDesc = article.objectForKey("description") as String
+        currentArticle.url = article.objectForKey("url") as String
+        currentArticle.section = article.objectForKey("section") as String
+        currentArticle.authorName = article.objectForKey("author_name") as String
+        currentArticle.sourceURL = article.objectForKey("source") as String
+        currentArticle.dek = article.objectForKey("dek") as String
+        currentArticle.authorURL = article.objectForKey("author_url") as String
+        currentArticle.keywords = article.objectForKey("keywords") as String
+        currentArticle.commentary = article.objectForKey("commentary") as String
+        currentArticle.articleType = article.objectForKey("type") as String
+        var metadata: AnyObject! = article.objectForKey("metadata")
+        if metadata.isKindOfClass(NSDictionary) {
+            currentArticle.metadata = metadata.JSONString()!
+        }
+        else {
+            currentArticle.metadata = metadata as String
+        }
         
-        let predicate = NSPredicate(format: "article.id = %@", articleId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        currentArticle.issueId = issue.globalId
+        currentArticle.placement = placement
+        currentArticle.versionStashed = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey) as String
         
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        //TODO: Featured or not
+        
+        //Insert article images
+        if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
+            if orderedArray.count > 0 {
+                for (index, imageDict) in enumerate(orderedArray) {
+                    Asset.createAsset(imageDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
+                }
+            }
+        }
+        
+        //TODO: Set thumbnail for article
+        var firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId)
+        
+        //Insert article sound files
+        if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
+            if orderedArray.count > 0 {
+                for (index, soundDict) in enumerate(orderedArray) {
+                    Asset.createAsset(soundDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
+                }
+            }
+        }
     }
     
-    
-    //Delete all assets for multiple articles
-    class func deleteAssetsForArticles(articles: NSArray) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "article.id IN %@", articles)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
-    }
-    
-    
-    //Delete all assets for a single issue
-    class func deleteAssetsForIssue(issueId: NSString) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "issue.appleId = %@", issueId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
-    }
 }

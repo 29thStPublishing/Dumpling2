@@ -11,16 +11,20 @@ import Realm
 
 //Issue object
 class Issue: RLMObject {
-    //dynamic var gloablId = 0 // Realm.io doesn't have a concept of auto-incrementing primary keys yet
+    dynamic var globalId = ""
     dynamic var appleId = ""
     dynamic var title = ""
     dynamic var issueDesc = "" //description
     dynamic var assetFolder = ""
-    dynamic var coverImage = UIImage()
-    dynamic var iconImage = UIImage()
+    dynamic var coverImageId = "" //globalId of asset
+    dynamic var iconImageURL = ""
     dynamic var publishedDate = NSDate()
     dynamic var lastUpdateDate = ""
     dynamic var displayDate = ""
     dynamic var metadata = ""
     dynamic var magazine = Magazine()
+    
+    override class func primaryKey() -> String {
+        return "globalId"
+    }
 }
