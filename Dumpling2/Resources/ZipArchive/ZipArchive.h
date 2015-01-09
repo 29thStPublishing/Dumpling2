@@ -1,108 +1,181 @@
-/**
-//  @header ZipArchive.h
-//  
-//  An objective C wrapper for minizip and libz for creating and exanding ZIP files.
 //
-//  @author Created by aish on 08-9-11.
+//  ZipArchive.h
+//
+//  Created by aish on 2008-9-11.
 //  acsolu@gmail.com
-//  @copyright Copyright 2008  Inc. All rights reserved.
+//  Copyright 2008
 //
-*/
+//  The MIT License (MIT)
+//
+//  Copyright (c) 2008 aish
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
+//  Modified by Robert Ryan on 2013-10-21
+//
+// History: 
+//    09-11-2008 version 1.0    release
+//    10-18-2009 version 1.1    support password protected zip files
+//    10-21-2009 version 1.2    fix date bug
+//    10-21-2013 version 1.3    support ARC; conform to Cocoa naming conventions; miscellaneous fixes
 
 #import <UIKit/UIKit.h>
 
+#include "minizip/zip.h"
+#include "minizip/unzip.h"
 
-/**
- a block that is called from UnzipFileTo:overwrite:withProgressBlock: where the percentage of
- files processed (as an integer from 0 to 100), the number of files processed so far and the
- total number of files in the archive is called after each file is processed.
- */
-typedef void(^ZipArchiveProgressUpdateBlock)(int percentage, int filesProcessed, unsigned long numFiles);
-	
-/**
-    @protocol
-    @discussion  methods for a delegate to receive error notifications and control overwriting of files
-*/
+/** ZipArchiveDelegate protocol */
 
 @protocol ZipArchiveDelegate <NSObject>
 @optional
 
-/**
-    @brief   Delegate method to be notified of errors
-    
-    ZipArchive calls this selector on the delegate when errors are encountered.
-    
-    @param      msg     a string describing the error.
-    @result     void
-*/
+/** Output error message
+ *
+ * @param msg The error message
+ */
 
--(void) ErrorMessage:(NSString*) msg;
+-(void) errorMessage:(NSString*) msg;
 
-/**
-    @brief   Delegate method to determine if a file should be replaced
-    
-    When an zip file is being expanded and a file is about to be replaced, this selector
-    is called on the delegate to notify that file is about to be replaced. The delegate method
-    should return YES to overwrite the file, or NO to skip it.
- 
-    @param      file - path to the file to be overwritten.
-    @result     a BOOL - YES to replace, NO to skip
-*/
+/** Overwrite operation
+ *
+ * @param file The path for the file
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
 
--(BOOL) OverWriteOperation:(NSString*) file;
+-(BOOL) overWriteOperation:(NSString*) file;
 
 @end
 
-/**
-    @class
-    @brief      An object that can create zip files and expand existing ones.
-    This class provides methods to create a zip file (optionally with a password) and
-    add files to that zip archive. 
-                 
-    It also provides methods to expand an existing archive file (optionally with a password),
-    and extract the files.
-*/
 
-@interface ZipArchive : NSObject {
-@private
-	void*           _zipFile;
-	void*           _unzFile;
-	
-    unsigned long   _numFiles;
-	NSString*       _password;
-	id              _delegate;
-    ZipArchiveProgressUpdateBlock _progressBlock;
-    
-    NSArray*    _unzippedFiles;
-    
-    NSFileManager* _fileManager;
-    NSStringEncoding _stringEncoding;
-}
+/** Class for creating and unzipping ZIP files
+ 
+ ### Usage
 
-/** a delegate object conforming to ZipArchiveDelegate protocol */
-@property (nonatomic, retain) id<ZipArchiveDelegate> delegate;
-@property (nonatomic, readonly) unsigned long numFiles;
-@property (nonatomic, copy) ZipArchiveProgressUpdateBlock progressBlock;
+ 1. Include `libz.dylib` to your project's "Link Binaries with Libraries" section of the target settings.
+ 
+ 2. Import `ZipArchive.h`
+ 
+       #import "ZipArchive.h"
 
-/**
-    @brief      String encoding to be used when interpreting file names in the zip file.
-*/
-@property (nonatomic, assign) NSStringEncoding stringEncoding;
+ 3. If unzipping file, the code might look like:
 
-/** an array of files that were successfully expanded. Available after calling UnzipFileTo:overWrite: */
-@property (nonatomic, readonly) NSArray* unzippedFiles;
+       NSString *subdirectory = @"archive";   // the folder name to which you will unzip the files
+       NSString *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
+       NSString *archivePath = [documentsPath stringByAppendingPathComponent:subdirectory];
 
--(id) initWithFileManager:(NSFileManager*) fileManager;
+       ZipArchive *za = [[ZipArchive alloc] init];
 
--(BOOL) CreateZipFile2:(NSString*) zipFile;
--(BOOL) CreateZipFile2:(NSString*) zipFile Password:(NSString*) password;
+       if ([za unzipOpenFile:path]) {
+           BOOL ret = [za unzipFileTo:archivePath overwrite:YES];
+           NSAssert(ret, @"Unzip failed");
+       }
+
+ ### See also
+ 
+ - This is based upon aish's original [ZipArchive class](http://code.google.com/p/ziparchive/)
+ - This includes version 1.01h of [Minizip](http://www.winimage.com/zLibDll/minizip.html)
+ 
+ */
+
+@interface ZipArchive : NSObject
+
+/// @name Properties
+
+/** Delegate property */
+
+@property (nonatomic, weak) id delegate;
+
+/// @name Create zip files
+
+/** Create zip file
+ *
+ * @param zipFile Path of file to create.
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) createZipFile:(NSString*) zipFile;
+
+/** Create zip file with password
+ *
+ * @param zipFile Path of file to create
+ * @param password The password to use when creating the zip file.
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) createZipFile:(NSString*) zipFile password:(NSString*) password;
+
+/** Add file to zip file
+ *
+ * @param file Path of file to create
+ * @param newname The new name of the file
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
 -(BOOL) addFileToZip:(NSString*) file newname:(NSString*) newname;
--(BOOL) CloseZipFile2;
 
--(BOOL) UnzipOpenFile:(NSString*) zipFile;
--(BOOL) UnzipOpenFile:(NSString*) zipFile Password:(NSString*) password;
--(BOOL) UnzipFileTo:(NSString*) path overWrite:(BOOL) overwrite;
--(BOOL) UnzipCloseFile;
--(NSArray*) getZipFileContents;     // list the contents of the zip archive. must be called after UnzipOpenFile
+/** Close the zip file
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) closeZipFile;
+
+/// @name Unzip files
+
+/** Open zip file to unzip
+ *
+ * @param zipFile Path of file to open
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) unzipOpenFile:(NSString*) zipFile;
+
+/** Open zip file to unzip with password
+ *
+ * @param zipFile Path of file to open
+ * @param password The password to use when opening the zip file.
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) unzipOpenFile:(NSString*) zipFile password:(NSString*) password;
+
+/** Unzip zip file to particular path
+ *
+ * @param path Path of directory to where the files will be unzipped.
+ * @param overwrite `BOOL` value indicating whether the files at the path should be overwritten if already found.
+ *
+ * @return Returns `YES` if successful. `NO` if failure.
+ */
+
+-(BOOL) unzipFileTo:(NSString*) path overwrite:(BOOL) overwrite;
+
+/** Close the zip file being unzipped
+ *
+ * @return Returns `YES` if successful. No if failure.
+ */
+
+-(BOOL) unzipCloseFile;
 
 @end

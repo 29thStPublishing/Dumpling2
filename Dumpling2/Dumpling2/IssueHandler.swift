@@ -15,7 +15,8 @@ class IssueHandler {
     class func addIssueToRealm(appleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        var currentIssue: Issue! = Issue.objectsWhere("appleId = \(appleId)").firstObject() as Issue
+        var predicate = NSString(format: "appleId = '%@'", appleId)
+        let issues = Issue.objectsWhere(predicate)
         
         var error: NSError?
         
@@ -26,24 +27,36 @@ class IssueHandler {
         
         var fullJSON = NSString(contentsOfFile: jsonPath, encoding: NSUTF8StringEncoding, error: &error)
         
-        if let issueDict: NSDictionary = fullJSON?.objectFromJSONString() as? NSDictionary {
+        if fullJSON == nil {
+            return
+        }
+        
+        if let issueDict: NSDictionary = Helper.jsonFromString(fullJSON!) as? NSDictionary {
             //if there is an issue with this issue id, remove all its content first (articles, assets)
-            if currentIssue != nil {
+            if issues.count > 0 {
+                var currentIssue: Issue! = issues.firstObject() as Issue
                 Article.deleteArticlesFor(currentIssue.globalId)
             }
             
             //now write the issue content into the database
             updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
-            
-            //TODO: add all articles for this issue
         }
     }
     
     
-    //Get issue details from Realm database for a specific issue id
-    class func getIssueFromRealm(issueId: NSString) -> Issue {
-        let newIssue = Issue()
-        return newIssue
+    //Get issue details from Realm database for a specific global id
+    class func getIssueFromRealm(issueId: NSString) -> Issue? {
+        
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = '%@'", issueId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            return issues.firstObject() as? Issue
+        }
+        
+        return nil
     }
 
     
@@ -53,9 +66,13 @@ class IssueHandler {
     class func updateIssueMetadata(issue: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
         
-        var results = Issue.objectsWhere("globalId = \(globalId)")
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var cacheDir: NSString = docPaths[0] as NSString
+        
+        var results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
         
+        realm.beginWriteTransaction()
         if results.count > 0 {
             //older issue
             currentIssue = results.firstObject() as Issue
@@ -63,7 +80,14 @@ class IssueHandler {
         else {
             //Create a new issue
             currentIssue = Issue()
-            currentIssue.metadata = issue.valueForKey("metadata") as String
+            if let metadata: AnyObject! = issue.objectForKey("metadata") {
+                if metadata.isKindOfClass(NSDictionary) {
+                    currentIssue.metadata = Helper.stringFromJSON(metadata)!
+                }
+                else {
+                    currentIssue.metadata = metadata as String
+                }
+            }
             currentIssue.globalId = issue.valueForKey("global_id") as String
         }
         
@@ -73,8 +97,8 @@ class IssueHandler {
         currentIssue.displayDate = issue.valueForKey("display_date") as String
         currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as String)
         currentIssue.appleId = issue.valueForKey("apple_id") as String
+        currentIssue.assetFolder = "\(cacheDir)/\(currentIssue.appleId)"
         
-        realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
 
@@ -89,7 +113,10 @@ class IssueHandler {
         
         //define cover image for issue
         if let firstAsset = Asset.getFirstAssetFor(currentIssue.globalId, articleId: "") {
+            realm.beginWriteTransaction()
             currentIssue.coverImageId = firstAsset.globalId
+            realm.addOrUpdateObject(currentIssue)
+            realm.commitWriteTransaction()
         }
         
         //Now add all articles into the database
@@ -97,8 +124,6 @@ class IssueHandler {
         for (index, articleDict) in enumerate(articles) {
             //Insert article for issueId x with placement y
             createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
-            
-            //Also check here if article is featured or not
         }
         
         return 0
@@ -125,7 +150,7 @@ class IssueHandler {
         currentArticle.articleType = article.objectForKey("type") as String
         var metadata: AnyObject! = article.objectForKey("metadata")
         if metadata.isKindOfClass(NSDictionary) {
-            currentArticle.metadata = metadata.JSONString()!
+            currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
         }
         else {
             currentArticle.metadata = metadata as String
@@ -135,7 +160,13 @@ class IssueHandler {
         currentArticle.placement = placement
         currentArticle.versionStashed = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey) as String
         
-        //TODO: Featured or not
+        //Featured or not
+        if let featuredDict = article.objectForKey("featured") as? NSDictionary {
+            //If the key doesn't exist, the article is not featured (default value)
+            if featuredDict.objectForKey(issue.globalId)?.integerValue == 1 {
+                currentArticle.isFeatured = true
+            }
+        }
         
         //Insert article images
         if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
@@ -146,8 +177,10 @@ class IssueHandler {
             }
         }
         
-        //TODO: Set thumbnail for article
-        var firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId)
+        //Set thumbnail for article
+        if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId) {
+            currentArticle.thumbImageURL = firstAsset.squareURL as String
+        }
         
         //Insert article sound files
         if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
@@ -157,6 +190,10 @@ class IssueHandler {
                 }
             }
         }
+        
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(currentArticle)
+        realm.commitWriteTransaction()
     }
     
 }

@@ -44,9 +44,10 @@ class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         var globalId = asset.objectForKey("id") as String
-        var results = Asset.objectsWhere("globalId = \(globalId)")
+        var results = Asset.objectsWhere("globalId = '\(globalId)'")
         var currentAsset: Asset!
         
+        realm.beginWriteTransaction()
         if results.count > 0 {
             //existing asset
             currentAsset = results.firstObject() as Asset
@@ -54,16 +55,18 @@ class Asset: RLMObject {
         else {
             //Create a new asset
             currentAsset = Asset()
+            currentAsset.globalId = asset.objectForKey("id") as String
         }
         
         currentAsset.caption = asset.objectForKey("caption") as String
         currentAsset.source = asset.objectForKey("source") as String
-        var metadata: AnyObject! = asset.objectForKey("metadata")
-        if metadata.isKindOfClass(NSDictionary) {
-            currentAsset.metadata = metadata.JSONString()!
-        }
-        else {
-            currentAsset.metadata = metadata as String
+        if let metadata: AnyObject = asset.objectForKey("metadata") {
+            if metadata.isKindOfClass(NSDictionary) {
+                currentAsset.metadata = Helper.stringFromJSON(metadata)! // metadata.JSONString()!
+            }
+            else {
+                currentAsset.metadata = metadata as String
+            }
         }
         currentAsset.issue = issue
         currentAsset.articleId = articleId
@@ -75,9 +78,11 @@ class Asset: RLMObject {
             currentAsset.type = AssetType.Photo.rawValue
         }
         
-        currentAsset.squareURL = asset.objectForKey("crop_350_350") as String
-        currentAsset.originalURL = asset.objectForKey("file_name") as String
-        currentAsset.globalId = asset.objectForKey("id") as String
+        var value = asset.objectForKey("crop_350_350") as String
+        currentAsset.squareURL = "\(issue.assetFolder)/\(value)"
+        
+        value = asset.objectForKey("file_name") as String
+        currentAsset.originalURL = "\(issue.assetFolder)/\(value)"
         
         var main_portrait = ""
         var main_landscape = ""
@@ -88,20 +93,27 @@ class Asset: RLMObject {
         
         if let cover = asset.objectForKey("cover") as? NSDictionary {
             var key = "cover_main_\(device)_portrait\(quality)"
-            main_portrait = cover.objectForKey(key) as String
+            value = cover.objectForKey(key) as String
+            main_portrait = "\(issue.assetFolder)/\(value)"
             
             key = "cover_main_\(device)_landscape\(quality)"
-            main_landscape = cover.objectForKey(key) as String
+            if let val = cover.objectForKey(key) as? String {
+                main_landscape = "\(issue.assetFolder)/\(val)"
+            }
             
             key = "cover_icon_iphone_portrait_retinal"
-            icon = cover.objectForKey(key) as String
+            value = cover.objectForKey(key) as String
+            icon = "\(issue.assetFolder)/\(value)"
         }
         else if let cropDict = asset.objectForKey("crop") as? NSDictionary {
             var key = "main_\(device)_portrait\(quality)"
-            main_portrait = cropDict.objectForKey(key) as String
+            value = cropDict.objectForKey(key) as String
+            main_portrait = "\(issue.assetFolder)/\(value)"
             
             key = "main_\(device)_landscape\(quality)"
-            main_landscape = cropDict.objectForKey(key) as String
+            if let val = cropDict.objectForKey(key) as? String {
+                main_landscape = "\(issue.assetFolder)/\(val)"
+            }
         }
         
         currentAsset.mainPortraitURL = main_portrait
@@ -110,7 +122,6 @@ class Asset: RLMObject {
         
         currentAsset.placement = placement
         
-        realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentAsset)
         realm.commitWriteTransaction()
     }
@@ -119,7 +130,7 @@ class Asset: RLMObject {
     class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND placement = 1", issueId, articleId)
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
         var assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -133,7 +144,7 @@ class Asset: RLMObject {
     class func deleteAssetsFor(articleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "article.globalId = %@", articleId)
+        let predicate = NSPredicate(format: "articleId = '%@'", articleId)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         realm.beginWriteTransaction()
@@ -146,7 +157,7 @@ class Asset: RLMObject {
     class func deleteAssetsForArticles(articles: NSArray) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "article.globalId IN %@", articles)
+        let predicate = NSPredicate(format: "articleId IN %@", articles)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         realm.beginWriteTransaction()
@@ -158,7 +169,7 @@ class Asset: RLMObject {
     class func deleteAssetsForIssue(globalId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = %@", globalId)
+        let predicate = NSPredicate(format: "issue.globalId = '%@'", globalId)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         realm.beginWriteTransaction()

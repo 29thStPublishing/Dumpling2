@@ -31,8 +31,8 @@ class DetailViewController: UIViewController {
             var cacheDir: NSString = docPaths[0] as NSString
 
             var appPath = NSBundle.mainBundle().bundlePath
-            var defaultZipPath = "\(appPath)/\(self.detailItem).zip"
-            var newZipDir = "\(cacheDir)/\(self.detailItem)"
+            var defaultZipPath = "\(appPath)/\(detail).zip"
+            var newZipDir = "\(cacheDir)/\(detail)"
             
             var isDir: ObjCBool = false
             if NSFileManager.defaultManager().fileExistsAtPath(newZipDir, isDirectory: &isDir) {
@@ -45,7 +45,8 @@ class DetailViewController: UIViewController {
             self.unpackZipFile(defaultZipPath)
             
             //Now insert into the realm db and return contents
-            IssueHandler.addIssueToRealm(newZipDir)
+            IssueHandler.addIssueToRealm(detail as String)
+            NSLog("HELLO THERE. DONE")
         }
     }
 
@@ -66,14 +67,14 @@ class DetailViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var cacheDir: NSString = docPaths[0] as NSString
         
-        if zipArchive.UnzipOpenFile(filePath) {
-            var result = zipArchive.UnzipFileTo(cacheDir, overWrite: true)
+        if zipArchive.unzipOpenFile(filePath) {
+            var result = zipArchive.unzipFileTo(cacheDir, overwrite: true)
             if !result {
                 //problem
                 return
             }
             
-            zipArchive.UnzipCloseFile()
+            zipArchive.unzipCloseFile()
         }
         
         if filePath.hasPrefix(cacheDir) {

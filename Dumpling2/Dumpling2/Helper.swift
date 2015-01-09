@@ -48,4 +48,28 @@ class Helper {
         
         return false
     }
+    
+    //JSON to string
+    class func stringFromJSON(object: AnyObject) -> String? {
+        
+        if NSJSONSerialization.isValidJSONObject(object) {
+            if let data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: nil) {
+                if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
+                    return string
+                }
+            }
+        }
+        
+        return nil
+    }
+    
+    //String to JSON
+    class func jsonFromString(string: String) -> AnyObject? {
+        if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
+            if let jsonData = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) {
+                return jsonData
+            }
+        }
+        return nil
+    }
 }

@@ -29,10 +29,9 @@ class Article: RLMObject {
     dynamic var metadata = ""
     dynamic var versionStashed = ""
     dynamic var placement = 0
-    dynamic var mainImage = UIImage()
-    dynamic var thumbImage = UIImage()
+    dynamic var mainImageURL = ""
+    dynamic var thumbImageURL = ""
     dynamic var isFeatured = false
-    dynamic var customValues = NSMutableDictionary()
     dynamic var issueId = "" //globalId of issue
     
     override class func primaryKey() -> String {
@@ -43,7 +42,7 @@ class Article: RLMObject {
     class func deleteArticlesFor(globalId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = %@", globalId)
+        let predicate = NSPredicate(format: "issueId = '%@'", globalId)
         var articles = Article.objectsWithPredicate(predicate)
         
         var articleIds = NSMutableArray()

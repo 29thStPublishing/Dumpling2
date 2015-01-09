@@ -7,17 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FF92632E1A5A920900900539 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = FF9263241A5A920900900539 /* ioapi.c */; };
-		FF92632F1A5A920900900539 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = FF9263261A5A920900900539 /* mztools.c */; };
-		FF9263301A5A920900900539 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = FF9263281A5A920900900539 /* unzip.c */; };
-		FF9263311A5A920900900539 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = FF92632A1A5A920900900539 /* zip.c */; };
-		FF9263321A5A920900900539 /* ZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = FF92632D1A5A920900900539 /* ZipArchive.m */; };
 		FF9263351A5A93DD00900539 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9263341A5A93DD00900539 /* Foundation.framework */; };
 		FF9263371A5A93EA00900539 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9263361A5A93EA00900539 /* libz.dylib */; };
 		FF9263391A5A945800900539 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF9263381A5A945800900539 /* UIKit.framework */; };
 		FF92633B1A5AA89F00900539 /* IssueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF92633A1A5AA89F00900539 /* IssueHandler.swift */; };
-		FF92633F1A5AB12800900539 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = FF92633E1A5AB12800900539 /* JSONKit.m */; };
 		FF9263431A5AD6D700900539 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9263421A5AD6D700900539 /* Helper.swift */; };
+		FFCAC6271A5FFDC700434DA1 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = FFCAC61D1A5FFDC700434DA1 /* ioapi.c */; };
+		FFCAC6281A5FFDC700434DA1 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = FFCAC61F1A5FFDC700434DA1 /* mztools.c */; };
+		FFCAC6291A5FFDC700434DA1 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = FFCAC6211A5FFDC700434DA1 /* unzip.c */; };
+		FFCAC62A1A5FFDC700434DA1 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = FFCAC6231A5FFDC700434DA1 /* zip.c */; };
+		FFCAC62B1A5FFDC700434DA1 /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = FFCAC6261A5FFDC700434DA1 /* ZipArchive.mm */; };
 		FFD572DA1A529B8300AB9113 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD572D91A529B8300AB9113 /* AppDelegate.swift */; };
 		FFD572DC1A529B8300AB9113 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD572DB1A529B8300AB9113 /* MasterViewController.swift */; };
 		FFD572DE1A529B8300AB9113 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD572DD1A529B8300AB9113 /* DetailViewController.swift */; };
@@ -46,25 +45,23 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FF9263231A5A920900900539 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		FF9263241A5A920900900539 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
-		FF9263251A5A920900900539 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		FF9263261A5A920900900539 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
-		FF9263271A5A920900900539 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
-		FF9263281A5A920900900539 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
-		FF9263291A5A920900900539 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
-		FF92632A1A5A920900900539 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
-		FF92632B1A5A920900900539 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
-		FF92632C1A5A920900900539 /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
-		FF92632D1A5A920900900539 /* ZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZipArchive.m; sourceTree = "<group>"; };
 		FF9263331A5A925300900539 /* Dumpling2-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Dumpling2-Bridging-Header.h"; sourceTree = "<group>"; };
 		FF9263341A5A93DD00900539 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		FF9263361A5A93EA00900539 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		FF9263381A5A945800900539 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		FF92633A1A5AA89F00900539 /* IssueHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IssueHandler.swift; sourceTree = "<group>"; };
-		FF92633D1A5AB12800900539 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
-		FF92633E1A5AB12800900539 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 		FF9263421A5AD6D700900539 /* Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		FFCAC61C1A5FFDC700434DA1 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		FFCAC61D1A5FFDC700434DA1 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		FFCAC61E1A5FFDC700434DA1 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		FFCAC61F1A5FFDC700434DA1 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
+		FFCAC6201A5FFDC700434DA1 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		FFCAC6211A5FFDC700434DA1 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		FFCAC6221A5FFDC700434DA1 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		FFCAC6231A5FFDC700434DA1 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
+		FFCAC6241A5FFDC700434DA1 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		FFCAC6251A5FFDC700434DA1 /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
+		FFCAC6261A5FFDC700434DA1 /* ZipArchive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZipArchive.mm; sourceTree = "<group>"; };
 		FFD572D41A529B8300AB9113 /* Dumpling2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dumpling2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD572D81A529B8300AB9113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FFD572D91A529B8300AB9113 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -112,38 +109,12 @@
 		FF9263211A5A920900900539 /* ZipArchive */ = {
 			isa = PBXGroup;
 			children = (
-				FF9263221A5A920900900539 /* minizip */,
-				FF92632C1A5A920900900539 /* ZipArchive.h */,
-				FF92632D1A5A920900900539 /* ZipArchive.m */,
+				FFCAC61B1A5FFDC700434DA1 /* minizip */,
+				FFCAC6251A5FFDC700434DA1 /* ZipArchive.h */,
+				FFCAC6261A5FFDC700434DA1 /* ZipArchive.mm */,
 			);
 			name = ZipArchive;
 			path = Resources/ZipArchive;
-			sourceTree = "<group>";
-		};
-		FF9263221A5A920900900539 /* minizip */ = {
-			isa = PBXGroup;
-			children = (
-				FF9263231A5A920900900539 /* crypt.h */,
-				FF9263241A5A920900900539 /* ioapi.c */,
-				FF9263251A5A920900900539 /* ioapi.h */,
-				FF9263261A5A920900900539 /* mztools.c */,
-				FF9263271A5A920900900539 /* mztools.h */,
-				FF9263281A5A920900900539 /* unzip.c */,
-				FF9263291A5A920900900539 /* unzip.h */,
-				FF92632A1A5A920900900539 /* zip.c */,
-				FF92632B1A5A920900900539 /* zip.h */,
-			);
-			path = minizip;
-			sourceTree = "<group>";
-		};
-		FF92633C1A5AB12800900539 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				FF92633D1A5AB12800900539 /* JSONKit.h */,
-				FF92633E1A5AB12800900539 /* JSONKit.m */,
-			);
-			name = JSON;
-			path = Resources/JSON;
 			sourceTree = "<group>";
 		};
 		FF9263401A5AD64300900539 /* Handlers */ = {
@@ -160,6 +131,22 @@
 				FF9263421A5AD6D700900539 /* Helper.swift */,
 			);
 			name = Helpers;
+			sourceTree = "<group>";
+		};
+		FFCAC61B1A5FFDC700434DA1 /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				FFCAC61C1A5FFDC700434DA1 /* crypt.h */,
+				FFCAC61D1A5FFDC700434DA1 /* ioapi.c */,
+				FFCAC61E1A5FFDC700434DA1 /* ioapi.h */,
+				FFCAC61F1A5FFDC700434DA1 /* mztools.c */,
+				FFCAC6201A5FFDC700434DA1 /* mztools.h */,
+				FFCAC6211A5FFDC700434DA1 /* unzip.c */,
+				FFCAC6221A5FFDC700434DA1 /* unzip.h */,
+				FFCAC6231A5FFDC700434DA1 /* zip.c */,
+				FFCAC6241A5FFDC700434DA1 /* zip.h */,
+			);
+			path = minizip;
 			sourceTree = "<group>";
 		};
 		FFD572CB1A529B8300AB9113 = {
@@ -251,7 +238,6 @@
 		FFEF64061A52E72300ACE7EC /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				FF92633C1A5AB12800900539 /* JSON */,
 				FF9263211A5A920900900539 /* ZipArchive */,
 				FFEF64071A52E75700ACE7EC /* org.bomb.mag.issue.20150101.zip */,
 				FF9263331A5A925300900539 /* Dumpling2-Bridging-Header.h */,
@@ -361,21 +347,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFD5730B1A52B93000AB9113 /* Article.swift in Sources */,
-				FF9263301A5A920900900539 /* unzip.c in Sources */,
 				FFD572DE1A529B8300AB9113 /* DetailViewController.swift in Sources */,
+				FFCAC6281A5FFDC700434DA1 /* mztools.c in Sources */,
 				FFD573071A529CA700AB9113 /* Magazine.swift in Sources */,
+				FFCAC62B1A5FFDC700434DA1 /* ZipArchive.mm in Sources */,
+				FFCAC6291A5FFDC700434DA1 /* unzip.c in Sources */,
 				FFD572DC1A529B8300AB9113 /* MasterViewController.swift in Sources */,
-				FF9263321A5A920900900539 /* ZipArchive.m in Sources */,
 				FF92633B1A5AA89F00900539 /* IssueHandler.swift in Sources */,
 				FF9263431A5AD6D700900539 /* Helper.swift in Sources */,
-				FF92632F1A5A920900900539 /* mztools.c in Sources */,
 				FFD572DA1A529B8300AB9113 /* AppDelegate.swift in Sources */,
 				FFD573031A529BD900AB9113 /* RLMSupport.swift in Sources */,
-				FF92632E1A5A920900900539 /* ioapi.c in Sources */,
-				FF9263311A5A920900900539 /* zip.c in Sources */,
+				FFCAC6271A5FFDC700434DA1 /* ioapi.c in Sources */,
+				FFCAC62A1A5FFDC700434DA1 /* zip.c in Sources */,
 				FFEF64051A52D22200ACE7EC /* Asset.swift in Sources */,
 				FFD573091A52B6E700AB9113 /* Issue.swift in Sources */,
-				FF92633F1A5AB12800900539 /* JSONKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
