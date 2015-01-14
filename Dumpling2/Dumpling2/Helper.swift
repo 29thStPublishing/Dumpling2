@@ -66,10 +66,34 @@ class Helper {
     //String to JSON
     class func jsonFromString(string: String) -> AnyObject? {
         if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
-            if let jsonData = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) {
+            if let jsonData: AnyObject = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) {
                 return jsonData
             }
         }
         return nil
+    }
+    
+    //Unpack a zip file
+    class func unpackZipFile(filePath: NSString) {
+        var zipArchive = ZipArchive()
+        
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var cacheDir: NSString = docPaths[0] as NSString
+        
+        if zipArchive.unzipOpenFile(filePath) {
+            var result = zipArchive.unzipFileTo(cacheDir, overwrite: true)
+            if !result {
+                //problem
+                return
+            }
+            
+            zipArchive.unzipCloseFile()
+        }
+        
+        if filePath.hasPrefix(cacheDir) {
+            //remove zip file if it was in cache dir
+            //planning ahead - this won't be called right now
+            NSFileManager.defaultManager().removeItemAtPath(filePath, error: nil)
+        }
     }
 }

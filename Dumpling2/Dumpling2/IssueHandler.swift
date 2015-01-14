@@ -9,10 +9,41 @@
 import UIKit
 import Realm
 
-class IssueHandler {
+class IssueHandler: NSObject {
+    
+    var defaultFolder: NSString!
+    
+    override convenience init() {
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var cacheDir: NSString = docPaths[0] as NSString
+        
+        self.init(folder: cacheDir)
+    }
+    
+    init(folder: NSString){
+        self.defaultFolder = folder
+    }
 
     //Add issue details from an extracted zip file to Realm database
-    class func addIssueToRealm(appleId: NSString) {
+    func addIssueToRealm(appleId: NSString) {
+        /* Step 1 - import zip file */
+        
+        var appPath = NSBundle.mainBundle().bundlePath
+        var defaultZipPath = "\(appPath)/\(appleId).zip"
+        var newZipDir = "\(self.defaultFolder)/\(appleId)"
+        
+        var isDir: ObjCBool = false
+        if NSFileManager.defaultManager().fileExistsAtPath(newZipDir, isDirectory: &isDir) {
+            if isDir {
+                //Issue directory already exists. Do nothing
+            }
+        }
+        else {
+            //Issue not copied yet. Unzip and copy
+            Helper.unpackZipFile(defaultZipPath)
+        }
+        
+        //Start reading the content of the zip file
         let realm = RLMRealm.defaultRealm()
         
         var predicate = NSString(format: "appleId = '%@'", appleId)
@@ -21,9 +52,7 @@ class IssueHandler {
         var error: NSError?
         
         //Get the contents of latest.json from the folder
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as NSString
-        var jsonPath = "\(cacheDir)/\(appleId)/latest.json"
+        var jsonPath = "\(self.defaultFolder)/\(appleId)/latest.json"
         
         var fullJSON = NSString(contentsOfFile: jsonPath, encoding: NSUTF8StringEncoding, error: &error)
         
@@ -39,13 +68,13 @@ class IssueHandler {
             }
             
             //now write the issue content into the database
-            updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
+            self.updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
         }
     }
     
     
     //Get issue details from Realm database for a specific global id
-    class func getIssueFromRealm(issueId: NSString) -> Issue? {
+    func getIssueFromRealm(issueId: NSString) -> Issue? {
         
         let realm = RLMRealm.defaultRealm()
         
@@ -63,11 +92,8 @@ class IssueHandler {
     // MARK: Add/Update Issues, Assets and Articles
     
     //Add or create issue details
-    class func updateIssueMetadata(issue: NSDictionary, globalId: String) -> Int {
+    func updateIssueMetadata(issue: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
-        
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as NSString
         
         var results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
@@ -97,7 +123,7 @@ class IssueHandler {
         currentIssue.displayDate = issue.valueForKey("display_date") as String
         currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as String)
         currentIssue.appleId = issue.valueForKey("apple_id") as String
-        currentIssue.assetFolder = "\(cacheDir)/\(currentIssue.appleId)"
+        currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
@@ -123,77 +149,10 @@ class IssueHandler {
         var articles = issue.objectForKey("articles") as NSArray
         for (index, articleDict) in enumerate(articles) {
             //Insert article for issueId x with placement y
-            createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
+            Article.createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
         }
         
         return 0
-    }
-    
-    
-    //Add article
-    class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
-        let realm = RLMRealm.defaultRealm()
-
-        var currentArticle = Article()
-        currentArticle.globalId = article.objectForKey("global_id") as String
-        currentArticle.title = article.objectForKey("title") as String
-        currentArticle.body = article.objectForKey("body") as String
-        currentArticle.articleDesc = article.objectForKey("description") as String
-        currentArticle.url = article.objectForKey("url") as String
-        currentArticle.section = article.objectForKey("section") as String
-        currentArticle.authorName = article.objectForKey("author_name") as String
-        currentArticle.sourceURL = article.objectForKey("source") as String
-        currentArticle.dek = article.objectForKey("dek") as String
-        currentArticle.authorURL = article.objectForKey("author_url") as String
-        currentArticle.keywords = article.objectForKey("keywords") as String
-        currentArticle.commentary = article.objectForKey("commentary") as String
-        currentArticle.articleType = article.objectForKey("type") as String
-        var metadata: AnyObject! = article.objectForKey("metadata")
-        if metadata.isKindOfClass(NSDictionary) {
-            currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
-        }
-        else {
-            currentArticle.metadata = metadata as String
-        }
-        
-        currentArticle.issueId = issue.globalId
-        currentArticle.placement = placement
-        currentArticle.versionStashed = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey) as String
-        
-        //Featured or not
-        if let featuredDict = article.objectForKey("featured") as? NSDictionary {
-            //If the key doesn't exist, the article is not featured (default value)
-            if featuredDict.objectForKey(issue.globalId)?.integerValue == 1 {
-                currentArticle.isFeatured = true
-            }
-        }
-        
-        //Insert article images
-        if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
-            if orderedArray.count > 0 {
-                for (index, imageDict) in enumerate(orderedArray) {
-                    Asset.createAsset(imageDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
-                }
-            }
-        }
-        
-        //Set thumbnail for article
-        if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId) {
-            currentArticle.thumbImageURL = firstAsset.squareURL as String
-        }
-        
-        //Insert article sound files
-        if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
-            if orderedArray.count > 0 {
-                for (index, soundDict) in enumerate(orderedArray) {
-                    Asset.createAsset(soundDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
-                }
-            }
-        }
-        
-        realm.beginWriteTransaction()
-        realm.addOrUpdateObject(currentArticle)
-        realm.commitWriteTransaction()
     }
     
 }
