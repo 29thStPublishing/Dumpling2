@@ -61,13 +61,6 @@ class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Is article featured
-    class func isArticleFeatured(issue: Issue, placement: Int) -> Bool{
-        let globalId = issue.globalId
-        //TODO: Needs to be implemented
-        return false
-    }
-    
     //Add article
     class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
         let realm = RLMRealm.defaultRealm()
@@ -132,6 +125,82 @@ class Article: RLMObject {
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentArticle)
         realm.commitWriteTransaction()
+    }
+    
+    //Get article details from API and create
+    class func createArticleForId(articleId: NSString, issue: Issue, placement: Int) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let manager = AFHTTPRequestOperationManager()
+        let authorization = "method=apikey,token=\(apiKey)"
+        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
+        
+        let requestURL = "\(baseURL)articles/\(articleId)"
+        
+        manager.GET(requestURL,
+            parameters: nil,
+            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
+                
+                var response: NSDictionary = responseObject as NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as NSDictionary
+
+                var currentArticle = Article()
+                currentArticle.globalId = articleId
+                currentArticle.placement = placement
+                currentArticle.issueId = issue.globalId
+                currentArticle.title = articleInfo.valueForKey("headline") as String
+                currentArticle.body = articleInfo.valueForKey("body") as String
+                currentArticle.articleDesc = articleInfo.valueForKey("description") as String
+                currentArticle.authorName = articleInfo.valueForKey("authorName") as String
+                currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as String
+                currentArticle.url = articleInfo.valueForKey("sharingUrl") as String
+                currentArticle.section = articleInfo.valueForKey("section") as String
+                currentArticle.articleType = articleInfo.valueForKey("type") as String
+                currentArticle.commentary = articleInfo.valueForKey("commentary") as String
+                currentArticle.slug = articleInfo.valueForKey("slug") as String
+                
+                var meta = articleInfo.objectForKey("meta") as NSDictionary
+                var featured = meta.valueForKey("featured") as NSNumber
+                currentArticle.isFeatured = featured.boolValue
+                
+                if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
+                    if metadata.isKindOfClass(NSDictionary) {
+                        currentArticle.metadata = Helper.stringFromJSON(metadata)!
+                    }
+                    else {
+                        currentArticle.metadata = metadata as String
+                    }
+                }
+                
+                var keywords = articleInfo.objectForKey("keywords") as NSArray
+                if keywords.count > 0 {
+                    currentArticle.keywords = Helper.stringFromJSON(keywords)!
+                }
+                
+                //Add all assets of the article (will add images and sound)
+                var articleMedia = articleInfo.objectForKey("media") as NSArray
+                if articleMedia.count > 0 {
+                    for (index, assetDict) in enumerate(articleMedia) {
+                        //Download images and create Asset object for issue
+                        Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as NSString, issue: issue, articleId: articleId, placement: index+1)
+                    }
+                }
+                
+                //Set thumbnail for article
+                if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId) {
+                    currentArticle.thumbImageURL = firstAsset.originalURL as String
+                }
+                
+                realm.beginWriteTransaction()
+                realm.addOrUpdateObject(currentArticle)
+                realm.commitWriteTransaction()
+                
+            },
+            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
+                
+                println("Error: " + error.localizedDescription)
+        })
     }
 
 }

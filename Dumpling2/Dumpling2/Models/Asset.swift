@@ -149,7 +149,7 @@ class Asset: RLMObject {
                 
                 var currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as String
-                currentAsset.caption = mediaFile.valueForKey("caption") as String
+                currentAsset.caption = mediaFile.valueForKey("title") as String
                 currentAsset.issue = issue
                 currentAsset.articleId = articleId
                 
@@ -164,7 +164,7 @@ class Asset: RLMObject {
                 currentAsset.placement = placement
                 
                 let fileUrl = mediaFile.valueForKey("url") as String
-                currentAsset.saveImageFromURL(fileUrl, toFolder: issue.assetFolder)
+                currentAsset.saveImageFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
                 currentAsset.originalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -248,7 +248,8 @@ class Asset: RLMObject {
             destination:{(targetPath:NSURL!,response:NSURLResponse!) -> NSURL! in
                 
                 var url:NSURL! = NSURL(fileURLWithPath: toFolder)
-                return url.URLByAppendingPathComponent(response.suggestedFilename as String!)
+                var urlPath = url.URLByAppendingPathComponent(response.suggestedFilename as String!)
+                return urlPath
             },
             completionHandler:{(response:NSURLResponse!,filePath:NSURL!,error:NSError!)  in
                 println(response.suggestedFilename)

@@ -224,6 +224,7 @@ public class IssueHandler: NSObject {
             currentIssue.globalId = globalId
         }
         
+        realm.beginWriteTransaction()
         currentIssue.title = issue.valueForKey("title") as String
         currentIssue.issueDesc = issue.valueForKey("description") as String
         
@@ -242,6 +243,17 @@ public class IssueHandler: NSObject {
         //TODO: Change this
         //currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
+        var isDir: ObjCBool = false
+        if NSFileManager.defaultManager().fileExistsAtPath(currentIssue.assetFolder, isDirectory: &isDir) {
+            if isDir {
+                //Folder already exists. Do nothing
+            }
+        }
+        else {
+            //Folder doesn't exist, create folder where assets will be downloaded
+            NSFileManager.defaultManager().createDirectoryAtPath(currentIssue.assetFolder, withIntermediateDirectories: true, attributes: nil, error: nil)
+        }
+        
         var assetId = issue.valueForKey("coverPhone") as String
         if !assetId.isEmpty {
             currentIssue.coverImageId = assetId
@@ -249,7 +261,6 @@ public class IssueHandler: NSObject {
         
         //TODO: Add featured article id if any
         
-        realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
         
@@ -262,12 +273,12 @@ public class IssueHandler: NSObject {
             }
         }
         
-        //TODO: Now add all articles into the database
-        /*var articles = issue.objectForKey("articles") as NSArray
+        //add all articles into the database
+        var articles = issue.objectForKey("articles") as NSArray
         for (index, articleDict) in enumerate(articles) {
-            //Insert article for issueId x with placement y
-            Article.createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
-        }*/
+            //Insert article
+            Article.createArticleForId(articleDict.valueForKey("id") as NSString, issue: currentIssue, placement: index+1)
+        }
         
         return 0
     }
