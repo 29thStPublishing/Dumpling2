@@ -2,8 +2,8 @@
 //  Dumpling2Tests.swift
 //  Dumpling2Tests
 //
-//  Created by Lata Rastogi on 30/12/14.
-//  Copyright (c) 2014 29th Street. All rights reserved.
+//  Created by Lata Rastogi on 28/01/15.
+//  Copyright (c) 2015 29th Street. All rights reserved.
 //
 
 import UIKit
