@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FFCB3AF61A78A12700F52BC6"
-               BuildableName = "Dumpling2.framework"
-               BlueprintName = "Dumpling2"
+               BlueprintIdentifier = "FFCB3B6D1A78EE6400F52BC6"
+               BuildableName = "D2consumer.app"
+               BlueprintName = "D2consumer"
                ReferencedContainer = "container:Dumpling2.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FFCB3B011A78A12700F52BC6"
-               BuildableName = "Dumpling2Tests.xctest"
-               BlueprintName = "Dumpling2Tests"
+               BlueprintIdentifier = "FFCB3B811A78EE6500F52BC6"
+               BuildableName = "D2consumerTests.xctest"
+               BlueprintName = "D2consumerTests"
                ReferencedContainer = "container:Dumpling2.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,9 +46,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FFCB3B011A78A12700F52BC6"
-               BuildableName = "Dumpling2Tests.xctest"
-               BlueprintName = "Dumpling2Tests"
+               BlueprintIdentifier = "FFCB3B811A78EE6500F52BC6"
+               BuildableName = "D2consumerTests.xctest"
+               BlueprintName = "D2consumerTests"
                ReferencedContainer = "container:Dumpling2.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -56,9 +56,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FFCB3AF61A78A12700F52BC6"
-            BuildableName = "Dumpling2.framework"
-            BlueprintName = "Dumpling2"
+            BlueprintIdentifier = "FFCB3B6D1A78EE6400F52BC6"
+            BuildableName = "D2consumer.app"
+            BlueprintName = "D2consumer"
             ReferencedContainer = "container:Dumpling2.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -72,15 +72,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FFCB3AF61A78A12700F52BC6"
-            BuildableName = "Dumpling2.framework"
-            BlueprintName = "Dumpling2"
+            BlueprintIdentifier = "FFCB3B6D1A78EE6400F52BC6"
+            BuildableName = "D2consumer.app"
+            BlueprintName = "D2consumer"
             ReferencedContainer = "container:Dumpling2.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -90,15 +90,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "FFCB3AF61A78A12700F52BC6"
-            BuildableName = "Dumpling2.framework"
-            BlueprintName = "Dumpling2"
+            BlueprintIdentifier = "FFCB3B6D1A78EE6400F52BC6"
+            BuildableName = "D2consumer.app"
+            BlueprintName = "D2consumer"
             ReferencedContainer = "container:Dumpling2.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
