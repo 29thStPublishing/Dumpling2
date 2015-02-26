@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FFC9EE361A9C971000B5927C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC9EE351A9C971000B5927C /* AppDelegate.swift */; };
+		FFC9EE381A9C971000B5927C /* ConsumerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC9EE371A9C971000B5927C /* ConsumerViewController.swift */; };
+		FFC9EE3B1A9C971000B5927C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFC9EE391A9C971000B5927C /* Main.storyboard */; };
+		FFC9EE3D1A9C971000B5927C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FFC9EE3C1A9C971000B5927C /* Images.xcassets */; };
+		FFC9EE401A9C971000B5927C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFC9EE3E1A9C971000B5927C /* LaunchScreen.xib */; };
+		FFC9EE4C1A9C971100B5927C /* D2ReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC9EE4B1A9C971100B5927C /* D2ReaderTests.swift */; };
 		FFCA0FD41A80DBF1000C9AFD /* AFHTTPRequestOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCA0FD51A80DBF1000C9AFD /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = FFCA0FC21A80DBF1000C9AFD /* AFHTTPRequestOperation.m */; };
 		FFCA0FD61A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCA0FC31A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -65,6 +71,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		FFC9EE461A9C971000B5927C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFCB3AEE1A78A12700F52BC6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFC9EE301A9C971000B5927C;
+			remoteInfo = D2Reader;
+		};
+		FFC9EE531A9C972C00B5927C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FFCB3AEE1A78A12700F52BC6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FFCB3AF61A78A12700F52BC6;
+			remoteInfo = Dumpling2;
+		};
 		FFCB3B041A78A12700F52BC6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FFCB3AEE1A78A12700F52BC6 /* Project object */;
@@ -103,6 +123,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FFC9EE311A9C971000B5927C /* D2Reader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = D2Reader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFC9EE341A9C971000B5927C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFC9EE351A9C971000B5927C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FFC9EE371A9C971000B5927C /* ConsumerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsumerViewController.swift; sourceTree = "<group>"; };
+		FFC9EE3A1A9C971000B5927C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FFC9EE3C1A9C971000B5927C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		FFC9EE3F1A9C971000B5927C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		FFC9EE451A9C971000B5927C /* D2ReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = D2ReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FFC9EE4A1A9C971100B5927C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFC9EE4B1A9C971100B5927C /* D2ReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = D2ReaderTests.swift; sourceTree = "<group>"; };
 		FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
 		FFCA0FC21A80DBF1000C9AFD /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
 		FFCA0FC31A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
@@ -167,6 +197,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		FFC9EE2E1A9C971000B5927C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFC9EE421A9C971000B5927C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FFCB3AF31A78A12700F52BC6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -210,6 +254,44 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		FFC9EE321A9C971000B5927C /* D2Reader */ = {
+			isa = PBXGroup;
+			children = (
+				FFC9EE351A9C971000B5927C /* AppDelegate.swift */,
+				FFC9EE371A9C971000B5927C /* ConsumerViewController.swift */,
+				FFC9EE391A9C971000B5927C /* Main.storyboard */,
+				FFC9EE3C1A9C971000B5927C /* Images.xcassets */,
+				FFC9EE3E1A9C971000B5927C /* LaunchScreen.xib */,
+				FFC9EE331A9C971000B5927C /* Supporting Files */,
+			);
+			path = D2Reader;
+			sourceTree = "<group>";
+		};
+		FFC9EE331A9C971000B5927C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FFC9EE341A9C971000B5927C /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FFC9EE481A9C971000B5927C /* D2ReaderTests */ = {
+			isa = PBXGroup;
+			children = (
+				FFC9EE4B1A9C971100B5927C /* D2ReaderTests.swift */,
+				FFC9EE491A9C971100B5927C /* Supporting Files */,
+			);
+			path = D2ReaderTests;
+			sourceTree = "<group>";
+		};
+		FFC9EE491A9C971100B5927C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				FFC9EE4A1A9C971100B5927C /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		FFCA0FC01A80DBF1000C9AFD /* AFNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -246,6 +328,8 @@
 				FFCB3B061A78A12700F52BC6 /* Dumpling2Tests */,
 				FFCB3B6F1A78EE6400F52BC6 /* D2consumer */,
 				FFCB3B851A78EE6500F52BC6 /* D2consumerTests */,
+				FFC9EE321A9C971000B5927C /* D2Reader */,
+				FFC9EE481A9C971000B5927C /* D2ReaderTests */,
 				FFCB3AF81A78A12700F52BC6 /* Products */,
 				F1B16F3685C54536E0868F50 /* Frameworks */,
 			);
@@ -258,6 +342,8 @@
 				FFCB3B021A78A12700F52BC6 /* Dumpling2Tests.xctest */,
 				FFCB3B6E1A78EE6400F52BC6 /* D2consumer.app */,
 				FFCB3B821A78EE6500F52BC6 /* D2consumerTests.xctest */,
+				FFC9EE311A9C971000B5927C /* D2Reader.app */,
+				FFC9EE451A9C971000B5927C /* D2ReaderTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -437,6 +523,42 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		FFC9EE301A9C971000B5927C /* D2Reader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFC9EE511A9C971100B5927C /* Build configuration list for PBXNativeTarget "D2Reader" */;
+			buildPhases = (
+				FFC9EE2D1A9C971000B5927C /* Sources */,
+				FFC9EE2E1A9C971000B5927C /* Frameworks */,
+				FFC9EE2F1A9C971000B5927C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFC9EE541A9C972C00B5927C /* PBXTargetDependency */,
+			);
+			name = D2Reader;
+			productName = D2Reader;
+			productReference = FFC9EE311A9C971000B5927C /* D2Reader.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FFC9EE441A9C971000B5927C /* D2ReaderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFC9EE521A9C971100B5927C /* Build configuration list for PBXNativeTarget "D2ReaderTests" */;
+			buildPhases = (
+				FFC9EE411A9C971000B5927C /* Sources */,
+				FFC9EE421A9C971000B5927C /* Frameworks */,
+				FFC9EE431A9C971000B5927C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FFC9EE471A9C971000B5927C /* PBXTargetDependency */,
+			);
+			name = D2ReaderTests;
+			productName = D2ReaderTests;
+			productReference = FFC9EE451A9C971000B5927C /* D2ReaderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		FFCB3AF61A78A12700F52BC6 /* Dumpling2 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFCB3B0D1A78A12700F52BC6 /* Build configuration list for PBXNativeTarget "Dumpling2" */;
@@ -519,6 +641,13 @@
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "29th Street";
 				TargetAttributes = {
+					FFC9EE301A9C971000B5927C = {
+						CreatedOnToolsVersion = 6.1;
+					};
+					FFC9EE441A9C971000B5927C = {
+						CreatedOnToolsVersion = 6.1;
+						TestTargetID = FFC9EE301A9C971000B5927C;
+					};
 					FFCB3AF61A78A12700F52BC6 = {
 						CreatedOnToolsVersion = 6.1;
 					};
@@ -551,11 +680,30 @@
 				FFCB3B011A78A12700F52BC6 /* Dumpling2Tests */,
 				FFCB3B6D1A78EE6400F52BC6 /* D2consumer */,
 				FFCB3B811A78EE6500F52BC6 /* D2consumerTests */,
+				FFC9EE301A9C971000B5927C /* D2Reader */,
+				FFC9EE441A9C971000B5927C /* D2ReaderTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		FFC9EE2F1A9C971000B5927C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFC9EE3B1A9C971000B5927C /* Main.storyboard in Resources */,
+				FFC9EE401A9C971000B5927C /* LaunchScreen.xib in Resources */,
+				FFC9EE3D1A9C971000B5927C /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFC9EE431A9C971000B5927C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FFCB3AF51A78A12700F52BC6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -591,6 +739,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		FFC9EE2D1A9C971000B5927C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFC9EE381A9C971000B5927C /* ConsumerViewController.swift in Sources */,
+				FFC9EE361A9C971000B5927C /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFC9EE411A9C971000B5927C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FFC9EE4C1A9C971100B5927C /* D2ReaderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		FFCB3AF21A78A12700F52BC6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -642,6 +807,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		FFC9EE471A9C971000B5927C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFC9EE301A9C971000B5927C /* D2Reader */;
+			targetProxy = FFC9EE461A9C971000B5927C /* PBXContainerItemProxy */;
+		};
+		FFC9EE541A9C972C00B5927C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FFCB3AF61A78A12700F52BC6 /* Dumpling2 */;
+			targetProxy = FFC9EE531A9C972C00B5927C /* PBXContainerItemProxy */;
+		};
 		FFCB3B051A78A12700F52BC6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FFCB3AF61A78A12700F52BC6 /* Dumpling2 */;
@@ -660,6 +835,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		FFC9EE391A9C971000B5927C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FFC9EE3A1A9C971000B5927C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FFC9EE3E1A9C971000B5927C /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FFC9EE3F1A9C971000B5927C /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
 		FFCB3B761A78EE6500F52BC6 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -679,6 +870,64 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		FFC9EE4D1A9C971100B5927C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = D2Reader/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		FFC9EE4E1A9C971100B5927C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = D2Reader/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		FFC9EE4F1A9C971100B5927C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = D2ReaderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/D2Reader.app/D2Reader";
+			};
+			name = Debug;
+		};
+		FFC9EE501A9C971100B5927C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = D2ReaderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/D2Reader.app/D2Reader";
+			};
+			name = Release;
+		};
 		FFCB3B0B1A78A12700F52BC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -945,6 +1194,22 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		FFC9EE511A9C971100B5927C /* Build configuration list for PBXNativeTarget "D2Reader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFC9EE4D1A9C971100B5927C /* Debug */,
+				FFC9EE4E1A9C971100B5927C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		FFC9EE521A9C971100B5927C /* Build configuration list for PBXNativeTarget "D2ReaderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFC9EE4F1A9C971100B5927C /* Debug */,
+				FFC9EE501A9C971100B5927C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		FFCB3AF11A78A12700F52BC6 /* Build configuration list for PBXProject "Dumpling2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>D2Reader.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
 		<key>D2consumer.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -22,6 +27,16 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>FFC9EE301A9C971000B5927C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>FFC9EE441A9C971000B5927C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>FFCB3AF61A78A12700F52BC6</key>
 		<dict>
 			<key>primary</key>

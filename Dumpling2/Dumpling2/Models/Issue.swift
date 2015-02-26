@@ -10,21 +10,39 @@ import UIKit
 //import Realm
 
 //Issue object
-class Issue: RLMObject {
-    dynamic var globalId = ""
+public class Issue: RLMObject {
+    dynamic public var globalId = ""
     dynamic var appleId = ""
-    dynamic var title = ""
-    dynamic var issueDesc = "" //description
-    dynamic var assetFolder = ""
-    dynamic var coverImageId = "" //globalId of asset
-    dynamic var iconImageURL = ""
-    dynamic var publishedDate = NSDate()
-    dynamic var lastUpdateDate = ""
-    dynamic var displayDate = ""
-    dynamic var metadata = ""
-    dynamic var magazine = Magazine()
+    dynamic public var title = ""
+    dynamic public var issueDesc = "" //description
+    dynamic public var assetFolder = ""
+    dynamic public var coverImageId = "" //globalId of asset
+    dynamic public var iconImageURL = ""
+    dynamic public var publishedDate = NSDate()
+    dynamic public var lastUpdateDate = ""
+    dynamic public var displayDate = ""
+    dynamic public var metadata = ""
+    //dynamic var magazine = Magazine()
     
-    override class func primaryKey() -> String {
+    override public class func primaryKey() -> String {
         return "globalId"
+    }
+    
+    //Get details for a specific key from custom meta of an issue
+    public func getValue(key: NSString) -> AnyObject? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = '%@'", self.globalId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            var issue: Issue =  issues.firstObject() as Issue
+            var metadata: AnyObject? = Helper.jsonFromString(issue.metadata)
+            if let metadataDict = metadata as? NSDictionary {
+                return metadataDict.valueForKey(key)
+            }
+        }
+        
+        return nil
     }
 }

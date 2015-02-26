@@ -16,8 +16,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIC-y2-B9R">
-                                <rect key="frame" x="257" y="135" width="86" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aIC-y2-B9R">
+                                <rect key="frame" x="266" y="135" width="69" height="30"/>
                                 <state key="normal" title="Import zip">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -25,8 +25,8 @@
                                     <action selector="importZip" destination="vXZ-lx-hvc" eventType="touchUpInside" id="oui-Ml-lGM"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yXi-CP-r2Z">
-                                <rect key="frame" x="261" y="183" width="79" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yXi-CP-r2Z">
+                                <rect key="frame" x="274" y="183" width="55" height="30"/>
                                 <state key="normal" title="Use API">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -36,6 +36,12 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="aIC-y2-B9R" secondAttribute="centerX" id="Hx9-1Y-uri"/>
+                            <constraint firstItem="aIC-y2-B9R" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="115" id="Yo4-Mq-IZq"/>
+                            <constraint firstItem="yXi-CP-r2Z" firstAttribute="top" secondItem="aIC-y2-B9R" secondAttribute="bottom" constant="18" id="f7Y-Yk-zRD"/>
+                            <constraint firstItem="yXi-CP-r2Z" firstAttribute="centerX" secondItem="aIC-y2-B9R" secondAttribute="centerX" constant="0.5" id="k8z-lf-BBy"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

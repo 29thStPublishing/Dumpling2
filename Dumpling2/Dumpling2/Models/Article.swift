@@ -149,7 +149,7 @@ class Article: RLMObject {
                 currentArticle.globalId = articleId
                 currentArticle.placement = placement
                 currentArticle.issueId = issue.globalId
-                currentArticle.title = articleInfo.valueForKey("headline") as String
+                currentArticle.title = articleInfo.valueForKey("title") as String
                 currentArticle.body = articleInfo.valueForKey("body") as String
                 currentArticle.articleDesc = articleInfo.valueForKey("description") as String
                 currentArticle.authorName = articleInfo.valueForKey("authorName") as String
