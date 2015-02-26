@@ -39,3 +39,14 @@ issueHandler.addIssueZip(appleId)
 //For issues from API
 issueHandler.addIssueFromAPI("54c829c639cc76043772948d")
 ```
+
+### Other points
+
+1. To check whether data was inserted into Realm properly or not, you can use Realm browser. The browser can be found in their [release zip](http://static.realm.io/downloads/cocoa/latest) under browser/. Open the Documents directory for your app on Simulator. You will find the Realm database here (if you have not specified a different folder path when initializing IssueHandler). Open the database with Realm browser and you can browse throguh all the data
+2. To see how the framework can be used for adding data to the database (using a zip or from the API), compile and run the D2consumer target
+3. To see how the framework can be used for reading data from the database, compile and run the D2Reader target
+
+**NOTE** - D2Reader and D2consumer will only be able to work (and share the Realm database) if they have App Sharing turned on and you use a folder name shared by both when creating IssueHandler object. For that you will need an app id with App Groups enabled and set the app group in Capabilities for both D2consumer and D2Reader. Without these, you will have to use the "Read" call from within the Consumer target.
+
+
+*The Documents directory is here ~/Library/Developer/CoreSimulator/Devices/Your_simulator_UDID/data/Containers/Data/Application/Your_app_UDID/Documents

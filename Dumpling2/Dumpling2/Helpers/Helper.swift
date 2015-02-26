@@ -8,7 +8,7 @@
 
 import UIKit
 
-let baseURL: String = "http://54.210.137.153:5601/"
+let baseURL: String = "http://52.1.9.236:5601/"
 var apiKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 class Helper {

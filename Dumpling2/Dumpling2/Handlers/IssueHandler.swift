@@ -7,7 +7,6 @@
 //
 
 import UIKit
-//import Realm
 
 public class IssueHandler: NSObject {
     
@@ -76,7 +75,7 @@ public class IssueHandler: NSObject {
     
     
     //Get issue details from Realm database for a specific global id
-    func getIssueFromRealm(issueId: NSString) -> Issue? {
+    public func getIssue(issueId: NSString) -> Issue? {
         
         let realm = RLMRealm.defaultRealm()
         
@@ -239,9 +238,8 @@ public class IssueHandler: NSObject {
         currentIssue.appleId = issue.valueForKey("sku") as String
         
         //SKU SHOULD NEVER be blank. Right now it is blank. So using globalId
-        currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.globalId)"
-        //TODO: Change this
-        //currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
+        //currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.globalId)"
+        currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         var isDir: ObjCBool = false
         if NSFileManager.defaultManager().fileExistsAtPath(currentIssue.assetFolder, isDirectory: &isDir) {
@@ -259,7 +257,17 @@ public class IssueHandler: NSObject {
             currentIssue.coverImageId = assetId
         }
         
+        if let metadata: AnyObject = issue.objectForKey("customMeta") {
+            if metadata.isKindOfClass(NSDictionary) {
+                currentIssue.metadata = Helper.stringFromJSON(metadata)!
+            }
+            else {
+                currentIssue.metadata = metadata as String
+            }
+        }
+        
         //TODO: Add featured article id if any
+        //Not getting this info from the server yet
         
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
@@ -281,6 +289,28 @@ public class IssueHandler: NSObject {
         }
         
         return 0
+    }
+    
+    //Get all issues - this is just a test function for me
+    public func listIssues() {
+        let manager = AFHTTPRequestOperationManager()
+        
+        let authorization = "method=apikey,token=\(apiKey)"
+        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
+        
+        let requestURL = "\(baseURL)issues"
+        
+        manager.GET(requestURL,
+            parameters: nil,
+            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
+                
+                var response: NSDictionary = responseObject as NSDictionary
+                println("ISSUES: \(response)")
+            },
+            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
+                
+                println("Error: " + error.localizedDescription)
+        })
     }
     
 }
