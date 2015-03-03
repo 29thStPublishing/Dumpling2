@@ -266,9 +266,6 @@ public class IssueHandler: NSObject {
             }
         }
         
-        //TODO: Add featured article id if any
-        //Not getting this info from the server yet
-        
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
         

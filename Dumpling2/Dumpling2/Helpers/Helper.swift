@@ -11,6 +11,10 @@ import UIKit
 let baseURL: String = "http://52.1.9.236:5601/"
 var apiKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
+let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
+let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
+let DOWNLOAD_COMPLETE: String = "downloadComplete"
+
 class Helper {
     
     class func publishedDateFrom(string: String) -> NSDate {

@@ -34,10 +34,11 @@ class ViewController: UIViewController {
         let container = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Dumpling2Test")
         let directory = container?.path
         
-        var issueHandler = IssueHandler(folder: directory)
+        //Uncomment when using a shared folder
+        //var issueHandler = IssueHandler(folder: directory!)
         
-        //When not using shared folders
-        //var issueHandler = IssueHandler()
+        //Uncomment when not using shared folders
+        var issueHandler = IssueHandler()
         issueHandler.addIssueFromAPI("54c829c639cc76043772948d")
     }
     
@@ -51,6 +52,32 @@ class ViewController: UIViewController {
         
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
+    
+    //Get issue details
+    func readIssueDetails () {
+        var issueHandler = IssueHandler()
+        var issue: Issue? = issueHandler.getIssue("54c829c639cc76043772948d")?
+        
+        if let currentIssue = issue {
+            var message = "Issue id: \(currentIssue.globalId)\nTitle: \(currentIssue.title)\nDisplay date: \(currentIssue.displayDate)"
+            
+            var alert = UIAlertController(title: "Issue details", message: message, preferredStyle: UIAlertControllerStyle.Alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
+        }
+    }
+    
+    //Get articles array for an issue
+    func getArticlesForIssue () {
+        var articlesArray: NSArray? = Article.getArticlesFor("54c829c639cc76043772948d")?
+        
+        if (articlesArray != nil) {
+            //Iterate through the array and view each article's details
+        }
+    }
+    
+    //TODO: Add a method which gets all issues from the API and adds them to realm
+    
 
 }
 

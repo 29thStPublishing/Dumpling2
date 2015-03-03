@@ -28,10 +28,11 @@ class ConsumerViewController: UIViewController {
         let container = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Dumpling2Test")
         let directory = container?.path
         
-        var issueHandler = IssueHandler(folder: directory!)
+        //Uncomment when using a shared folder
+        //var issueHandler = IssueHandler(folder: directory!)
         
-        //When not using shared folders
-        //var issueHandler = IssueHandler()
+        //Uncomment when not using shared folders
+        var issueHandler = IssueHandler()
         var issue: Issue? = issueHandler.getIssue("54c829c639cc76043772948d")?
         
         if let currentIssue = issue {

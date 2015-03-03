@@ -10,55 +10,32 @@ import UIKit
 //import Realm
 
 //Article object
-class Article: RLMObject {
-    dynamic var globalId = ""
-    dynamic var title = ""
-    dynamic var articleDesc = "" //description
-    dynamic var slug = ""
-    dynamic var dek = ""
-    dynamic var body = ""
-    dynamic var permalink = "" //keeping URLs as string - we might need to append parts to get the final
-    dynamic var url = ""
-    dynamic var sourceURL = ""
-    dynamic var authorName = ""
-    dynamic var authorURL = ""
-    dynamic var section = ""
-    dynamic var articleType = ""
-    dynamic var keywords = ""
-    dynamic var commentary = ""
-    dynamic var metadata = ""
-    dynamic var versionStashed = ""
-    dynamic var placement = 0
-    dynamic var mainImageURL = ""
-    dynamic var thumbImageURL = ""
-    dynamic var isFeatured = false
+public class Article: RLMObject {
+    dynamic public var globalId = ""
+    dynamic public var title = ""
+    dynamic public var articleDesc = "" //description
+    dynamic public var slug = ""
+    dynamic public var dek = ""
+    dynamic public var body = ""
+    dynamic public var permalink = "" //keeping URLs as string - we might need to append parts to get the final
+    dynamic public var url = ""
+    dynamic public var sourceURL = ""
+    dynamic public var authorName = ""
+    dynamic public var authorURL = ""
+    dynamic public var section = ""
+    dynamic public var articleType = ""
+    dynamic public var keywords = ""
+    dynamic public var commentary = ""
+    dynamic public var metadata = ""
+    dynamic public var versionStashed = ""
+    dynamic public var placement = 0
+    dynamic public var mainImageURL = ""
+    dynamic public var thumbImageURL = ""
+    dynamic public var isFeatured = false
     dynamic var issueId = "" //globalId of issue
     
-    override class func primaryKey() -> String {
+    override public class func primaryKey() -> String {
         return "globalId"
-    }
-    
-    //Delete articles and assets for a specific issue
-    class func deleteArticlesFor(globalId: NSString) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "issueId = '%@'", globalId)
-        var articles = Article.objectsWithPredicate(predicate)
-        
-        var articleIds = NSMutableArray()
-        //go through each article and delete all assets associated with it
-        for article in articles {
-            let article = article as Article
-            articleIds.addObject(article.globalId)
-        }
-        
-        Asset.deleteAssetsForIssue(globalId)
-        Asset.deleteAssetsForArticles(articleIds)
-        
-        //Delete articles
-        realm.beginWriteTransaction()
-        realm.deleteObjects(articles)
-        realm.commitWriteTransaction()
     }
     
     //Add article
@@ -201,6 +178,81 @@ class Article: RLMObject {
                 
                 println("Error: " + error.localizedDescription)
         })
+    }
+    
+    
+    // MARK: Public methods
+    
+    //Delete articles and assets for a specific issue
+    public class func deleteArticlesFor(issueId: NSString) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId = '%@'", issueId)
+        var articles = Article.objectsWithPredicate(predicate)
+        
+        var articleIds = NSMutableArray()
+        //go through each article and delete all assets associated with it
+        for article in articles {
+            let article = article as Article
+            articleIds.addObject(article.globalId)
+        }
+        
+        Asset.deleteAssetsForIssue(issueId)
+        Asset.deleteAssetsForArticles(articleIds)
+        
+        //Delete articles
+        realm.beginWriteTransaction()
+        realm.deleteObjects(articles)
+        realm.commitWriteTransaction()
+    }
+    
+    //Get all articles for a specific issue
+    public class func getArticlesFor(issueId: NSString) -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId = '%@'", issueId)
+        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        
+        if articles.count > 0 {
+            var array = NSMutableArray()
+            for object in articles {
+                let obj: Article = object as Article
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    //Get all  featuredarticles for a specific issue
+    public class func getFeaturedArticlesFor(issueId: NSString) -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId = '%@' AND isFeatured = true", issueId)
+        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        
+        if articles.count > 0 {
+            var array = NSMutableArray()
+            for object in articles {
+                let obj: Article = object as Article
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    //Get details for a specific key from custom meta of an article
+    public func getValue(key: NSString) -> AnyObject? {
+        
+        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+        if let metadataDict = metadata as? NSDictionary {
+            return metadataDict.valueForKey(key)
+        }
+        
+        return nil
     }
 
 }

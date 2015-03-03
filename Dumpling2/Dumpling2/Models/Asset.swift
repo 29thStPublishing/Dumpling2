@@ -14,23 +14,23 @@ enum AssetType: String {
     case Sound = "sound"
 }
 //Asset object
-class Asset: RLMObject {
-    dynamic var globalId = ""
-    dynamic var caption = ""
-    dynamic var source = ""
-    dynamic var squareURL = ""
-    dynamic var originalURL = ""
-    dynamic var mainPortraitURL = ""
-    dynamic var mainLandscapeURL = ""
-    dynamic var iconURL = ""
-    dynamic var metadata = ""
-    dynamic var type = AssetType.Photo.rawValue //default to a photo
-    dynamic var placement = 0
-    dynamic var fullFolderPath = ""
-    dynamic var articleId = "" //globalId of associated article
-    dynamic var issue = Issue() //an asset can belong to an article or an issue
+public class Asset: RLMObject {
+    dynamic public var globalId = ""
+    dynamic public var caption = ""
+    dynamic public var source = ""
+    dynamic public var squareURL = ""
+    dynamic public var originalURL = ""
+    dynamic public var mainPortraitURL = ""
+    dynamic public var mainLandscapeURL = ""
+    dynamic public var iconURL = ""
+    dynamic public var metadata = ""
+    dynamic public var type = AssetType.Photo.rawValue //default to a photo
+    dynamic public var placement = 0
+    dynamic public var fullFolderPath = ""
+    dynamic public var articleId = "" //globalId of associated article
+    dynamic public var issue = Issue() //an asset can belong to an article or an issue
     
-    override class func primaryKey() -> String {
+    override public class func primaryKey() -> String {
         return "globalId"
     }
     
@@ -186,57 +186,6 @@ class Asset: RLMObject {
         })
     }
     
-    //Retrieve asset
-    class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
-        var assets = Asset.objectsWithPredicate(predicate)
-        
-        if assets.count > 0 {
-            return assets.firstObject() as? Asset
-        }
-        
-        return nil
-    }
-    
-    //Delete all assets for a single article
-    class func deleteAssetsFor(articleId: NSString) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "articleId = '%@'", articleId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
-    }
-    
-    
-    //Delete all assets for multiple articles
-    class func deleteAssetsForArticles(articles: NSArray) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "articleId IN %@", articles)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
-    }
-    
-    //Delete all assets for a single issue
-    class func deleteAssetsForIssue(globalId: NSString) {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "issue.globalId = '%@'", globalId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
-        realm.beginWriteTransaction()
-        realm.deleteObjects(results)
-        realm.commitWriteTransaction()
-    }
-    
     //Saves an image from a remote URL
     func saveImageFromURL(path: String, toFolder: String) {
         var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
@@ -256,5 +205,150 @@ class Asset: RLMObject {
         })
         
         downloadTask.resume();
+    }
+    
+    //Delete all assets for a single article
+    class func deleteAssetsFor(articleId: NSString) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "articleId = '%@'", articleId)
+        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        var fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as Asset
+            let originalURL = assetDetails.originalURL
+            fileManager.removeItemAtPath(originalURL, error: nil)
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
+    }
+    
+    
+    //Delete all assets for multiple articles
+    class func deleteAssetsForArticles(articles: NSArray) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "articleId IN %@", articles)
+        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        var fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as Asset
+            let originalURL = assetDetails.originalURL
+            fileManager.removeItemAtPath(originalURL, error: nil)
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
+    }
+    
+    //Delete all assets for a single issue
+    class func deleteAssetsForIssue(globalId: NSString) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issue.globalId = '%@'", globalId)
+        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        var fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as Asset
+            let originalURL = assetDetails.originalURL
+            fileManager.removeItemAtPath(originalURL, error: nil)
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
+    }
+    
+    // MARK: Public methods
+    
+    //Delete a specific asset
+    public class func deleteAsset(assetId: NSString) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = '%@'", assetId)
+        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        var fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as Asset
+            let originalURL = assetDetails.originalURL
+            fileManager.removeItemAtPath(originalURL, error: nil)
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
+    }
+    
+    //Retrieve first asset for an issue/article
+    //articleId will be blank if this is an issue's asset
+    public class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
+        var assets = Asset.objectsWithPredicate(predicate)
+        
+        if assets.count > 0 {
+            return assets.firstObject() as? Asset
+        }
+        
+        return nil
+    }
+    
+    //Retrieve number of assets for an issue/article
+    public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
+        var assets = Asset.objectsWithPredicate(predicate)
+        
+        if assets.count > 0 {
+            return assets.count
+        }
+        
+        return 0
+    }
+    
+    //Retrieve a specific asset
+    public class func getAsset(assetId: String) -> Asset? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = '%@'", assetId)
+        var assets = Asset.objectsWithPredicate(predicate)
+        
+        if assets.count > 0 {
+            return assets.firstObject() as? Asset
+        }
+        
+        return nil
+    }
+    
+    //Retrieve all sound files for an article/issue as a playlist/array
+    public class func getPlaylistFor(issueId: String, articleId: String) -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND type = 'sound'", issueId, articleId)
+        var assets = Asset.objectsWithPredicate(predicate)
+        
+        if assets.count > 0 {
+            var array = NSMutableArray()
+            for object in assets {
+                let obj: Asset = object as Asset
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
     }
 }
