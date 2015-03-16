@@ -63,11 +63,69 @@ public class Issue: RLMObject {
         }
     }
     
+    //Find most recent issue
     public class func getNewestIssue() -> Issue? {
         let realm = RLMRealm.defaultRealm()
         
-        //TODO: Check why arraySortedByProperty doesnt work
-        //var results = Issue.allObjects().arraySortedByProperty("publishedDate", ascending: true)
+        var results = Issue.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
+        
+        if results.count > 0 {
+            var newestIssue = results.firstObject() as Issue
+            return newestIssue
+        }
+        
+        return nil
+    }
+    
+    //Find issue before a given issue
+    public func getOlderIssues() -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate)
+        var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        
+        if issues.count > 0 {
+            var array = NSMutableArray()
+            for object in issues {
+                let obj: Issue = object as Issue
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    //Find issue newer than a given issue
+    public func getNewerIssues() -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate)
+        var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        
+        if issues.count > 0 {
+            var array = NSMutableArray()
+            for object in issues {
+                let obj: Issue = object as Issue
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    //Get the issue for a specific Apple id
+    public class func getIssueFor(appleId: String) -> Issue? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "appleId = '%@'", appleId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            return issues.firstObject() as? Issue
+        }
+        
         return nil
     }
 }

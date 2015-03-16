@@ -10,8 +10,9 @@ import UIKit
 //import Realm
 
 enum AssetType: String {
-    case Photo = "photo"
+    case Image = "image"
     case Sound = "sound"
+    case Video = "video"
 }
 //Asset object
 public class Asset: RLMObject {
@@ -24,7 +25,7 @@ public class Asset: RLMObject {
     dynamic public var mainLandscapeURL = ""
     dynamic public var iconURL = ""
     dynamic public var metadata = ""
-    dynamic public var type = AssetType.Photo.rawValue //default to a photo
+    dynamic public var type = AssetType.Image.rawValue //default to a photo
     dynamic public var placement = 0
     dynamic public var fullFolderPath = ""
     dynamic public var articleId = "" //globalId of associated article
@@ -41,6 +42,15 @@ public class Asset: RLMObject {
     
     //Add any asset (sound/image)
     class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, sound: Bool, placement: Int) {
+        var type = AssetType.Image.rawValue
+        if sound {
+            type = AssetType.Sound.rawValue
+        }
+        createAsset(asset, issue: issue, articleId: articleId, type: type, placement: placement)
+    }
+    
+    //Add any asset (sound/image/anything else)
+    class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, type: String, placement: Int) {
         let realm = RLMRealm.defaultRealm()
         
         var globalId = asset.objectForKey("id") as String
@@ -71,12 +81,7 @@ public class Asset: RLMObject {
         currentAsset.issue = issue
         currentAsset.articleId = articleId
         
-        if sound {
-            currentAsset.type = AssetType.Sound.rawValue
-        }
-        else {
-            currentAsset.type = AssetType.Photo.rawValue
-        }
+        currentAsset.type = type
         
         var value = asset.objectForKey("crop_350_350") as String
         currentAsset.squareURL = "\(issue.assetFolder)/\(value)"
@@ -156,15 +161,21 @@ public class Asset: RLMObject {
                 var meta = mediaFile.objectForKey("meta") as NSDictionary
                 var dataType = meta.objectForKey("type") as NSString
                 if dataType.isEqualToString("image") {
-                    currentAsset.type = AssetType.Photo.rawValue
+                    currentAsset.type = AssetType.Image.rawValue
+                }
+                else if dataType.isEqualToString("audio") {
+                    currentAsset.type = AssetType.Sound.rawValue
+                }
+                else if dataType.isEqualToString("video") {
+                    currentAsset.type = AssetType.Video.rawValue
                 }
                 else {
-                    currentAsset.type = AssetType.Sound.rawValue
+                    currentAsset.type = dataType
                 }
                 currentAsset.placement = placement
                 
                 let fileUrl = mediaFile.valueForKey("url") as String
-                currentAsset.saveImageFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
+                currentAsset.saveFileFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
                 currentAsset.originalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -186,8 +197,8 @@ public class Asset: RLMObject {
         })
     }
     
-    //Saves an image from a remote URL
-    func saveImageFromURL(path: String, toFolder: String) {
+    //Saves a file from a remote URL
+    func saveFileFromURL(path: String, toFolder: String) {
         var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         var man = AFURLSessionManager(sessionConfiguration: configuration)
         var url = NSURL(string: path)
@@ -295,11 +306,21 @@ public class Asset: RLMObject {
     public class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
-        var assets = Asset.objectsWithPredicate(predicate)
+        if issueId == "" {
+            let predicate = NSPredicate(format: "articleId = '%@' AND placement = 1 AND type = 'image'", issueId, articleId)
+            var assets = Asset.objectsWithPredicate(predicate)
+            
+            if assets.count > 0 {
+                return assets.firstObject() as? Asset
+            }
+        }
+        else {
+            let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1 AND type = 'image'", issueId, articleId)
+            var assets = Asset.objectsWithPredicate(predicate)
         
-        if assets.count > 0 {
-            return assets.firstObject() as? Asset
+            if assets.count > 0 {
+                return assets.firstObject() as? Asset
+            }
         }
         
         return nil
@@ -309,7 +330,7 @@ public class Asset: RLMObject {
     public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1", issueId, articleId)
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@'", issueId, articleId)
         var assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -317,6 +338,35 @@ public class Asset: RLMObject {
         }
         
         return 0
+    }
+    
+    //Retrieve all assets for an issue/article (of a specific type: optional)
+    public class func getNumberOfAssetsFor(issueId: String, articleId: String, type: String?) -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        var subPredicates = NSMutableArray()
+        
+        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@'", issueId, articleId)
+        subPredicates.addObject(predicate!)
+
+        if type != nil {
+            var assetPredicate = NSPredicate(format: "type = '%@'", type!)
+            subPredicates.addObject(assetPredicate!)
+        }
+        
+        let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+        var assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
+        
+        if assets.count > 0 {
+            var array = NSMutableArray()
+            for object in assets {
+                let obj: Asset = object as Asset
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
     }
     
     //Retrieve a specific asset

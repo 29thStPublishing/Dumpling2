@@ -12,11 +12,13 @@ let baseURL: String = "http://52.1.9.236:5601/"
 var apiKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
+let ISSUE_ASSET_DOWNLOAD_COMPLETE: String = "issueAssetDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
-let DOWNLOAD_COMPLETE: String = "downloadComplete"
+let DOWNLOAD_COMPLETE: String = "downloadComplete" //Issue + Article + Issue assets + Article assets downloaded
 
 class Helper {
     
+    //Date from string of format MM/dd/yyyy
     class func publishedDateFrom(string: String) -> NSDate {
         var dummyDate = NSDate()
         
@@ -40,6 +42,7 @@ class Helper {
         return date!
     }
 
+    //Date from string of ISO format
     class func publishedDateFromISO(string: String) -> NSDate {
         var dateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"

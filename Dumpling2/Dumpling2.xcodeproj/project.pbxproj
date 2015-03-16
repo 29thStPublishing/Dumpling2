@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; };
 		FFC9EE361A9C971000B5927C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC9EE351A9C971000B5927C /* AppDelegate.swift */; };
 		FFC9EE381A9C971000B5927C /* ConsumerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC9EE371A9C971000B5927C /* ConsumerViewController.swift */; };
 		FFC9EE3B1A9C971000B5927C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FFC9EE391A9C971000B5927C /* Main.storyboard */; };
@@ -65,9 +66,9 @@
 		FFCF42511A7A582B00E847E8 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCF42441A7A582B00E847E8 /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCF42521A7A582B00E847E8 /* RLMResults.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCF42451A7A582B00E847E8 /* RLMResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCF42531A7A582B00E847E8 /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCF42461A7A582B00E847E8 /* RLMSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FFCF42541A7A582B00E847E8 /* RLMSwiftHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCF42471A7A582B00E847E8 /* RLMSwiftHelpers.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCF42561A7A592100E847E8 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCF42551A7A592100E847E8 /* Realm */; };
 		FFCF6D0F1A7F42BF008DF718 /* Dumpling2.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCB3AFC1A78A12700F52BC6 /* Dumpling2.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFD501BE1AB18E140091A194 /* RLMObjectBase.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD501BD1AB18E140091A194 /* RLMObjectBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +124,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NewsstandKit.framework; path = System/Library/Frameworks/NewsstandKit.framework; sourceTree = SDKROOT; };
 		FFC9EE311A9C971000B5927C /* D2Reader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = D2Reader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFC9EE341A9C971000B5927C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FFC9EE351A9C971000B5927C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -192,8 +194,8 @@
 		FFCF42441A7A582B00E847E8 /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm.h; sourceTree = "<group>"; };
 		FFCF42451A7A582B00E847E8 /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
 		FFCF42461A7A582B00E847E8 /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema.h; sourceTree = "<group>"; };
-		FFCF42471A7A582B00E847E8 /* RLMSwiftHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftHelpers.h; sourceTree = "<group>"; };
 		FFCF42551A7A592100E847E8 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
+		FFD501BD1AB18E140091A194 /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */,
 				FFCB3B9F1A79076700F52BC6 /* libc++.dylib in Frameworks */,
 				FFCB3B311A78E51D00F52BC6 /* libz.dylib in Frameworks */,
 				FFCB3B9D1A79000500F52BC6 /* libZipArchive-ios.a in Frameworks */,
@@ -250,6 +253,7 @@
 		F1B16F3685C54536E0868F50 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -467,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				FFCF42551A7A592100E847E8 /* Realm */,
+				FFD501BD1AB18E140091A194 /* RLMObjectBase.h */,
 				FFCF423B1A7A582B00E847E8 /* Realm.h */,
 				FFCF423C1A7A582B00E847E8 /* RLMArray.h */,
 				FFCF423D1A7A582B00E847E8 /* RLMCollection.h */,
@@ -479,7 +484,6 @@
 				FFCF42441A7A582B00E847E8 /* RLMRealm.h */,
 				FFCF42451A7A582B00E847E8 /* RLMResults.h */,
 				FFCF42461A7A582B00E847E8 /* RLMSchema.h */,
-				FFCF42471A7A582B00E847E8 /* RLMSwiftHelpers.h */,
 			);
 			name = RHeaders;
 			path = Dumpling2/RHeaders;
@@ -502,6 +506,7 @@
 				FFCF424E1A7A582B00E847E8 /* RLMObjectSchema.h in Headers */,
 				FFCF424D1A7A582B00E847E8 /* RLMObject.h in Headers */,
 				FFCA0FE31A80DBF1000C9AFD /* AFURLResponseSerialization.h in Headers */,
+				FFD501BE1AB18E140091A194 /* RLMObjectBase.h in Headers */,
 				FFCA0FE51A80DBF1000C9AFD /* AFURLSessionManager.h in Headers */,
 				FFCA0FD81A80DBF1000C9AFD /* AFHTTPSessionManager.h in Headers */,
 				FFCF424B1A7A582B00E847E8 /* RLMConstants.h in Headers */,
@@ -511,7 +516,6 @@
 				FFCF42531A7A582B00E847E8 /* RLMSchema.h in Headers */,
 				FFCF6D0F1A7F42BF008DF718 /* Dumpling2.h in Headers */,
 				FFCA0FE11A80DBF1000C9AFD /* AFURLRequestSerialization.h in Headers */,
-				FFCF42541A7A582B00E847E8 /* RLMSwiftHelpers.h in Headers */,
 				FFCA0FD41A80DBF1000C9AFD /* AFHTTPRequestOperation.h in Headers */,
 				FFCA0FDB1A80DBF1000C9AFD /* AFNetworkReachabilityManager.h in Headers */,
 				FFCA0FDD1A80DBF1000C9AFD /* AFSecurityPolicy.h in Headers */,
@@ -1201,6 +1205,7 @@
 				FFC9EE4E1A9C971100B5927C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FFC9EE521A9C971100B5927C /* Build configuration list for PBXNativeTarget "D2ReaderTests" */ = {
 			isa = XCConfigurationList;
@@ -1209,6 +1214,7 @@
 				FFC9EE501A9C971100B5927C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FFCB3AF11A78A12700F52BC6 /* Build configuration list for PBXProject "Dumpling2" */ = {
 			isa = XCConfigurationList;
