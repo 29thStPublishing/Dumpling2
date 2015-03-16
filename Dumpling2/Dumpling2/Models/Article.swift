@@ -7,7 +7,9 @@
 //
 
 import UIKit
-//import Realm
+
+var assetPattern: String = "<!-- \\[ASSET: .+\\] -->"
+var assetPatternParts: [String] = ["<!-- [ASSET: ", "] -->"]
 
 //Article object
 public class Article: RLMObject {
@@ -26,13 +28,14 @@ public class Article: RLMObject {
     dynamic public var articleType = ""
     dynamic public var keywords = ""
     dynamic public var commentary = ""
+    dynamic public var date = NSDate()
     dynamic public var metadata = ""
     dynamic public var versionStashed = ""
     dynamic public var placement = 0
     dynamic public var mainImageURL = ""
     dynamic public var thumbImageURL = ""
     dynamic public var isFeatured = false
-    dynamic var issueId = "" //globalId of issue
+    dynamic var issueId = "" //globalId of issue, can be blank for independent articles
     
     override public class func primaryKey() -> String {
         return "globalId"
@@ -56,6 +59,12 @@ public class Article: RLMObject {
         currentArticle.keywords = article.objectForKey("keywords") as String
         currentArticle.commentary = article.objectForKey("commentary") as String
         currentArticle.articleType = article.objectForKey("type") as String
+        
+        var updateDate = article.objectForKey("date_last_updated") as String
+        if updateDate != "" {
+            currentArticle.date = Helper.publishedDateFromISO(updateDate)
+        }
+        
         var metadata: AnyObject! = article.objectForKey("metadata")
         if metadata.isKindOfClass(NSDictionary) {
             currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
@@ -141,6 +150,11 @@ public class Article: RLMObject {
                 var featured = meta.valueForKey("featured") as NSNumber
                 currentArticle.isFeatured = featured.boolValue
                 
+                var updated = meta.valueForKey("updated") as NSDictionary
+                if let updateDate: String = updated.valueForKey("date") as? String {
+                    currentArticle.date = Helper.publishedDateFromISO(updateDate)
+                }
+                
                 if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
                         currentArticle.metadata = Helper.stringFromJSON(metadata)!
@@ -180,8 +194,171 @@ public class Article: RLMObject {
         })
     }
     
+    //Get Article details from API
+    func retrieveArticleFromAPI(issueId: String, articleId: String) {
+        let manager = AFHTTPRequestOperationManager()
+        let authorization = "method=apikey,token=\(apiKey)"
+        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
+        
+        let requestURL = "\(baseURL)articles/\(articleId)"
+        
+        manager.GET(requestURL,
+            parameters: nil,
+            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
+                
+                var articleDetails: NSDictionary = responseObject as NSDictionary
+                //Add to database?
+                
+            },
+            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
+                
+                println("Error: " + error.localizedDescription)
+        })
+    }
+    
     
     // MARK: Public methods
+    
+    //Change the asset pattern
+    public class func setAssetPattern(newPattern: String) {
+        assetPattern = newPattern
+    }
+    
+    //Replace asset pattern with actual assets in an Article body
+    public func replacePatternsWithAssets() -> NSString {
+        //Should work for images, audio, video or any other types of assets
+        var regex = NSRegularExpression(pattern: assetPattern, options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
+        
+        var articleBody = self.body
+        var matches = regex?.matchesInString(articleBody, options: nil, range: NSMakeRange(0, articleBody.utf16Count)) as Array<NSTextCheckingResult>
+        
+        var updatedBody: NSString = articleBody
+        
+        if matches.count > 0 {
+            for match: NSTextCheckingResult in matches {
+                let matchRange = match.range
+                var range = NSRange(location: matchRange.location, length: matchRange.length)
+                var matchedString: NSString = (articleBody as NSString).substringWithRange(range) as NSString
+                var originallyMatched = matchedString
+                
+                //Get global id for the asset
+                for patternPart in assetPatternParts {
+                    matchedString = matchedString.stringByReplacingOccurrencesOfString(patternPart, withString: "", options: nil, range: NSMakeRange(0, matchedString.length))
+                }
+                
+                //Find asset with the global id
+                if let asset = Asset.getAsset(matchedString) {
+                    //Use the asset - generate an HTML with the asset file URL (image, audio, video)
+                    var originalAssetPath = asset.originalURL
+                    var fileURL = NSURL(fileURLWithPath: originalAssetPath)
+                    
+                    //Replace with HTML tags
+                    var finalHTML = "<div class='article_image'>"
+                    if asset.type == "image" {
+                        finalHTML += "<img src='\(fileURL)' alt='Tap to enlarge image' />"
+                    }
+                    else if asset.type == "sound" {
+                        finalHTML += "<audio src='\(fileURL)' controls='controls' />"
+                    }
+                    else if asset.type == "video" {
+                        finalHTML += "<video src='\(fileURL)' controls />"
+                    }
+                    
+                    //Add caption and source
+                    var captionSource = ""
+                    if asset.source != "" {
+                        captionSource += "<span class='source'>\(asset.source)</span>"
+                    }
+                    if asset.caption != "" {
+                        captionSource += "<span class='caption'>\(asset.caption)</span>"
+                    }
+                    if captionSource != "" {
+                        finalHTML += "<div class='article_caption'>\(captionSource)</div>"
+                    }
+                    finalHTML += "</div>" //closing div
+                    
+                    //Special case - the asset was enclosed in paragraph tags
+                    //Move opening paragraph tag after the asset html in that case
+                    if matchRange.location >= 3 && articleBody.utf16Count > 3 {
+                        var possibleMatchRange = NSMakeRange(matchRange.location - 3, 3)
+                        
+                        if updatedBody.substringWithRange(possibleMatchRange) == "<p>" {
+                            updatedBody = updatedBody.stringByReplacingCharactersInRange(possibleMatchRange, withString: "")
+                            finalHTML += "<p>"
+                        }
+                    }
+                    
+                    updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched, withString: finalHTML)
+                }
+            }
+        }
+        
+        return updatedBody
+    }
+    
+    //Create article not associated with any issue
+    //The structure expected for the dictionary is the same as currently used in zipped format
+    //Images will be stored in Documents folder by default for such articles
+    public class func createIndependentArticle(article: NSDictionary) {
+        let realm = RLMRealm.defaultRealm()
+        
+        var currentArticle = Article()
+        currentArticle.globalId = article.objectForKey("global_id") as String
+        currentArticle.title = article.objectForKey("title") as String
+        currentArticle.body = article.objectForKey("body") as String
+        currentArticle.articleDesc = article.objectForKey("description") as String
+        currentArticle.url = article.objectForKey("url") as String
+        currentArticle.section = article.objectForKey("section") as String
+        currentArticle.authorName = article.objectForKey("author_name") as String
+        currentArticle.sourceURL = article.objectForKey("source") as String
+        currentArticle.dek = article.objectForKey("dek") as String
+        currentArticle.authorURL = article.objectForKey("author_url") as String
+        currentArticle.keywords = article.objectForKey("keywords") as String
+        currentArticle.commentary = article.objectForKey("commentary") as String
+        currentArticle.articleType = article.objectForKey("type") as String
+        var metadata: AnyObject! = article.objectForKey("metadata")
+        if metadata.isKindOfClass(NSDictionary) {
+            currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
+        }
+        else {
+            currentArticle.metadata = metadata as String
+        }
+        
+        currentArticle.versionStashed = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey) as String
+        
+        var issue = Issue()
+        
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var cacheDir: NSString = docPaths[0] as NSString
+        issue.assetFolder = cacheDir
+        
+        //Insert article images
+        if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
+            if orderedArray.count > 0 {
+                for (index, imageDict) in enumerate(orderedArray) {
+                    Asset.createAsset(imageDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
+                }
+            }
+        }
+        
+        //Set thumbnail for article
+        if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId) {
+            currentArticle.thumbImageURL = firstAsset.squareURL as String
+        }
+        
+        //Insert article sound files
+        if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
+            if orderedArray.count > 0 {
+                for (index, soundDict) in enumerate(orderedArray) {
+                    Asset.createAsset(soundDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
+                }
+            }
+        }
+        
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(currentArticle)
+        realm.commitWriteTransaction()
+    }
     
     //Delete articles and assets for a specific issue
     public class func deleteArticlesFor(issueId: NSString) {
@@ -206,11 +383,108 @@ public class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Get all articles for a specific issue
-    public class func getArticlesFor(issueId: NSString) -> NSArray? {
+    //Get all articles for a any issue (or if nil, all issues)
+    //Articles for only a specific type (optional)
+    //Articles excluding a specific type (optional) - all params can be used in conjunction
+    //At least one of the params is needed
+    public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> NSArray? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = '%@'", issueId)
+        var subPredicates = NSMutableArray()
+        
+        if issueId != nil {
+            var predicate = NSPredicate(format: "issueId = '%@'", issueId!)
+            subPredicates.addObject(predicate!)
+        }
+        
+        if type != nil {
+            var typePredicate = NSPredicate(format: "articleType = '%@'", type!)
+            subPredicates.addObject(typePredicate!)
+        }
+        if excludeType != nil {
+            var excludePredicate = NSPredicate(format: "articleType != '%@'", excludeType!)
+            subPredicates.addObject(excludePredicate!)
+        }
+        
+        if subPredicates.count > 0 {
+            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
+            
+            if articles.count > 0 {
+                var array = NSMutableArray()
+                for object in articles {
+                    let obj: Article = object as Article
+                    array.addObject(obj)
+                }
+                return array
+            }
+        }
+        
+        return nil
+    }
+    
+    //Get all articles for an issue (or if nil, all issues) with specific keywords
+    public class func searchArticlesWith(keywords: [String], issueId: String?) -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        var subPredicates = NSMutableArray()
+        
+        for keyword in keywords {
+            var subPredicate = NSPredicate(format: "keywords CONTAINS '%@'", keyword)
+            subPredicates.addObject(subPredicate!)
+        }
+        
+        var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates)
+        
+        subPredicates.removeAllObjects()
+        subPredicates.addObject(orPredicate)
+        
+        if issueId != nil {
+            var predicate = NSPredicate(format: "issueId = '%@'", issueId!)
+            subPredicates.addObject(predicate!)
+        }
+
+        if subPredicates.count > 0 {
+            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
+            
+            if articles.count > 0 {
+                var array = NSMutableArray()
+                for object in articles {
+                    let obj: Article = object as Article
+                    array.addObject(obj)
+                }
+                return array
+            }
+        }
+        
+        return nil
+    }
+    
+    //Get all articles newer than a specific article
+    public func getNewerArticles() -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId = '%@' AND date > %@", self.issueId, self.date)
+        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        
+        if articles.count > 0 {
+            var array = NSMutableArray()
+            for object in articles {
+                let obj: Article = object as Article
+                array.addObject(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    //Get all articles older than a specific article
+    public func getOlderArticles() -> NSArray? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId = '%@' AND date < %@", self.issueId, self.date)
         var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {

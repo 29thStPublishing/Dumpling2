@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMCollection.h"
+//#import <Realm/RLMCollection.h>
 
 @class RLMObject, RLMRealm, RLMResults;
 
@@ -55,6 +56,11 @@
  The Realm in which this array is persisted. Returns nil for standalone arrays.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
+
+/**
+ Indicates if an array can no longer be accessed.
+ */
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
 #pragma mark -
 
@@ -293,5 +299,10 @@
  */
 - (instancetype)reversedSortDescriptor;
 
+@end
+
+
+@interface RLMArray (Private)
+- (instancetype)initWithObjectClassName:(NSString *)objectClassName;
 @end
 

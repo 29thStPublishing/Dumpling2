@@ -24,8 +24,7 @@
 #import <Realm/RLMPlatform.h>
 #import <Realm/RLMRealm.h>
 #import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSwiftHelpers.h>*/
+#import <Realm/RLMSchema.h>*/
 #import "RLMArray.h"
 #import "RLMMigration.h"
 #import "RLMObject.h"
@@ -33,4 +32,3 @@
 #import "RLMRealm.h"
 #import "RLMResults.h"
 #import "RLMSchema.h"
-#import "RLMSwiftHelpers.h"

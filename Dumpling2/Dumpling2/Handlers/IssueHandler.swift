@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import NewsstandKit
 
 public class IssueHandler: NSObject {
     
@@ -24,14 +25,53 @@ public class IssueHandler: NSObject {
     
     public init(folder: NSString){
         self.defaultFolder = folder
-        //self.apiKey = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
+        
+        RLMRealm.setDefaultRealmPath("\(self.defaultFolder)/default.realm")
     }
     
     public init(folder: NSString, apikey: NSString) {
         self.defaultFolder = folder
         apiKey = apikey
+        
+        RLMRealm.setDefaultRealmPath(self.defaultFolder)
+        
+        //Call this if the schema version has changed - pass new schema version as integer
+        //IssueHandler.checkAndMigrateData(2)
+    }
+    
+    //Find current schema version (if needed)
+    public class func getCurrentSchemaVersion() -> UInt {
+        var currentSchemaVersion: UInt = RLMRealm.schemaVersionAtPath(RLMRealm.defaultRealmPath(), error: nil)
+        
+        if currentSchemaVersion < 0 {
+            return 0
+        }
+        
+        return currentSchemaVersion
     }
 
+    //Check and migrate Realm data if needed
+    //Do I need to make this public
+    class func checkAndMigrateData(schemaVersion: UInt) {
+        
+        var currentSchemaVersion: UInt = getCurrentSchemaVersion()
+        
+        if currentSchemaVersion < schemaVersion {
+            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealm.defaultRealmPath(),
+                withMigrationBlock: { migration, oldSchemaVersion in
+                    
+                    //Enumerate through the models and migrate data as needed
+                    /*migration.enumerateObjects(MyClass.className()) { oldObject, newObject in
+                        // Make the necessary changes for migration
+                        if oldSchemaVersion < 1 {
+                            //Use old object and new object
+                        }
+                    }*/
+                }
+            )
+        }
+    }
+    
     // MARK: Use zip
     
     //Add issue details from an extracted zip file to Realm database
@@ -108,27 +148,6 @@ public class IssueHandler: NSObject {
                 let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
                 //Update issue now
                 self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
-            },
-            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
-                
-                println("Error: " + error.localizedDescription)
-        })
-    }
-    
-    //Get Article details from API - Move to Articles.swift
-    func retrieveArticleFromAPI(issueId: String, articleId: String) {
-        let manager = AFHTTPRequestOperationManager()
-        let authorization = "method=apikey,token=\(apiKey)"
-        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
-        
-        let requestURL = "\(baseURL)articles/\(articleId)"
-        
-        manager.GET(requestURL,
-            parameters: nil,
-            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
-                
-                var articleDetails: NSDictionary = responseObject as NSDictionary
-                
             },
             failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
                 
@@ -308,6 +327,89 @@ public class IssueHandler: NSObject {
                 
                 println("Error: " + error.localizedDescription)
         })
+    }
+    
+    //Search for an issue with an apple id if not available in the database
+    //This will get the issue from the server and add to realm
+    public func searchIssueFor(appleId: String) -> Issue? {
+        
+        var issue = Issue.getIssueFor(appleId)
+        
+        if issue == nil {
+            let manager = AFHTTPRequestOperationManager()
+            let authorization = "method=apikey,token=\(apiKey)"
+            manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
+            
+            let requestURL = "\(baseURL)issues/sku/\(appleId)"
+            
+            manager.GET(requestURL,
+                parameters: nil,
+                success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
+                    
+                    var response: NSDictionary = responseObject as NSDictionary
+                    var allIssues: NSArray = response.valueForKey("issues") as NSArray
+                    let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
+                    //Update issue now
+                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
+                },
+                failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
+                    
+                    println("Error: " + error.localizedDescription)
+            })
+        }
+        
+        return issue
+    }
+    
+    //MARK: Publish issue on Newsstand
+    
+    public func addIssueOnNewsstand(issueId: String) {
+        
+        if let issue = self.getIssue(issueId) {
+            var library = NKLibrary.sharedLibrary()
+            
+            var issueAppleId = issue.appleId
+            var existingIssue = library.issueWithName(issueAppleId)
+            if existingIssue == nil {
+                //Insert issue to Newsstand
+                library.addIssueWithName(issueAppleId, date: issue.publishedDate)
+            }
+            
+            //Update issue cover icon
+        }
+    }
+    
+    //Update Newsstand icon
+    func updateIssueCoverIcon() {
+        var issues = NKLibrary.sharedLibrary().issues
+        
+        //Find newest issue
+        var newestIssue: NKIssue? = nil
+        for issue in issues {
+            let issueDate = issue.date!
+            if newestIssue == nil {
+                newestIssue = issue as? NKIssue
+            }
+            else if newestIssue?.date.compare(issueDate!) == NSComparisonResult.OrderedAscending {
+                newestIssue = issue as? NKIssue
+            }
+        }
+        
+        //Get cover image of isse
+        if let issue = newestIssue {
+            var savedIssue = Issue.getIssueFor(issue.name)
+            if savedIssue != nil {
+                if let coverImageId = savedIssue?.coverImageId {
+                    var asset = Asset.getAsset(coverImageId)
+                    if let coverImgURL = asset?.originalURL {
+                        var coverImg = UIImage(contentsOfFile: coverImgURL)
+                        UIApplication.sharedApplication().setNewsstandIconImage(coverImg)
+                        UIApplication.sharedApplication().applicationIconBadgeNumber = 0
+                    }
+                }
+                
+            }
+        }
     }
     
 }

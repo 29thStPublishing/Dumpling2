@@ -69,15 +69,12 @@ class ViewController: UIViewController {
     
     //Get articles array for an issue
     func getArticlesForIssue () {
-        var articlesArray: NSArray? = Article.getArticlesFor("54c829c639cc76043772948d")?
+        var articlesArray: NSArray? = Article.getArticlesFor("54c829c639cc76043772948d", type: nil, excludeType: nil)
         
         if (articlesArray != nil) {
             //Iterate through the array and view each article's details
         }
     }
-    
-    //TODO: Add a method which gets all issues from the API and adds them to realm
-    
 
 }
 
