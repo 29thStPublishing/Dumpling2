@@ -4,7 +4,11 @@ Hello there! Dumpling 2 is intended to be compiled into a framework as a client 
 
 The project has 2 targets - the **Dumpling2** target (the framework) and a **D2consumer** target (which will use the framework)
 
-Right now it parses through a zip file for an issue and adds all the data into a Realm database. The interaction with Magent API is in progress.
+The framework lets you get an issue's details in 2 ways
+1. Parse through a zip file for an issue (in the application bundle)
+2. Get an issue id (or an individual article's id) and retrieve the information from Magnet
+
+The information from both is added into a Realm database.
 
 ### Dependencies
 
@@ -27,6 +31,10 @@ Right now it parses through a zip file for an issue and adds all the data into a
 
 It provides a default convenience initializer. Optionally you can specify a folder where all assets and the database should be stored and an API key for usage
 
+**Helper** class stores the various functions used throughout the framework like finding the device type and resolution, getting string from date (and other way round), getting JSON object from string (and other way round). It also stores the constants in the project like the base URL for Magnet and notification names (for download completion)
+
+**LRNetworkManager** is a singleton subclass of AFHTTPRequestOperationManager. All network operations should be through this file. It sends requests to the Magnet API and downloads data as well as files
+
 
 ### Usage
 
@@ -37,7 +45,7 @@ var issueHandler = IssueHandler()
 issueHandler.addIssueZip(appleId)
 
 //For issues from API
-issueHandler.addIssueFromAPI("54c829c639cc76043772948d")
+issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
 ```
 
 ### Other points
@@ -46,7 +54,7 @@ issueHandler.addIssueFromAPI("54c829c639cc76043772948d")
 2. To see how the framework can be used for adding data to the database (using a zip or from the API), compile and run the D2consumer target
 3. To see how the framework can be used for reading data from the database, compile and run the D2Reader target
 
-**NOTE** - D2Reader and D2consumer will only be able to work (and share the Realm database) if they have App Sharing turned on and you use a folder name shared by both when creating IssueHandler object. For that you will need an app id with App Groups enabled and set the app group in Capabilities for both D2consumer and D2Reader. Without these, you will have to use the "Read" call from within the Consumer target.
+**NOTE** - D2Reader and D2consumer will only be able to work (and share the Realm database) if they have App Sharing turned on and you use a folder name (app groups) shared by both when creating IssueHandler object. For that you will need an app id with App Groups enabled and set the app group in Capabilities for both D2consumer and D2Reader. Without these, you will have to use the "Read" call from within the Consumer target.
 
 
 *The Documents directory is here ~/Library/Developer/CoreSimulator/Devices/Your_simulator_UDID/data/Containers/Data/Application/Your_app_UDID/Documents

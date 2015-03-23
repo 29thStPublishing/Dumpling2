@@ -132,20 +132,17 @@ public class Asset: RLMObject {
     }
     
     //Add asset from API
-    class func downloadAndCreateAsset(assetId: NSString, issue: Issue, articleId: String, placement: Int) {
+    class func downloadAndCreateAsset(assetId: NSString, issue: Issue, articleId: String, placement: Int, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
-        
-        let manager = AFHTTPRequestOperationManager()
-        let authorization = "method=apikey,token=\(apiKey)"
-        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
         
         let requestURL = "\(baseURL)media/\(assetId)"
         
-        manager.GET(requestURL,
-            parameters: nil,
-            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
-                
-                var response: NSDictionary = responseObject as NSDictionary
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as NSDictionary
                 var allMedia: NSArray = response.valueForKey("media") as NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as NSDictionary
                 //Update Asset now
@@ -175,7 +172,26 @@ public class Asset: RLMObject {
                 currentAsset.placement = placement
                 
                 let fileUrl = mediaFile.valueForKey("url") as String
-                currentAsset.saveFileFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
+                let finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                    (status:AnyObject?, error:NSError?) -> () in
+                    if status != nil {
+                        let completed = status as NSNumber
+                        if completed.boolValue {
+                            //Mark asset download as done
+                            if delegate != nil {
+                                (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
+                            }
+                        }
+                    }
+                    else if let err = error {
+                        println("Error: " + err.description)
+                        if delegate != nil {
+                            (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                        }
+                    }
+                }
+                //currentAsset.saveFileFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
                 currentAsset.originalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -189,15 +205,18 @@ public class Asset: RLMObject {
                 
                 realm.addOrUpdateObject(currentAsset)
                 realm.commitWriteTransaction()
-                
-            },
-            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
-                
-                println("Error: " + error.localizedDescription)
-        })
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+                if delegate != nil {
+                    (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                }
+            }
+            
+        }
     }
     
-    //Saves a file from a remote URL
+    //Saves a file from a remote URL - not used any more - Use LRNetworkManager
     func saveFileFromURL(path: String, toFolder: String) {
         var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         var man = AFURLSessionManager(sessionConfiguration: configuration)
@@ -341,7 +360,7 @@ public class Asset: RLMObject {
     }
     
     //Retrieve all assets for an issue/article (of a specific type: optional)
-    public class func getNumberOfAssetsFor(issueId: String, articleId: String, type: String?) -> NSArray? {
+    public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> NSArray? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()

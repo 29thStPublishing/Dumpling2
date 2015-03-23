@@ -29,7 +29,7 @@ class ViewController: UIViewController {
     
     //Add issue details from API
     @IBAction func useAPI () {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateIssueStatus:", name: "issueAdded", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateIssueStatus:", name: "downloadComplete", object: nil)
         
         let container = NSFileManager.defaultManager().containerURLForSecurityApplicationGroupIdentifier("group.Dumpling2Test")
         let directory = container?.path
@@ -39,16 +39,18 @@ class ViewController: UIViewController {
         
         //Uncomment when not using shared folders
         var issueHandler = IssueHandler()
-        issueHandler.addIssueFromAPI("54c829c639cc76043772948d")
+        issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //5500b63339cc7634055faf6a
+        //issueHandler.listIssues()
     }
     
     func updateIssueStatus(notif: NSNotification) {
-        let userInfo:Dictionary<String,String!> = notif.userInfo as Dictionary<String,String!>
+        /*let userInfo:Dictionary<String,String!> = notif.userInfo as Dictionary<String,String!>
         let globalId = userInfo["globalId"]
         
         var alert = UIAlertController(title: "Issue downloaded", message: globalId, preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
+        self.presentViewController(alert, animated: true, completion: nil)*/
+        println("#####DOWNLOADED######")
         
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
