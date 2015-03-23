@@ -8,11 +8,11 @@
 
 import UIKit
 
-let baseURL: String = "http://52.1.9.236:5601/"
+//let baseURL: String = "http://52.1.9.236:5601/"
+let baseURL: String = "https://magnet-dev.29.io/"
 var apiKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
-let ISSUE_ASSET_DOWNLOAD_COMPLETE: String = "issueAssetDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
 let DOWNLOAD_COMPLETE: String = "downloadComplete" //Issue + Article + Issue assets + Article assets downloaded
 

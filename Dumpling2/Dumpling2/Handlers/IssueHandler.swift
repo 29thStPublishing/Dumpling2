@@ -12,26 +12,45 @@ import NewsstandKit
 public class IssueHandler: NSObject {
     
     var defaultFolder: NSString!
-    //var apiKey: NSString!
+    var activeDownloads: NSMutableDictionary
+    //activeDownloads is a dictionary of issueIds (keys). Each issueId has a dictionary.
+    //Each entry in the dictionary has the key = request url, value = completion_status (true, false)
     
     // MARK: Initializers
     
     public override convenience init() {
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as NSString
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as NSString
         
-        self.init(folder: cacheDir)
+        self.init(folder: docsDir)
     }
     
     public init(folder: NSString){
         self.defaultFolder = folder
+        self.activeDownloads = NSMutableDictionary()
         
-        RLMRealm.setDefaultRealmPath("\(self.defaultFolder)/default.realm")
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+    }
+    
+    public init(apikey: NSString) {
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as NSString
+        
+        self.defaultFolder = docsDir
+        apiKey = apikey
+        self.activeDownloads = NSMutableDictionary()
+        
+        RLMRealm.setDefaultRealmPath(self.defaultFolder)
+        
+        //Call this if the schema version has changed - pass new schema version as integer
+        //IssueHandler.checkAndMigrateData(2)
     }
     
     public init(folder: NSString, apikey: NSString) {
         self.defaultFolder = folder
         apiKey = apikey
+        self.activeDownloads = NSMutableDictionary()
         
         RLMRealm.setDefaultRealmPath(self.defaultFolder)
         
@@ -112,47 +131,33 @@ public class IssueHandler: NSObject {
             self.updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
         }
     }
-    
-    
-    //Get issue details from Realm database for a specific global id
-    public func getIssue(issueId: NSString) -> Issue? {
-        
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "globalId = '%@'", issueId)
-        var issues = Issue.objectsWithPredicate(predicate)
-        
-        if issues.count > 0 {
-            return issues.firstObject() as? Issue
-        }
-        
-        return nil
-    }
 
     // MARK: Use API
     
     //Get Issue details from API and add to database
     public func addIssueFromAPI(issueId: String) {
-        let manager = AFHTTPRequestOperationManager()
-        let authorization = "method=apikey,token=\(apiKey)"
-        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
         
         let requestURL = "\(baseURL)issues/\(issueId)"
         
-        manager.GET(requestURL,
-            parameters: nil,
-            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
-
-                var response: NSDictionary = responseObject as NSDictionary
+        self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: issueId)
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as NSDictionary
                 var allIssues: NSArray = response.valueForKey("issues") as NSArray
                 let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
                 //Update issue now
                 self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
-            },
-            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
-                
-                println("Error: " + error.localizedDescription)
-        })
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+                //Mark issue download as failed
+                self.updateStatusDictionary(issueId, url: "\(baseURL)issues/\(issueId)", status: 2)
+            }
+        }
     }
     
     // MARK: Add/Update Issues, Assets and Articles
@@ -169,6 +174,7 @@ public class IssueHandler: NSObject {
             //older issue
             currentIssue = results.firstObject() as Issue
             //Delete all articles and assets if the issue already exists. Then add again
+            Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
         }
         else {
@@ -234,6 +240,7 @@ public class IssueHandler: NSObject {
             //older issue
             currentIssue = results.firstObject() as Issue
             //Delete all articles and assets if the issue already exists. Then add again
+            Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
         }
         else {
@@ -293,7 +300,10 @@ public class IssueHandler: NSObject {
         if issueMedia.count > 0 {
             for (index, assetDict) in enumerate(issueMedia) {
                 //Download images and create Asset object for issue
-                Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as NSString, issue: currentIssue, articleId: "", placement: index+1)
+                //Add asset to Issue dictionary
+                let assetid = assetDict.valueForKey("id") as NSString
+                self.updateStatusDictionary(globalId, url: "\(baseURL)media/\(assetId)", status: 0)
+                Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)
             }
         }
         
@@ -301,32 +311,39 @@ public class IssueHandler: NSObject {
         var articles = issue.objectForKey("articles") as NSArray
         for (index, articleDict) in enumerate(articles) {
             //Insert article
-            Article.createArticleForId(articleDict.valueForKey("id") as NSString, issue: currentIssue, placement: index+1)
+            //Add article and its assets to Issue dictionary
+            let articleId = articleDict.valueForKey("id") as NSString
+            self.updateStatusDictionary(globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+            Article.createArticleForId(articleId, issue: currentIssue, placement: index+1, delegate: self)
         }
+        
+        //Mark issue URL as done
+        self.updateStatusDictionary(globalId, url: "\(baseURL)issues/\(globalId)", status: 1)
+        
+        //Fire a notification that issue's data is saved
+        NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: globalId, forKey: "issue"))
         
         return 0
     }
     
     //Get all issues - this is just a test function for me
     public func listIssues() {
-        let manager = AFHTTPRequestOperationManager()
-        
-        let authorization = "method=apikey,token=\(apiKey)"
-        manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
         
         let requestURL = "\(baseURL)issues"
         
-        manager.GET(requestURL,
-            parameters: nil,
-            success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
-                
-                var response: NSDictionary = responseObject as NSDictionary
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as NSDictionary
                 println("ISSUES: \(response)")
-            },
-            failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
-                
-                println("Error: " + error.localizedDescription)
-        })
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+            
+        }
     }
     
     //Search for an issue with an apple id if not available in the database
@@ -336,29 +353,43 @@ public class IssueHandler: NSObject {
         var issue = Issue.getIssueFor(appleId)
         
         if issue == nil {
-            let manager = AFHTTPRequestOperationManager()
-            let authorization = "method=apikey,token=\(apiKey)"
-            manager.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
             
             let requestURL = "\(baseURL)issues/sku/\(appleId)"
             
-            manager.GET(requestURL,
-                parameters: nil,
-                success: { (operation: AFHTTPRequestOperation!,responseObject: AnyObject!) in
-                    
-                    var response: NSDictionary = responseObject as NSDictionary
+            var networkManager = LRNetworkManager.sharedInstance
+            
+            networkManager.requestData("GET", urlString: requestURL) {
+                (data:AnyObject?, error:NSError?) -> () in
+                if data != nil {
+                    var response: NSDictionary = data as NSDictionary
                     var allIssues: NSArray = response.valueForKey("issues") as NSArray
                     let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
                     //Update issue now
                     self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
-                },
-                failure: { (operation: AFHTTPRequestOperation!,error: NSError!) in
-                    
-                    println("Error: " + error.localizedDescription)
-            })
+                }
+                else if let err = error {
+                    println("Error: " + err.description)
+                }
+                
+            }
         }
         
         return issue
+    }
+    
+    //Get issue details from Realm database for a specific global id
+    public func getIssue(issueId: NSString) -> Issue? {
+        
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = '%@'", issueId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            return issues.firstObject() as? Issue
+        }
+        
+        return nil
     }
     
     //MARK: Publish issue on Newsstand
@@ -410,6 +441,59 @@ public class IssueHandler: NSObject {
                 
             }
         }
+    }
+    
+    //MARK: Downloads tracking
+    
+    //status = 0 for not started, 1 for complete, 2 for error
+    func updateStatusDictionary(issueId: String, url: String, status: Int) {
+        var dictionaryLock = NSLock()
+        dictionaryLock.lock()
+        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as NSDictionary)
+        issueStatus.setValue(NSNumber(integer: status), forKey: url)
+        self.activeDownloads.setValue(issueStatus, forKey: issueId)
+        dictionaryLock.unlock()
+        
+        //Check if all values 1 or 2 for the dictionary, send out a notification
+        var stats = issueStatus.allValues
+        var keys: [String] = issueStatus.allKeys as [String]
+        var predicate = NSPredicate(format: "SELF contains[c] %@", "/articles/")
+        var articleKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate!)
+        
+        var values: NSArray = issueStatus.objectsForKeys(articleKeys, notFoundMarker: NSNumber(integer: 0))
+        if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All articles not downloaded yet
+        }
+        else {
+            //All articles downloaded (with or without errors)
+            NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue"))
+            
+            if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
+            }
+            else {
+                //Issue download complete (with or without errors)
+                NSLog("#####Stats count: \(stats.count)")
+                //MARK: Note - Can send status as well
+                NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue"))
+            }
+        }
+    }
+    
+    //Get issue ids whose download not complete yet
+    public func getActiveDownloads() -> NSArray? {
+        //Return issueId whose download is not complete yet
+        var issueIds = NSMutableArray(array: self.activeDownloads.allKeys)
+        for (issueid, urls) in self.activeDownloads {
+            var stats = urls.allValues //get all URLs status for the issueId
+        
+            if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
+            }
+            else {
+                //Issue download complete - remove from array to be returned
+                issueIds.removeObject(issueid)
+            }
+        }
+        
+        return issueIds
     }
     
 }

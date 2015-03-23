@@ -28,19 +28,9 @@ public class Issue: RLMObject {
         return "globalId"
     }
     
-    //Get details for a specific key from custom meta of an issue
-    public func getValue(key: NSString) -> AnyObject? {
-        
-        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
-        if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key)
-        }
-        
-        return nil
-    }
-    
-    
     // MARK: Public methods
+    
+    //MARK: Class methods
     
     //Delete an issue
     public class func deleteIssue(appleId: NSString) {
@@ -54,6 +44,7 @@ public class Issue: RLMObject {
             //older issue
             var currentIssue = issues.firstObject() as Issue
             //Delete all articles and assets if the issue already exists
+            Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
             
             //Delete issue
@@ -72,6 +63,33 @@ public class Issue: RLMObject {
         if results.count > 0 {
             var newestIssue = results.firstObject() as Issue
             return newestIssue
+        }
+        
+        return nil
+    }
+    
+    //Get the issue for a specific Apple id
+    public class func getIssueFor(appleId: String) -> Issue? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "appleId = '%@'", appleId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            return issues.firstObject() as? Issue
+        }
+        
+        return nil
+    }
+    
+    //MARK: Instance methods
+    
+    //Get details for a specific key from custom meta of an issue
+    public func getValue(key: NSString) -> AnyObject? {
+        
+        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+        if let metadataDict = metadata as? NSDictionary {
+            return metadataDict.valueForKey(key)
         }
         
         return nil
@@ -110,20 +128,6 @@ public class Issue: RLMObject {
                 array.addObject(obj)
             }
             return array
-        }
-        
-        return nil
-    }
-    
-    //Get the issue for a specific Apple id
-    public class func getIssueFor(appleId: String) -> Issue? {
-        let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "appleId = '%@'", appleId)
-        var issues = Issue.objectsWithPredicate(predicate)
-        
-        if issues.count > 0 {
-            return issues.firstObject() as? Issue
         }
         
         return nil
