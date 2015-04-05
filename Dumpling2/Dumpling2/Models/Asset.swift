@@ -173,12 +173,13 @@ public class Asset: RLMObject {
                 
                 let fileUrl = mediaFile.valueForKey("url") as String
                 let finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
                     (status:AnyObject?, error:NSError?) -> () in
                     if status != nil {
                         let completed = status as NSNumber
                         if completed.boolValue {
-                            //Mark asset download as done
+                            //Mark asset download as done
                             if delegate != nil {
                                 (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
                             }
@@ -216,8 +217,9 @@ public class Asset: RLMObject {
         }
     }
     
+    
     //Saves a file from a remote URL - not used any more - Use LRNetworkManager
-    func saveFileFromURL(path: String, toFolder: String) {
+    /*func saveFileFromURL(path: String, toFolder: String) {
         var configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         var man = AFURLSessionManager(sessionConfiguration: configuration)
         var url = NSURL(string: path)
@@ -235,13 +237,13 @@ public class Asset: RLMObject {
         })
         
         downloadTask.resume();
-    }
+    }*/
     
     //Delete all assets for a single article
     class func deleteAssetsFor(articleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "articleId = '%@'", articleId)
+        let predicate = NSPredicate(format: "articleId = %@", articleId)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
@@ -282,7 +284,7 @@ public class Asset: RLMObject {
     class func deleteAssetsForIssue(globalId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@'", globalId)
+        let predicate = NSPredicate(format: "issue.globalId = %@", globalId)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
@@ -300,11 +302,20 @@ public class Asset: RLMObject {
     
     // MARK: Public methods
     
+    //Save an Asset to the database
+    public func saveAsset() {
+        let realm = RLMRealm.defaultRealm()
+        
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(self)
+        realm.commitWriteTransaction()
+    }
+    
     //Delete a specific asset
     public class func deleteAsset(assetId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "globalId = '%@'", assetId)
+        let predicate = NSPredicate(format: "globalId = %@", assetId)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
@@ -326,7 +337,7 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         if issueId == "" {
-            let predicate = NSPredicate(format: "articleId = '%@' AND placement = 1 AND type = 'image'", issueId, articleId)
+            let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
             var assets = Asset.objectsWithPredicate(predicate)
             
             if assets.count > 0 {
@@ -334,7 +345,7 @@ public class Asset: RLMObject {
             }
         }
         else {
-            let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND placement = 1 AND type = 'image'", issueId, articleId)
+            let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
             var assets = Asset.objectsWithPredicate(predicate)
         
             if assets.count > 0 {
@@ -349,7 +360,7 @@ public class Asset: RLMObject {
     public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@'", issueId, articleId)
+        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
         var assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -360,16 +371,16 @@ public class Asset: RLMObject {
     }
     
     //Retrieve all assets for an issue/article (of a specific type: optional)
-    public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> NSArray? {
+    public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@'", issueId, articleId)
+        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
         subPredicates.addObject(predicate!)
 
         if type != nil {
-            var assetPredicate = NSPredicate(format: "type = '%@'", type!)
+            var assetPredicate = NSPredicate(format: "type = %@", type!)
             subPredicates.addObject(assetPredicate!)
         }
         
@@ -377,10 +388,10 @@ public class Asset: RLMObject {
         var assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
         
         if assets.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Asset>()
             for object in assets {
                 let obj: Asset = object as Asset
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }
@@ -392,7 +403,7 @@ public class Asset: RLMObject {
     public class func getAsset(assetId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "globalId = '%@'", assetId)
+        let predicate = NSPredicate(format: "globalId = %@", assetId)
         var assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -403,17 +414,17 @@ public class Asset: RLMObject {
     }
     
     //Retrieve all sound files for an article/issue as a playlist/array
-    public class func getPlaylistFor(issueId: String, articleId: String) -> NSArray? {
+    public class func getPlaylistFor(issueId: String, articleId: String) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = '%@' AND articleId = '%@' AND type = 'sound'", issueId, articleId)
+        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND type = %@", issueId, articleId, "sound")
         var assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Asset>()
             for object in assets {
                 let obj: Asset = object as Asset
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }

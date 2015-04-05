@@ -61,6 +61,8 @@ Realm object for Issues. Also has methods for directly dealing with issues
 
 3. **getNewerIssues()** returns an array of issues whose publish date is after the publish date of current issue
 
+4. **saveIssue()** lets you save an Issue object to Realm
+
 
 ## Article
 
@@ -95,6 +97,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 5. **getOlderArticles()** returns an array of articles for the current article's issue whose date is older than the date of current article
 
+6. **saveArticle()** lets you save an Article object to Realm
+
 
 ## Asset
 
@@ -127,6 +131,9 @@ Realm object for Assets. Also has methods for directly dealing with assets
 5. **getAsset(assetId:)** returns a specific asset
 
 6. **getPlaylistFor(issueId:, articleId:)** returns an array of all assets for an article/issue which are of type=sound
+
+###Instance methods (public)
+1. **saveAsset()** lets you save an Asset object to Realm
 
 
 ## Helper

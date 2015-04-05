@@ -36,7 +36,7 @@ public class Issue: RLMObject {
     public class func deleteIssue(appleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "appleId = '%@'", appleId)
+        let predicate = NSPredicate(format: "appleId = %@", appleId)
         var issues = Issue.objectsWithPredicate(predicate)
         
         //Delete all assets and articles for the issue
@@ -72,7 +72,7 @@ public class Issue: RLMObject {
     public class func getIssueFor(appleId: String) -> Issue? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "appleId = '%@'", appleId)
+        let predicate = NSPredicate(format: "appleId = %@", appleId)
         var issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
@@ -83,6 +83,15 @@ public class Issue: RLMObject {
     }
     
     //MARK: Instance methods
+    
+    //Save an Issue to the database
+    public func saveIssue() {
+        let realm = RLMRealm.defaultRealm()
+        
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(self)
+        realm.commitWriteTransaction()
+    }
     
     //Get details for a specific key from custom meta of an issue
     public func getValue(key: NSString) -> AnyObject? {
@@ -96,17 +105,17 @@ public class Issue: RLMObject {
     }
     
     //Find issue before a given issue
-    public func getOlderIssues() -> NSArray? {
+    public func getOlderIssues() -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate)
         var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
         
         if issues.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Issue>()
             for object in issues {
                 let obj: Issue = object as Issue
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }
@@ -115,17 +124,17 @@ public class Issue: RLMObject {
     }
     
     //Find issue newer than a given issue
-    public func getNewerIssues() -> NSArray? {
+    public func getNewerIssues() -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate)
         var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
         
         if issues.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Issue>()
             for object in issues {
                 let obj: Issue = object as Issue
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }

@@ -38,18 +38,11 @@ class ViewController: UIViewController {
         //var issueHandler = IssueHandler(folder: directory!)
         
         //Uncomment when not using shared folders
-        var issueHandler = IssueHandler()
-        issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //5500b63339cc7634055faf6a
-        //issueHandler.listIssues()
+        var issueHandler = IssueHandler(apikey: "19dc497bc4d6481cb827dd3e4637a8e3")
+        issueHandler.addIssueFromAPI("55146ee6aa93900422037b15")
     }
     
     func updateIssueStatus(notif: NSNotification) {
-        /*let userInfo:Dictionary<String,String!> = notif.userInfo as Dictionary<String,String!>
-        let globalId = userInfo["globalId"]
-        
-        var alert = UIAlertController(title: "Issue downloaded", message: globalId, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)*/
         println("#####DOWNLOADED######")
         
         NSNotificationCenter.defaultCenter().removeObserver(self)
