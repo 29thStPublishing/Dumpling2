@@ -41,7 +41,8 @@ public class IssueHandler: NSObject {
         apiKey = apikey
         self.activeDownloads = NSMutableDictionary()
         
-        RLMRealm.setDefaultRealmPath(self.defaultFolder)
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         //Call this if the schema version has changed - pass new schema version as integer
         //IssueHandler.checkAndMigrateData(2)
@@ -52,7 +53,8 @@ public class IssueHandler: NSObject {
         apiKey = apikey
         self.activeDownloads = NSMutableDictionary()
         
-        RLMRealm.setDefaultRealmPath(self.defaultFolder)
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         //Call this if the schema version has changed - pass new schema version as integer
         //IssueHandler.checkAndMigrateData(2)
@@ -337,7 +339,8 @@ public class IssueHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 var response: NSDictionary = data as NSDictionary
-                println("ISSUES: \(response)")
+                var allIssues: NSArray = response.valueForKey("issues") as NSArray
+                println("ISSUES: \(allIssues)")
             }
             else if let err = error {
                 println("Error: " + err.description)
@@ -382,7 +385,7 @@ public class IssueHandler: NSObject {
         
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "globalId = '%@'", issueId)
+        let predicate = NSPredicate(format: "globalId = %@", issueId)
         var issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
@@ -471,11 +474,23 @@ public class IssueHandler: NSObject {
             }
             else {
                 //Issue download complete (with or without errors)
-                NSLog("#####Stats count: \(stats.count)")
                 //MARK: Note - Can send status as well
                 NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue"))
             }
         }
+    }
+    
+    //Find download % progress for an issue
+    public func findDownloadProgress(issueId: String) -> Int {
+        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as NSDictionary)
+        var values = issueStatus.allValues
+        var occurrences = 0
+        for value in values {
+            occurrences += (value.integerValue != 0) ? 1 : 0
+        }
+        
+        let percent = occurrences * 100 / values.count
+        return percent
     }
     
     //Get issue ids whose download not complete yet

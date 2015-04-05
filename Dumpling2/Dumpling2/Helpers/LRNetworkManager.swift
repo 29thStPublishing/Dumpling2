@@ -31,7 +31,8 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
 
     func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
-        let authorization = "method=apikey,token=\(apiKey)"
+        //let authorization = "method=apikey,token=\(apiKey)"
+        let authorization = "method=clientkey,token=\(apiKey)"
         self.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
         
         if methodType == "GET" {
@@ -59,17 +60,21 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
     
     func downloadFile(fromPath: String, toPath: String, completion:(status:AnyObject?, error:NSError?) -> ()) {
+        var url = NSURL(string: fromPath)
+        var urlRequest = NSURLRequest(URL: url!)
         
-        var operation = self.GET(fromPath,
-            parameters: nil,
-            success: { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
-                completion(status: NSNumber(bool: true), error: nil)
-            },
-            failure: { (operation: AFHTTPRequestOperation!, error: NSError!) in
+        var operation = AFHTTPRequestOperation(request: urlRequest)
+        operation.outputStream = NSOutputStream(toFileAtPath: toPath, append: false)
+        operation.setCompletionBlockWithSuccess( { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
+            
+            completion(status: NSNumber(bool: true), error: nil)
+            
+            }, failure: { (operation: AFHTTPRequestOperation!, error: NSError!) in
                 completion(status: nil, error: error)
+        
         })
         
-        operation.outputStream = NSOutputStream(toFileAtPath: toPath, append: false)
+        operation.start()
     }
     
     func findAllActiveOperations() -> NSArray {

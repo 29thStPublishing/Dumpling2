@@ -171,7 +171,11 @@ public class Article: RLMObject {
                 if articleMedia.count > 0 {
                     for (index, assetDict) in enumerate(articleMedia) {
                         //Download images and create Asset object for issue
-                        Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as NSString, issue: issue, articleId: articleId, placement: index+1, delegate: delegate)
+                        let assetid = assetDict.valueForKey("id") as NSString
+                        if delegate != nil {
+                            (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
+                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId, placement: index+1, delegate: delegate)
                     }
                 }
                 
@@ -297,7 +301,7 @@ public class Article: RLMObject {
     public class func deleteArticlesFor(issueId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = '%@'", issueId)
+        let predicate = NSPredicate(format: "issueId = %@", issueId)
         var articles = Article.objectsWithPredicate(predicate)
         
         var articleIds = NSMutableArray()
@@ -320,34 +324,33 @@ public class Article: RLMObject {
     //Articles for only a specific type (optional)
     //Articles excluding a specific type (optional) - all params can be used in conjunction
     //At least one of the params is needed
-    public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> NSArray? {
+    public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()
         
         if issueId != nil {
-            var predicate = NSPredicate(format: "issueId = '%@'", issueId!)
+            var predicate = NSPredicate(format: "issueId = %@", issueId!)
             subPredicates.addObject(predicate!)
         }
         
         if type != nil {
-            var typePredicate = NSPredicate(format: "articleType = '%@'", type!)
+            var typePredicate = NSPredicate(format: "articleType = %@", type!)
             subPredicates.addObject(typePredicate!)
         }
         if excludeType != nil {
-            var excludePredicate = NSPredicate(format: "articleType != '%@'", excludeType!)
+            var excludePredicate = NSPredicate(format: "articleType != %@", excludeType!)
             subPredicates.addObject(excludePredicate!)
         }
         
         if subPredicates.count > 0 {
             let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
-            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
-            
+            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
             if articles.count > 0 {
-                var array = NSMutableArray()
+                var array = Array<Article>()
                 for object in articles {
                     let obj: Article = object as Article
-                    array.addObject(obj)
+                    array.append(obj)
                 }
                 return array
             }
@@ -357,13 +360,13 @@ public class Article: RLMObject {
     }
     
     //Get all articles for an issue (or if nil, all issues) with specific keywords
-    public class func searchArticlesWith(keywords: [String], issueId: String?) -> NSArray? {
+    public class func searchArticlesWith(keywords: [String], issueId: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()
         
         for keyword in keywords {
-            var subPredicate = NSPredicate(format: "keywords CONTAINS '%@'", keyword)
+            var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
             subPredicates.addObject(subPredicate!)
         }
         
@@ -373,7 +376,7 @@ public class Article: RLMObject {
         subPredicates.addObject(orPredicate)
         
         if issueId != nil {
-            var predicate = NSPredicate(format: "issueId = '%@'", issueId!)
+            var predicate = NSPredicate(format: "issueId = %@", issueId!)
             subPredicates.addObject(predicate!)
         }
         
@@ -382,10 +385,10 @@ public class Article: RLMObject {
             var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
             
             if articles.count > 0 {
-                var array = NSMutableArray()
+                var array = Array<Article>()
                 for object in articles {
                     let obj: Article = object as Article
-                    array.addObject(obj)
+                    array.append(obj)
                 }
                 return array
             }
@@ -395,17 +398,17 @@ public class Article: RLMObject {
     }
     
     //Get all  featured articles for a specific issue
-    public class func getFeaturedArticlesFor(issueId: NSString) -> NSArray? {
+    public class func getFeaturedArticlesFor(issueId: NSString) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = '%@' AND isFeatured = true", issueId)
+        let predicate = NSPredicate(format: "issueId = %@ AND isFeatured == true", issueId)
         var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Article>()
             for object in articles {
                 let obj: Article = object as Article
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }
@@ -419,6 +422,17 @@ public class Article: RLMObject {
     }
     
     //MARK: Instance methods
+    
+    //Save an Article to the database
+    public func saveArticle() {
+        let realm = RLMRealm.defaultRealm()
+        
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(self)
+        realm.commitWriteTransaction()
+    }
+    
+    //MARK: This is to be revisited
     //Replace asset pattern with actual assets in an Article body
     public func replacePatternsWithAssets() -> NSString {
         //Should work for images, audio, video or any other types of assets
@@ -491,19 +505,18 @@ public class Article: RLMObject {
         return updatedBody
     }
     
-    
     //Get all articles newer than a specific article
-    public func getNewerArticles() -> NSArray? {
+    public func getNewerArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = '%@' AND date > %@", self.issueId, self.date)
+        let predicate = NSPredicate(format: "issueId = %@ AND date > %@", self.issueId, self.date)
         var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Article>()
             for object in articles {
                 let obj: Article = object as Article
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }
@@ -512,17 +525,17 @@ public class Article: RLMObject {
     }
     
     //Get all articles older than a specific article
-    public func getOlderArticles() -> NSArray? {
+    public func getOlderArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = '%@' AND date < %@", self.issueId, self.date)
+        let predicate = NSPredicate(format: "issueId = %@ AND date < %@", self.issueId, self.date)
         var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
-            var array = NSMutableArray()
+            var array = Array<Article>()
             for object in articles {
                 let obj: Article = object as Article
-                array.addObject(obj)
+                array.append(obj)
             }
             return array
         }
