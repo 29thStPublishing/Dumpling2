@@ -234,7 +234,6 @@ public class IssueHandler: NSObject {
     //Add or create issue details (from API)
     func updateIssueFromAPI(issue: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
-        
         var results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
         
@@ -402,14 +401,16 @@ public class IssueHandler: NSObject {
         if let issue = self.getIssue(issueId) {
             var library = NKLibrary.sharedLibrary()
             
-            var issueAppleId = issue.appleId
-            var existingIssue = library.issueWithName(issueAppleId)
-            if existingIssue == nil {
-                //Insert issue to Newsstand
-                library.addIssueWithName(issueAppleId, date: issue.publishedDate)
+            if let issueAppleId = issue.appleId as String? {
+                let existingIssue = library.issueWithName(issueAppleId) as NKIssue?
+                if existingIssue == nil {
+                    //Insert issue to Newsstand
+                    library.addIssueWithName(issueAppleId, date: issue.publishedDate)
+                }
             }
             
             //Update issue cover icon
+            self.updateIssueCoverIcon()
         }
     }
     
