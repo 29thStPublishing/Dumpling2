@@ -39,12 +39,11 @@ class ViewController: UIViewController {
         
         //Uncomment when not using shared folders
         var issueHandler = IssueHandler(apikey: "19dc497bc4d6481cb827dd3e4637a8e3")
-        issueHandler.addIssueFromAPI("55146ee6aa93900422037b15")
+        issueHandler.addIssueFromAPI("551477bfaa93900422037b16")
     }
     
     func updateIssueStatus(notif: NSNotification) {
         println("#####DOWNLOADED######")
-        
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     

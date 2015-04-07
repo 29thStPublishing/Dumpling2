@@ -459,7 +459,7 @@ public class Article: RLMObject {
                 if let asset = Asset.getAsset(matchedString) {
                     //Use the asset - generate an HTML with the asset file URL (image, audio, video)
                     var originalAssetPath = asset.originalURL
-                    var fileURL = NSURL(fileURLWithPath: originalAssetPath)
+                    let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath)
                     
                     //Replace with HTML tags
                     var finalHTML = "<div class='article_image'>"
