@@ -20,7 +20,7 @@ public class IssueHandler: NSObject {
     
     public override convenience init() {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as NSString
+        var docsDir: NSString = docPaths[0] as! NSString
         
         self.init(folder: docsDir)
     }
@@ -35,10 +35,10 @@ public class IssueHandler: NSObject {
     
     public init(apikey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as NSString
+        var docsDir: NSString = docPaths[0] as! NSString
         
         self.defaultFolder = docsDir
-        apiKey = apikey
+        apiKey = apikey as String
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
@@ -50,7 +50,7 @@ public class IssueHandler: NSObject {
     
     public init(folder: NSString, apikey: NSString) {
         self.defaultFolder = folder
-        apiKey = apikey
+        apiKey = apikey as String
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
@@ -126,11 +126,11 @@ public class IssueHandler: NSObject {
             return
         }
         
-        if let issueDict: NSDictionary = Helper.jsonFromString(fullJSON!) as? NSDictionary {
+        if let issueDict: NSDictionary = Helper.jsonFromString(fullJSON! as String) as? NSDictionary {
             //if there is an issue with this issue id, remove all its content first (articles, assets)
             //Moved ^ to updateIssueMetadata method
             //now write the issue content into the database
-            self.updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as String)
+            self.updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as! String)
         }
     }
 
@@ -148,11 +148,11 @@ public class IssueHandler: NSObject {
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as NSDictionary
-                var allIssues: NSArray = response.valueForKey("issues") as NSArray
-                let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
+                var response: NSDictionary = data as! NSDictionary
+                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
                 //Update issue now
-                self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
+                self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String)
             }
             else if let err = error {
                 println("Error: " + err.description)
@@ -174,7 +174,7 @@ public class IssueHandler: NSObject {
         realm.beginWriteTransaction()
         if results.count > 0 {
             //older issue
-            currentIssue = results.firstObject() as Issue
+            currentIssue = results.firstObject() as! Issue
             //Delete all articles and assets if the issue already exists. Then add again
             Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
@@ -183,33 +183,33 @@ public class IssueHandler: NSObject {
             //Create a new issue
             currentIssue = Issue()
             if let metadata: AnyObject! = issue.objectForKey("metadata") {
-                if metadata.isKindOfClass(NSDictionary) {
-                    currentIssue.metadata = Helper.stringFromJSON(metadata)!
+                if metadata!.isKindOfClass(NSDictionary) {
+                    currentIssue.metadata = Helper.stringFromJSON(metadata!)!
                 }
                 else {
-                    currentIssue.metadata = metadata as String
+                    currentIssue.metadata = metadata as! String
                 }
             }
-            currentIssue.globalId = issue.valueForKey("global_id") as String
+            currentIssue.globalId = issue.valueForKey("global_id") as! String
         }
         
-        currentIssue.title = issue.valueForKey("title") as String
-        currentIssue.issueDesc = issue.valueForKey("description") as String
-        currentIssue.lastUpdateDate = issue.valueForKey("last_updated") as String
-        currentIssue.displayDate = issue.valueForKey("display_date") as String
-        currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as String)
-        currentIssue.appleId = issue.valueForKey("apple_id") as String
+        currentIssue.title = issue.valueForKey("title") as! String
+        currentIssue.issueDesc = issue.valueForKey("description") as! String
+        currentIssue.lastUpdateDate = issue.valueForKey("last_updated") as! String
+        currentIssue.displayDate = issue.valueForKey("display_date") as! String
+        currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as! String)
+        currentIssue.appleId = issue.valueForKey("apple_id") as! String
         currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         realm.addOrUpdateObject(currentIssue)
         realm.commitWriteTransaction()
 
         //Add all assets of the issue (which do not have an associated article)
-        var orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as NSArray
+        var orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as! NSArray
         if orderedArray.count > 0 {
             for (index, assetDict) in enumerate(orderedArray) {
                 //create asset
-                Asset.createAsset(assetDict as NSDictionary, issue: currentIssue, articleId: "", placement: index+1)
+                Asset.createAsset(assetDict as! NSDictionary, issue: currentIssue, articleId: "", placement: index+1)
             }
         }
         
@@ -222,10 +222,10 @@ public class IssueHandler: NSObject {
         }
         
         //Now add all articles into the database
-        var articles = issue.objectForKey("articles") as NSArray
+        var articles = issue.objectForKey("articles") as! NSArray
         for (index, articleDict) in enumerate(articles) {
             //Insert article for issueId x with placement y
-            Article.createArticle(articleDict as NSDictionary, issue: currentIssue, placement: index+1)
+            Article.createArticle(articleDict as! NSDictionary, issue: currentIssue, placement: index+1)
         }
         
         return 0
@@ -239,7 +239,7 @@ public class IssueHandler: NSObject {
         
         if results.count > 0 {
             //older issue
-            currentIssue = results.firstObject() as Issue
+            currentIssue = results.firstObject() as! Issue
             //Delete all articles and assets if the issue already exists. Then add again
             Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
@@ -251,18 +251,18 @@ public class IssueHandler: NSObject {
         }
         
         realm.beginWriteTransaction()
-        currentIssue.title = issue.valueForKey("title") as String
-        currentIssue.issueDesc = issue.valueForKey("description") as String
+        currentIssue.title = issue.valueForKey("title") as! String
+        currentIssue.issueDesc = issue.valueForKey("description") as! String
         
-        var meta = issue.valueForKey("meta") as NSDictionary
-        var updatedInfo = meta.valueForKey("updated") as NSDictionary
+        var meta = issue.valueForKey("meta") as! NSDictionary
+        var updatedInfo = meta.valueForKey("updated") as! NSDictionary
         
         if updatedInfo.count > 0 {
-            currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as String
+            currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as! String
         }
-        currentIssue.displayDate = meta.valueForKey("displayDate") as String
-        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as String)
-        currentIssue.appleId = issue.valueForKey("sku") as String
+        currentIssue.displayDate = meta.valueForKey("displayDate") as! String
+        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as! String)
+        currentIssue.appleId = issue.valueForKey("sku") as! String
         
         //SKU SHOULD NEVER be blank. Right now it is blank. So using globalId
         //currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.globalId)"
@@ -279,7 +279,7 @@ public class IssueHandler: NSObject {
             NSFileManager.defaultManager().createDirectoryAtPath(currentIssue.assetFolder, withIntermediateDirectories: true, attributes: nil, error: nil)
         }
         
-        var assetId = issue.valueForKey("coverPhone") as String
+        var assetId = issue.valueForKey("coverPhone") as! String
         if !assetId.isEmpty {
             currentIssue.coverImageId = assetId
         }
@@ -289,7 +289,7 @@ public class IssueHandler: NSObject {
                 currentIssue.metadata = Helper.stringFromJSON(metadata)!
             }
             else {
-                currentIssue.metadata = metadata as String
+                currentIssue.metadata = metadata as! String
             }
         }
         
@@ -297,23 +297,23 @@ public class IssueHandler: NSObject {
         realm.commitWriteTransaction()
         
         //Add all assets of the issue (which do not have an associated article)
-        var issueMedia = issue.objectForKey("media") as NSArray
+        var issueMedia = issue.objectForKey("media") as! NSArray
         if issueMedia.count > 0 {
             for (index, assetDict) in enumerate(issueMedia) {
                 //Download images and create Asset object for issue
                 //Add asset to Issue dictionary
-                let assetid = assetDict.valueForKey("id") as NSString
+                let assetid = assetDict.valueForKey("id") as! NSString
                 self.updateStatusDictionary(globalId, url: "\(baseURL)media/\(assetId)", status: 0)
                 Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)
             }
         }
         
         //add all articles into the database
-        var articles = issue.objectForKey("articles") as NSArray
+        var articles = issue.objectForKey("articles") as! NSArray
         for (index, articleDict) in enumerate(articles) {
             //Insert article
             //Add article and its assets to Issue dictionary
-            let articleId = articleDict.valueForKey("id") as NSString
+            let articleId = articleDict.valueForKey("id") as! NSString
             self.updateStatusDictionary(globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
             Article.createArticleForId(articleId, issue: currentIssue, placement: index+1, delegate: self)
         }
@@ -322,7 +322,7 @@ public class IssueHandler: NSObject {
         self.updateStatusDictionary(globalId, url: "\(baseURL)issues/\(globalId)", status: 1)
         
         //Fire a notification that issue's data is saved
-        NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: globalId, forKey: "issue"))
+        NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: globalId, forKey: "issue") as! [String : String])
         
         return 0
     }
@@ -337,8 +337,8 @@ public class IssueHandler: NSObject {
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as NSDictionary
-                var allIssues: NSArray = response.valueForKey("issues") as NSArray
+                var response: NSDictionary = data as! NSDictionary
+                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
                 println("ISSUES: \(allIssues)")
             }
             else if let err = error {
@@ -363,11 +363,11 @@ public class IssueHandler: NSObject {
             networkManager.requestData("GET", urlString: requestURL) {
                 (data:AnyObject?, error:NSError?) -> () in
                 if data != nil {
-                    var response: NSDictionary = data as NSDictionary
-                    var allIssues: NSArray = response.valueForKey("issues") as NSArray
-                    let issueDetails: NSDictionary = allIssues.firstObject as NSDictionary
+                    var response: NSDictionary = data as! NSDictionary
+                    var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                    let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
                     //Update issue now
-                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as String)
+                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String)
                 }
                 else if let err = error {
                     println("Error: " + err.description)
@@ -453,37 +453,37 @@ public class IssueHandler: NSObject {
     func updateStatusDictionary(issueId: String, url: String, status: Int) {
         var dictionaryLock = NSLock()
         dictionaryLock.lock()
-        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as NSDictionary)
+        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as! NSDictionary)
         issueStatus.setValue(NSNumber(integer: status), forKey: url)
         self.activeDownloads.setValue(issueStatus, forKey: issueId)
         dictionaryLock.unlock()
         
         //Check if all values 1 or 2 for the dictionary, send out a notification
         var stats = issueStatus.allValues
-        var keys: [String] = issueStatus.allKeys as [String]
+        var keys: [String] = issueStatus.allKeys as! [String]
         var predicate = NSPredicate(format: "SELF contains[c] %@", "/articles/")
-        var articleKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate!)
+        var articleKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
         
         var values: NSArray = issueStatus.objectsForKeys(articleKeys, notFoundMarker: NSNumber(integer: 0))
         if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All articles not downloaded yet
         }
         else {
             //All articles downloaded (with or without errors)
-            NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue"))
+            NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
             
             if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
             }
             else {
                 //Issue download complete (with or without errors)
                 //MARK: Note - Can send status as well
-                NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue"))
+                NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
             }
         }
     }
     
     //Find download % progress for an issue
     public func findDownloadProgress(issueId: String) -> Int {
-        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as NSDictionary)
+        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as! NSDictionary)
         var values = issueStatus.allValues
         var occurrences = 0
         for value in values {

@@ -42,7 +42,7 @@ public class Issue: RLMObject {
         //Delete all assets and articles for the issue
         if issues.count == 1 {
             //older issue
-            var currentIssue = issues.firstObject() as Issue
+            var currentIssue = issues.firstObject() as! Issue
             //Delete all articles and assets if the issue already exists
             Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
@@ -61,7 +61,7 @@ public class Issue: RLMObject {
         var results = Issue.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
         
         if results.count > 0 {
-            var newestIssue = results.firstObject() as Issue
+            var newestIssue = results.firstObject() as! Issue
             return newestIssue
         }
         
@@ -98,7 +98,7 @@ public class Issue: RLMObject {
         
         var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key)
+            return metadataDict.valueForKey(key as String)
         }
         
         return nil
@@ -114,7 +114,7 @@ public class Issue: RLMObject {
         if issues.count > 0 {
             var array = Array<Issue>()
             for object in issues {
-                let obj: Issue = object as Issue
+                let obj: Issue = object as! Issue
                 array.append(obj)
             }
             return array
@@ -133,7 +133,7 @@ public class Issue: RLMObject {
         if issues.count > 0 {
             var array = Array<Issue>()
             for object in issues {
-                let obj: Issue = object as Issue
+                let obj: Issue = object as! Issue
                 array.append(obj)
             }
             return array
