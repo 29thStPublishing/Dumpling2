@@ -41,13 +41,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Handlers/IssueHandler.swift"
-            timestampString = "450080765.218268"
+            filePath = "D2consumer/ViewController.swift"
+            timestampString = "450689962.987296"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
-            landmarkName = "addIssueFromAPI(_:)"
+            startingLineNumber = "46"
+            endingLineNumber = "46"
+            landmarkName = "updateIssueStatus(_:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

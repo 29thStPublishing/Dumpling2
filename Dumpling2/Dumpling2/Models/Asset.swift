@@ -53,29 +53,29 @@ public class Asset: RLMObject {
     class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, type: String, placement: Int) {
         let realm = RLMRealm.defaultRealm()
         
-        var globalId = asset.objectForKey("id") as String
+        var globalId = asset.objectForKey("id") as! String
         var results = Asset.objectsWhere("globalId = '\(globalId)'")
         var currentAsset: Asset!
         
         realm.beginWriteTransaction()
         if results.count > 0 {
             //existing asset
-            currentAsset = results.firstObject() as Asset
+            currentAsset = results.firstObject() as! Asset
         }
         else {
             //Create a new asset
             currentAsset = Asset()
-            currentAsset.globalId = asset.objectForKey("id") as String
+            currentAsset.globalId = asset.objectForKey("id") as! String
         }
         
-        currentAsset.caption = asset.objectForKey("caption") as String
-        currentAsset.source = asset.objectForKey("source") as String
+        currentAsset.caption = asset.objectForKey("caption") as! String
+        currentAsset.source = asset.objectForKey("source") as! String
         if let metadata: AnyObject = asset.objectForKey("metadata") {
             if metadata.isKindOfClass(NSDictionary) {
                 currentAsset.metadata = Helper.stringFromJSON(metadata)! // metadata.JSONString()!
             }
             else {
-                currentAsset.metadata = metadata as String
+                currentAsset.metadata = metadata as! String
             }
         }
         currentAsset.issue = issue
@@ -83,10 +83,10 @@ public class Asset: RLMObject {
         
         currentAsset.type = type
         
-        var value = asset.objectForKey("crop_350_350") as String
+        var value = asset.objectForKey("crop_350_350") as! String
         currentAsset.squareURL = "\(issue.assetFolder)/\(value)"
         
-        value = asset.objectForKey("file_name") as String
+        value = asset.objectForKey("file_name") as! String
         currentAsset.originalURL = "\(issue.assetFolder)/\(value)"
         
         var main_portrait = ""
@@ -98,7 +98,7 @@ public class Asset: RLMObject {
         
         if let cover = asset.objectForKey("cover") as? NSDictionary {
             var key = "cover_main_\(device)_portrait\(quality)"
-            value = cover.objectForKey(key) as String
+            value = cover.objectForKey(key) as! String
             main_portrait = "\(issue.assetFolder)/\(value)"
             
             key = "cover_main_\(device)_landscape\(quality)"
@@ -107,12 +107,12 @@ public class Asset: RLMObject {
             }
             
             key = "cover_icon_iphone_portrait_retinal"
-            value = cover.objectForKey(key) as String
+            value = cover.objectForKey(key) as! String
             icon = "\(issue.assetFolder)/\(value)"
         }
         else if let cropDict = asset.objectForKey("crop") as? NSDictionary {
             var key = "main_\(device)_portrait\(quality)"
-            value = cropDict.objectForKey(key) as String
+            value = cropDict.objectForKey(key) as! String
             main_portrait = "\(issue.assetFolder)/\(value)"
             
             key = "main_\(device)_landscape\(quality)"
@@ -142,21 +142,21 @@ public class Asset: RLMObject {
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as NSDictionary
-                var allMedia: NSArray = response.valueForKey("media") as NSArray
-                let mediaFile: NSDictionary = allMedia.firstObject as NSDictionary
+                var response: NSDictionary = data as! NSDictionary
+                var allMedia: NSArray = response.valueForKey("media") as! NSArray
+                let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
                 
                 realm.beginWriteTransaction()
                 
                 var currentAsset = Asset()
-                currentAsset.globalId = mediaFile.valueForKey("id") as String
-                currentAsset.caption = mediaFile.valueForKey("title") as String
+                currentAsset.globalId = mediaFile.valueForKey("id") as! String
+                currentAsset.caption = mediaFile.valueForKey("title") as! String
                 currentAsset.issue = issue
                 currentAsset.articleId = articleId
                 
-                var meta = mediaFile.objectForKey("meta") as NSDictionary
-                var dataType = meta.objectForKey("type") as NSString
+                var meta = mediaFile.objectForKey("meta") as! NSDictionary
+                var dataType = meta.objectForKey("type") as! NSString
                 if dataType.isEqualToString("image") {
                     currentAsset.type = AssetType.Image.rawValue
                 }
@@ -167,28 +167,28 @@ public class Asset: RLMObject {
                     currentAsset.type = AssetType.Video.rawValue
                 }
                 else {
-                    currentAsset.type = dataType
+                    currentAsset.type = dataType as String
                 }
                 currentAsset.placement = placement
                 
-                let fileUrl = mediaFile.valueForKey("url") as String
+                let fileUrl = mediaFile.valueForKey("url") as! String
                 let finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
                     (status:AnyObject?, error:NSError?) -> () in
                     if status != nil {
-                        let completed = status as NSNumber
+                        let completed = status as! NSNumber
                         if completed.boolValue {
                             //Mark asset download as done
                             if delegate != nil {
-                                (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
+                                (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
                             }
                         }
                     }
                     else if let err = error {
                         println("Error: " + err.description)
                         if delegate != nil {
-                            (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
                         }
                     }
                 }
@@ -200,7 +200,7 @@ public class Asset: RLMObject {
                         currentAsset.metadata = Helper.stringFromJSON(metadata)!
                     }
                     else {
-                        currentAsset.metadata = metadata as String
+                        currentAsset.metadata = metadata as! String
                     }
                 }
                 
@@ -210,7 +210,7 @@ public class Asset: RLMObject {
             else if let err = error {
                 println("Error: " + err.description)
                 if delegate != nil {
-                    (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
                 }
             }
             
@@ -249,7 +249,7 @@ public class Asset: RLMObject {
         //Iterate through the results and delete the files saved
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
-            let assetDetails = asset as Asset
+            let assetDetails = asset as! Asset
             let originalURL = assetDetails.originalURL
             fileManager.removeItemAtPath(originalURL, error: nil)
         }
@@ -270,7 +270,7 @@ public class Asset: RLMObject {
         //Iterate through the results and delete the files saved
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
-            let assetDetails = asset as Asset
+            let assetDetails = asset as! Asset
             let originalURL = assetDetails.originalURL
             fileManager.removeItemAtPath(originalURL, error: nil)
         }
@@ -290,7 +290,7 @@ public class Asset: RLMObject {
         //Iterate through the results and delete the files saved
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
-            let assetDetails = asset as Asset
+            let assetDetails = asset as! Asset
             let originalURL = assetDetails.originalURL
             fileManager.removeItemAtPath(originalURL, error: nil)
         }
@@ -321,7 +321,7 @@ public class Asset: RLMObject {
         //Iterate through the results and delete the files saved
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
-            let assetDetails = asset as Asset
+            let assetDetails = asset as! Asset
             let originalURL = assetDetails.originalURL
             fileManager.removeItemAtPath(originalURL, error: nil)
         }
@@ -377,20 +377,20 @@ public class Asset: RLMObject {
         var subPredicates = NSMutableArray()
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
-        subPredicates.addObject(predicate!)
+        subPredicates.addObject(predicate)
 
         if type != nil {
             var assetPredicate = NSPredicate(format: "type = %@", type!)
-            subPredicates.addObject(assetPredicate!)
+            subPredicates.addObject(assetPredicate)
         }
         
-        let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+        let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
         var assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
         
         if assets.count > 0 {
             var array = Array<Asset>()
             for object in assets {
-                let obj: Asset = object as Asset
+                let obj: Asset = object as! Asset
                 array.append(obj)
             }
             return array
@@ -423,7 +423,7 @@ public class Asset: RLMObject {
         if assets.count > 0 {
             var array = Array<Asset>()
             for object in assets {
-                let obj: Asset = object as Asset
+                let obj: Asset = object as! Asset
                 array.append(obj)
             }
             return array

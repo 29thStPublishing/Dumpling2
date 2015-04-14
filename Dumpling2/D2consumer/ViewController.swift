@@ -50,7 +50,7 @@ class ViewController: UIViewController {
     //Get issue details
     func readIssueDetails () {
         var issueHandler = IssueHandler()
-        var issue: Issue? = issueHandler.getIssue("54c829c639cc76043772948d")?
+        var issue: Issue? = issueHandler.getIssue("54c829c639cc76043772948d")
         
         if let currentIssue = issue {
             var message = "Issue id: \(currentIssue.globalId)\nTitle: \(currentIssue.title)\nDisplay date: \(currentIssue.displayDate)"

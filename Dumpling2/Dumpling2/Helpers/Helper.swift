@@ -75,7 +75,7 @@ class Helper {
         if NSJSONSerialization.isValidJSONObject(object) {
             if let data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: nil) {
                 if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
-                    return string
+                    return string as String
                 }
             }
         }
@@ -98,10 +98,10 @@ class Helper {
         var zipArchive = ZipArchive()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as NSString
+        var cacheDir: NSString = docPaths[0] as! NSString
         
-        if zipArchive.UnzipOpenFile(filePath) {
-            var result = zipArchive.UnzipFileTo(cacheDir, overWrite: true)
+        if zipArchive.UnzipOpenFile(filePath as String) {
+            var result = zipArchive.UnzipFileTo(cacheDir as String, overWrite: true)
             if !result {
                 //problem
                 return
@@ -110,10 +110,10 @@ class Helper {
             zipArchive.UnzipCloseFile()
         }
         
-        if filePath.hasPrefix(cacheDir) {
+        if filePath.hasPrefix(cacheDir as String) {
             //remove zip file if it was in cache dir
             //planning ahead - this won't be called right now
-            NSFileManager.defaultManager().removeItemAtPath(filePath, error: nil)
+            NSFileManager.defaultManager().removeItemAtPath(filePath as String, error: nil)
         }
     }
 }

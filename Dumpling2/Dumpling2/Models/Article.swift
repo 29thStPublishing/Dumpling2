@@ -46,21 +46,21 @@ public class Article: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         var currentArticle = Article()
-        currentArticle.globalId = article.objectForKey("global_id") as String
-        currentArticle.title = article.objectForKey("title") as String
-        currentArticle.body = article.objectForKey("body") as String
-        currentArticle.articleDesc = article.objectForKey("description") as String
-        currentArticle.url = article.objectForKey("url") as String
-        currentArticle.section = article.objectForKey("section") as String
-        currentArticle.authorName = article.objectForKey("author_name") as String
-        currentArticle.sourceURL = article.objectForKey("source") as String
-        currentArticle.dek = article.objectForKey("dek") as String
-        currentArticle.authorURL = article.objectForKey("author_url") as String
-        currentArticle.keywords = article.objectForKey("keywords") as String
-        currentArticle.commentary = article.objectForKey("commentary") as String
-        currentArticle.articleType = article.objectForKey("type") as String
+        currentArticle.globalId = article.objectForKey("global_id") as! String
+        currentArticle.title = article.objectForKey("title") as! String
+        currentArticle.body = article.objectForKey("body") as! String
+        currentArticle.articleDesc = article.objectForKey("description") as! String
+        currentArticle.url = article.objectForKey("url") as! String
+        currentArticle.section = article.objectForKey("section") as! String
+        currentArticle.authorName = article.objectForKey("author_name") as! String
+        currentArticle.sourceURL = article.objectForKey("source") as! String
+        currentArticle.dek = article.objectForKey("dek") as! String
+        currentArticle.authorURL = article.objectForKey("author_url") as! String
+        currentArticle.keywords = article.objectForKey("keywords") as! String
+        currentArticle.commentary = article.objectForKey("commentary") as! String
+        currentArticle.articleType = article.objectForKey("type") as! String
         
-        var updateDate = article.objectForKey("date_last_updated") as String
+        var updateDate = article.objectForKey("date_last_updated") as! String
         if updateDate != "" {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
         }
@@ -70,12 +70,13 @@ public class Article: RLMObject {
             currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
         }
         else {
-            currentArticle.metadata = metadata as String
+            currentArticle.metadata = metadata as! String
         }
         
         currentArticle.issueId = issue.globalId
         currentArticle.placement = placement
-        currentArticle.versionStashed = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey) as String
+        var bundleVersion: AnyObject? = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey as String)
+        currentArticle.versionStashed = bundleVersion as! String
         
         //Featured or not
         if let featuredDict = article.objectForKey("featured") as? NSDictionary {
@@ -89,7 +90,7 @@ public class Article: RLMObject {
         if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
             if orderedArray.count > 0 {
                 for (index, imageDict) in enumerate(orderedArray) {
-                    Asset.createAsset(imageDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
+                    Asset.createAsset(imageDict as! NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
                 }
             }
         }
@@ -103,7 +104,7 @@ public class Article: RLMObject {
         if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
             if orderedArray.count > 0 {
                 for (index, soundDict) in enumerate(orderedArray) {
-                    Asset.createAsset(soundDict as NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
+                    Asset.createAsset(soundDict as! NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
                 }
             }
         }
@@ -124,30 +125,30 @@ public class Article: RLMObject {
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as NSArray
-                let articleInfo: NSDictionary = allArticles.firstObject as NSDictionary
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 
                 var currentArticle = Article()
-                currentArticle.globalId = articleId
+                currentArticle.globalId = articleId as String
                 currentArticle.placement = placement
                 currentArticle.issueId = issue.globalId
-                currentArticle.title = articleInfo.valueForKey("title") as String
-                currentArticle.body = articleInfo.valueForKey("body") as String
-                currentArticle.articleDesc = articleInfo.valueForKey("description") as String
-                currentArticle.authorName = articleInfo.valueForKey("authorName") as String
-                currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as String
-                currentArticle.url = articleInfo.valueForKey("sharingUrl") as String
-                currentArticle.section = articleInfo.valueForKey("section") as String
-                currentArticle.articleType = articleInfo.valueForKey("type") as String
-                currentArticle.commentary = articleInfo.valueForKey("commentary") as String
-                currentArticle.slug = articleInfo.valueForKey("slug") as String
+                currentArticle.title = articleInfo.valueForKey("title") as! String
+                currentArticle.body = articleInfo.valueForKey("body") as! String
+                currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
+                currentArticle.authorName = articleInfo.valueForKey("authorName") as! String
+                currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                currentArticle.url = articleInfo.valueForKey("sharingUrl") as! String
+                currentArticle.section = articleInfo.valueForKey("section") as! String
+                currentArticle.articleType = articleInfo.valueForKey("type") as! String
+                currentArticle.commentary = articleInfo.valueForKey("commentary") as! String
+                currentArticle.slug = articleInfo.valueForKey("slug") as! String
                 
-                var meta = articleInfo.objectForKey("meta") as NSDictionary
-                var featured = meta.valueForKey("featured") as NSNumber
+                var meta = articleInfo.objectForKey("meta") as! NSDictionary
+                var featured = meta.valueForKey("featured") as! NSNumber
                 currentArticle.isFeatured = featured.boolValue
                 
-                var updated = meta.valueForKey("updated") as NSDictionary
+                var updated = meta.valueForKey("updated") as! NSDictionary
                 if let updateDate: String = updated.valueForKey("date") as? String {
                     currentArticle.date = Helper.publishedDateFromISO(updateDate)
                 }
@@ -157,30 +158,30 @@ public class Article: RLMObject {
                         currentArticle.metadata = Helper.stringFromJSON(metadata)!
                     }
                     else {
-                        currentArticle.metadata = metadata as String
+                        currentArticle.metadata = metadata as! String
                     }
                 }
                 
-                var keywords = articleInfo.objectForKey("keywords") as NSArray
+                var keywords = articleInfo.objectForKey("keywords") as! NSArray
                 if keywords.count > 0 {
                     currentArticle.keywords = Helper.stringFromJSON(keywords)!
                 }
                 
                 //Add all assets of the article (will add images and sound)
-                var articleMedia = articleInfo.objectForKey("media") as NSArray
+                var articleMedia = articleInfo.objectForKey("media") as! NSArray
                 if articleMedia.count > 0 {
                     for (index, assetDict) in enumerate(articleMedia) {
                         //Download images and create Asset object for issue
-                        let assetid = assetDict.valueForKey("id") as NSString
+                        let assetid = assetDict.valueForKey("id") as! NSString
                         if delegate != nil {
-                            (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
-                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId, placement: index+1, delegate: delegate)
+                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)
                     }
                 }
                 
                 //Set thumbnail for article
-                if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId) {
+                if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId as String) {
                     currentArticle.thumbImageURL = firstAsset.originalURL as String
                 }
                 
@@ -190,14 +191,14 @@ public class Article: RLMObject {
                 
                 if delegate != nil {
                     //Mark article as done
-                    (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
                 }
             }
             else if let err = error {
                 println("Error: " + err.description)
                 if delegate != nil {
                     //Mark article as done - even if with errors
-                    (delegate as IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
                 }
             }
             
@@ -217,9 +218,9 @@ public class Article: RLMObject {
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as NSArray
-                let articleInfo: NSDictionary = allArticles.firstObject as NSDictionary
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 
                 self.addArticle(articleInfo)
                 
@@ -237,23 +238,23 @@ public class Article: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         var currentArticle = Article()
-        currentArticle.globalId = article.valueForKey("id") as String
-        currentArticle.title = article.valueForKey("title") as String
-        currentArticle.body = article.valueForKey("body") as String
-        currentArticle.articleDesc = article.valueForKey("description") as String
-        currentArticle.authorName = article.valueForKey("authorName") as String
-        currentArticle.authorURL = article.valueForKey("authorUrl") as String
-        currentArticle.url = article.valueForKey("sharingUrl") as String
-        currentArticle.section = article.valueForKey("section") as String
-        currentArticle.articleType = article.valueForKey("type") as String
-        currentArticle.commentary = article.valueForKey("commentary") as String
-        currentArticle.slug = article.valueForKey("slug") as String
+        currentArticle.globalId = article.valueForKey("id") as! String
+        currentArticle.title = article.valueForKey("title") as! String
+        currentArticle.body = article.valueForKey("body") as! String
+        currentArticle.articleDesc = article.valueForKey("description") as! String
+        currentArticle.authorName = article.valueForKey("authorName") as! String
+        currentArticle.authorURL = article.valueForKey("authorUrl") as! String
+        currentArticle.url = article.valueForKey("sharingUrl") as! String
+        currentArticle.section = article.valueForKey("section") as! String
+        currentArticle.articleType = article.valueForKey("type") as! String
+        currentArticle.commentary = article.valueForKey("commentary") as! String
+        currentArticle.slug = article.valueForKey("slug") as! String
         
-        var meta = article.objectForKey("meta") as NSDictionary
-        var featured = meta.valueForKey("featured") as NSNumber
+        var meta = article.objectForKey("meta") as! NSDictionary
+        var featured = meta.valueForKey("featured") as! NSNumber
         currentArticle.isFeatured = featured.boolValue
         
-        var updated = meta.valueForKey("updated") as NSDictionary
+        var updated = meta.valueForKey("updated") as! NSDictionary
         if let updateDate: String = updated.valueForKey("date") as? String {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
         }
@@ -263,11 +264,11 @@ public class Article: RLMObject {
                 currentArticle.metadata = Helper.stringFromJSON(metadata)!
             }
             else {
-                currentArticle.metadata = metadata as String
+                currentArticle.metadata = metadata as! String
             }
         }
         
-        var keywords = article.objectForKey("keywords") as NSArray
+        var keywords = article.objectForKey("keywords") as! NSArray
         if keywords.count > 0 {
             currentArticle.keywords = Helper.stringFromJSON(keywords)!
         }
@@ -275,15 +276,15 @@ public class Article: RLMObject {
         var issue = Issue()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as NSString
-        issue.assetFolder = cacheDir
+        var cacheDir: NSString = docPaths[0] as! NSString
+        issue.assetFolder = cacheDir as String
         
         //Add all assets of the article (will add images and sound)
-        var articleMedia = article.objectForKey("media") as NSArray
+        var articleMedia = article.objectForKey("media") as! NSArray
         if articleMedia.count > 0 {
             for (index, assetDict) in enumerate(articleMedia) {
                 //Download images and create Asset object for issue
-                Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as NSString, issue: issue, articleId: currentArticle.globalId, placement: index+1, delegate: nil)
+                Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as! NSString, issue: issue, articleId: currentArticle.globalId, placement: index+1, delegate: nil)
             }
         }
         
@@ -307,7 +308,7 @@ public class Article: RLMObject {
         var articleIds = NSMutableArray()
         //go through each article and delete all assets associated with it
         for article in articles {
-            let article = article as Article
+            let article = article as! Article
             articleIds.addObject(article.globalId)
         }
         
@@ -331,25 +332,25 @@ public class Article: RLMObject {
         
         if issueId != nil {
             var predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.addObject(predicate!)
+            subPredicates.addObject(predicate)
         }
         
         if type != nil {
             var typePredicate = NSPredicate(format: "articleType = %@", type!)
-            subPredicates.addObject(typePredicate!)
+            subPredicates.addObject(typePredicate)
         }
         if excludeType != nil {
             var excludePredicate = NSPredicate(format: "articleType != %@", excludeType!)
-            subPredicates.addObject(excludePredicate!)
+            subPredicates.addObject(excludePredicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
             var articles: RLMResults = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
             if articles.count > 0 {
                 var array = Array<Article>()
                 for object in articles {
-                    let obj: Article = object as Article
+                    let obj: Article = object as! Article
                     array.append(obj)
                 }
                 return array
@@ -367,27 +368,27 @@ public class Article: RLMObject {
         
         for keyword in keywords {
             var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
-            subPredicates.addObject(subPredicate!)
+            subPredicates.addObject(subPredicate)
         }
         
-        var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates)
+        var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates as [AnyObject])
         
         subPredicates.removeAllObjects()
         subPredicates.addObject(orPredicate)
         
         if issueId != nil {
             var predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.addObject(predicate!)
+            subPredicates.addObject(predicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates)
+            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
             var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
             
             if articles.count > 0 {
                 var array = Array<Article>()
                 for object in articles {
-                    let obj: Article = object as Article
+                    let obj: Article = object as! Article
                     array.append(obj)
                 }
                 return array
@@ -407,7 +408,7 @@ public class Article: RLMObject {
         if articles.count > 0 {
             var array = Array<Article>()
             for object in articles {
-                let obj: Article = object as Article
+                let obj: Article = object as! Article
                 array.append(obj)
             }
             return array
@@ -439,7 +440,7 @@ public class Article: RLMObject {
         var regex = NSRegularExpression(pattern: assetPattern, options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
         
         var articleBody = self.body
-        var matches = regex?.matchesInString(articleBody, options: nil, range: NSMakeRange(0, articleBody.utf16Count)) as Array<NSTextCheckingResult>
+        var matches = regex?.matchesInString(articleBody, options: nil, range: NSMakeRange(0, count(articleBody))) as! Array<NSTextCheckingResult>
         
         var updatedBody: NSString = articleBody
         
@@ -456,7 +457,7 @@ public class Article: RLMObject {
                 }
                 
                 //Find asset with the global id
-                if let asset = Asset.getAsset(matchedString) {
+                if let asset = Asset.getAsset(matchedString as String) {
                     //Use the asset - generate an HTML with the asset file URL (image, audio, video)
                     var originalAssetPath = asset.originalURL
                     let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath)
@@ -488,7 +489,7 @@ public class Article: RLMObject {
                     
                     //Special case - the asset was enclosed in paragraph tags
                     //Move opening paragraph tag after the asset html in that case
-                    if matchRange.location >= 3 && articleBody.utf16Count > 3 {
+                    if matchRange.location >= 3 && count(articleBody) > 3 {
                         var possibleMatchRange = NSMakeRange(matchRange.location - 3, 3)
                         
                         if updatedBody.substringWithRange(possibleMatchRange) == "<p>" {
@@ -497,7 +498,7 @@ public class Article: RLMObject {
                         }
                     }
                     
-                    updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched, withString: finalHTML)
+                    updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched as String, withString: finalHTML)
                 }
             }
         }
@@ -515,7 +516,7 @@ public class Article: RLMObject {
         if articles.count > 0 {
             var array = Array<Article>()
             for object in articles {
-                let obj: Article = object as Article
+                let obj: Article = object as! Article
                 array.append(obj)
             }
             return array
@@ -534,7 +535,7 @@ public class Article: RLMObject {
         if articles.count > 0 {
             var array = Array<Article>()
             for object in articles {
-                let obj: Article = object as Article
+                let obj: Article = object as! Article
                 array.append(obj)
             }
             return array
@@ -548,7 +549,7 @@ public class Article: RLMObject {
         
         var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key)
+            return metadataDict.valueForKey(key as String)
         }
         
         return nil
