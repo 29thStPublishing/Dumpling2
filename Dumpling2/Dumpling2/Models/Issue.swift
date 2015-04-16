@@ -7,20 +7,30 @@
 //
 
 import UIKit
-//import Realm
 
-//Issue object
+/** A model object for Issue */
 public class Issue: RLMObject {
+    /// Global id of an issue - this is unique for each issue */
     dynamic public var globalId = ""
+    /// SKU or Apple Id for an issue */
     dynamic var appleId = ""
+    /// Title of the issue */
     dynamic public var title = ""
+    /// Description of the issue */
     dynamic public var issueDesc = "" //description
+    /// Folder saving all the assets for the issue */
     dynamic public var assetFolder = ""
+    /// Global id of the asset which is the cover image of the issue */
     dynamic public var coverImageId = "" //globalId of asset
+    /// File URL for the icon image */
     dynamic public var iconImageURL = ""
+    /// Published date for the issue */
     dynamic public var publishedDate = NSDate()
+    /// Last updated date for the issue */
     dynamic public var lastUpdateDate = ""
+    /// Display date for an issue */
     dynamic public var displayDate = ""
+    /// Custom metadata of the issue */
     dynamic public var metadata = ""
     //dynamic var magazine = Magazine()
     
@@ -32,7 +42,13 @@ public class Issue: RLMObject {
     
     //MARK: Class methods
     
-    //Delete an issue
+    /**
+    @brief Delete an issue
+    
+    @discussion This method uses the SKU/Apple id for an issue and deletes it from the database. All the issue's articles, assets, article assets are deleted from the database and the file system
+    
+    @param  appleId The SKU/Apple id for the issue
+    */
     public class func deleteIssue(appleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
@@ -54,7 +70,13 @@ public class Issue: RLMObject {
         }
     }
     
-    //Find most recent issue
+    /**
+    @brief Find most recent issue
+    
+    @discussion This method returns the Issue object for the most recent issue in the database (sorted by publish date)
+    
+    @return  Object for most recent issue
+    */
     public class func getNewestIssue() -> Issue? {
         let realm = RLMRealm.defaultRealm()
         
@@ -68,7 +90,15 @@ public class Issue: RLMObject {
         return nil
     }
     
-    //Get the issue for a specific Apple id
+    /**
+    @brief Get the issue for a specific Apple id
+    
+    @discussion This method takes in an SKU/Apple id and returns the Issue object associated with it (or nil if not found in the database)
+    
+    @param appleId The SKU/Apple id to search for
+    
+    @return  Issue object for the given SKU/Apple id
+    */
     public class func getIssueFor(appleId: String) -> Issue? {
         let realm = RLMRealm.defaultRealm()
         
@@ -84,7 +114,11 @@ public class Issue: RLMObject {
     
     //MARK: Instance methods
     
-    //Save an Issue to the database
+    /**
+    @brief Save an Issue to the database
+    
+    @discussion This method saves an issue back to the database
+    */
     public func saveIssue() {
         let realm = RLMRealm.defaultRealm()
         
@@ -93,7 +127,13 @@ public class Issue: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Get details for a specific key from custom meta of an issue
+    /**
+    @brief Get value for a specific key from custom meta of an issue
+    
+    @discussion This method returns the value for a specific key from the custom metadata of the issue
+    
+    @return an object for the key from the custom metadata (or nil)
+    */
     public func getValue(key: NSString) -> AnyObject? {
         
         var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
@@ -104,7 +144,13 @@ public class Issue: RLMObject {
         return nil
     }
     
-    //Find issue before a given issue
+    /**
+    @brief Get all issues older than a specific issue
+    
+    @discussion This method returns all issues whose publish date is older than the published date of current issue
+    
+    @return an array of issues older than the current issue
+    */
     public func getOlderIssues() -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -123,7 +169,13 @@ public class Issue: RLMObject {
         return nil
     }
     
-    //Find issue newer than a given issue
+    /**
+    @brief Get all issues newer than a specific issue
+    
+    @discussion This method returns all issues whose publish date is newer than the published date of current issue
+    
+    @return an array of issues newer than the current issue
+    */
     public func getNewerIssues() -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
         

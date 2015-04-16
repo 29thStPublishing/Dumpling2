@@ -9,6 +9,7 @@
 import UIKit
 import NewsstandKit
 
+/** Starter class which adds issues to the database */
 public class IssueHandler: NSObject {
     
     var defaultFolder: NSString!
@@ -18,6 +19,11 @@ public class IssueHandler: NSObject {
     
     // MARK: Initializers
     
+    /**
+    @brief Initializer object
+    
+    @discussion Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved
+    */
     public override convenience init() {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
@@ -25,6 +31,13 @@ public class IssueHandler: NSObject {
         self.init(folder: docsDir)
     }
     
+    /**
+    @brief Initializer object
+    
+    @discussion Initializes the IssueHandler with the given folder. This is where the database and assets will be saved
+    
+    @param folder The folder where the database and downloaded assets should be saved
+    */
     public init(folder: NSString){
         self.defaultFolder = folder
         self.activeDownloads = NSMutableDictionary()
@@ -33,6 +46,13 @@ public class IssueHandler: NSObject {
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
     }
     
+    /**
+    @brief Initializer object
+    
+    @discussion Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+    
+    @param apikey Client API key to be used for making calls to the Magnet API
+    */
     public init(apikey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
@@ -48,6 +68,15 @@ public class IssueHandler: NSObject {
         //IssueHandler.checkAndMigrateData(2)
     }
     
+    /**
+    @brief Initializer object
+    
+    @discussion Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+    
+    @param folder The folder where the database and downloaded assets should be saved
+    
+    @apikey Client API key to be used for making calls to the Magnet API
+    */
     public init(folder: NSString, apikey: NSString) {
         self.defaultFolder = folder
         apiKey = apikey as String
@@ -60,7 +89,11 @@ public class IssueHandler: NSObject {
         //IssueHandler.checkAndMigrateData(2)
     }
     
-    //Find current schema version (if needed)
+    /**
+    @brief Find current schema version
+    
+    @return the current schema version for the database
+    */
     public class func getCurrentSchemaVersion() -> UInt {
         var currentSchemaVersion: UInt = RLMRealm.schemaVersionAtPath(RLMRealm.defaultRealmPath(), error: nil)
         
@@ -72,7 +105,6 @@ public class IssueHandler: NSObject {
     }
 
     //Check and migrate Realm data if needed
-    //Do I need to make this public
     class func checkAndMigrateData(schemaVersion: UInt) {
         
         var currentSchemaVersion: UInt = getCurrentSchemaVersion()
@@ -95,7 +127,13 @@ public class IssueHandler: NSObject {
     
     // MARK: Use zip
     
-    //Add issue details from an extracted zip file to Realm database
+    /**
+    @brief Add issue details from an extracted zip file to the database
+    
+    @description The method uses an Apple id, gets a zip file from the project Bundle with the name appleId.zip, extracts its contents and adds the issue, articles and assets to the database
+    
+    @param appleId The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
+    */
     public func addIssueZip(appleId: NSString) {
         /* Step 1 - import zip file */
         
@@ -136,7 +174,13 @@ public class IssueHandler: NSObject {
 
     // MARK: Use API
     
-    //Get Issue details from API and add to database
+    /**
+    @brief Get Issue details from API and add to database
+    
+    @description The method uses the global id of an issue, gets its content from the Magnet API and adds it to the database
+    
+    @param appleId The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
+    */
     public func addIssueFromAPI(issueId: String) {
         
         let requestURL = "\(baseURL)issues/\(issueId)"
@@ -327,7 +371,11 @@ public class IssueHandler: NSObject {
         return 0
     }
     
-    //Get all issues - this is just a test function for me
+    /**
+    @brief Print log of all issues
+    
+    @description The method is for testing only. It prints the available issues for a client api key
+    */
     public func listIssues() {
         
         let requestURL = "\(baseURL)issues"
@@ -348,8 +396,15 @@ public class IssueHandler: NSObject {
         }
     }
     
-    //Search for an issue with an apple id if not available in the database
-    //This will get the issue from the server and add to realm
+    /**
+    @brief Search for an issue with an apple id
+    
+    @description The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
+    
+    @param appleId The SKU/Apple id for the issue
+    
+    @return Issue object or nil if the issue is not in the database or on the server
+    */
     public func searchIssueFor(appleId: String) -> Issue? {
         
         var issue = Issue.getIssueFor(appleId)
@@ -379,7 +434,13 @@ public class IssueHandler: NSObject {
         return issue
     }
     
-    //Get issue details from Realm database for a specific global id
+    /**
+    @brief Get issue details from database for a specific global id
+    
+    @param issueId global id of the issue
+    
+    @return Issue object or nil if the issue is not in the database
+    */
     public func getIssue(issueId: NSString) -> Issue? {
         
         let realm = RLMRealm.defaultRealm()
@@ -396,6 +457,11 @@ public class IssueHandler: NSObject {
     
     //MARK: Publish issue on Newsstand
     
+    /**
+    @brief Add issue on Newsstand
+    
+    @param issueId global id of the issue
+    */
     public func addIssueOnNewsstand(issueId: String) {
         
         if let issue = self.getIssue(issueId) {
@@ -494,7 +560,12 @@ public class IssueHandler: NSObject {
         return percent
     }
     
-    //Get issue ids whose download not complete yet
+    /**
+    @brief Get issue ids whose download not complete yet
+    
+    @return array with issue ids whose download is not complete
+    */
+    //
     public func getActiveDownloads() -> NSArray? {
         //Return issueId whose download is not complete yet
         var issueIds = NSMutableArray(array: self.activeDownloads.allKeys)
