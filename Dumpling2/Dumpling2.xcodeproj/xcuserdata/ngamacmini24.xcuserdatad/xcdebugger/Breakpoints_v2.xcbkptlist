@@ -15,8 +15,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "183"
             endingLineNumber = "183"
-            landmarkName = "updateIssueMetadata(_:globalId:)"
-            landmarkType = "5">
+            landmarkName = "IssueHandler"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -31,7 +31,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "342"
             endingLineNumber = "342"
-            landmarkName = "listIssues()"
+            landmarkName = "updateIssueFromAPI(_:globalId:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -14,22 +14,37 @@ enum AssetType: String {
     case Sound = "sound"
     case Video = "video"
 }
-//Asset object
+
+/** A model object for Assets */
 public class Asset: RLMObject {
+    /// Global id of an asset - this is unique for each asset */
     dynamic public var globalId = ""
+    /// Caption for the asset - used in the final rendered HTML */
     dynamic public var caption = ""
+    /// Source attribution for the asset */
     dynamic public var source = ""
+    /// File URL for the asset's square thumbnail */
     dynamic public var squareURL = ""
+    /// File URL for the original asset */
     dynamic public var originalURL = ""
+    /// File URL for the portrait image of the asset */
     dynamic public var mainPortraitURL = ""
+    /// File URL for the landscape image of the asset */
     dynamic public var mainLandscapeURL = ""
+    /// File URL for the icon image */
     dynamic public var iconURL = ""
+    /// Custom metadata for the asset */
     dynamic public var metadata = ""
+    /// Asset type. Defaults to a photo. Can be image, sound, video or custom */
     dynamic public var type = AssetType.Image.rawValue //default to a photo
+    /// Placement of an asset for an article or issue */
     dynamic public var placement = 0
+    /// Folder which stores the asset files - downloaded or unzipped */
     dynamic public var fullFolderPath = ""
-    dynamic public var articleId = "" //globalId of associated article
-    dynamic public var issue = Issue() //an asset can belong to an article or an issue
+    /// Global id for the article with which the asset is associated. Can be blank if this is an issue's asset */
+    dynamic public var articleId = ""
+    /// Issue object for the issue with which the asset is associated. Can be a default Issue object if the asset is for an independent article */
+    dynamic public var issue = Issue()
     
     override public class func primaryKey() -> String {
         return "globalId"
@@ -302,7 +317,11 @@ public class Asset: RLMObject {
     
     // MARK: Public methods
     
-    //Save an Asset to the database
+    /**
+    @brief Save an Asset to the database
+    
+    @discussion This method lets you save an Asset object back to the database in case some changes are made to it
+    */
     public func saveAsset() {
         let realm = RLMRealm.defaultRealm()
         
@@ -311,7 +330,13 @@ public class Asset: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Delete a specific asset
+    /**
+    @brief Delete a specific asset
+    
+    @discussion This method accepts the global id of an asset and deletes it from the database. The file for the asset is also deleted
+    
+    @param  assetId The global id for the asset
+    */
     public class func deleteAsset(assetId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
@@ -331,8 +356,17 @@ public class Asset: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Retrieve first asset for an issue/article
-    //articleId will be blank if this is an issue's asset
+    /**
+    @brief Retrieve first asset for an issue/article
+    
+    @discussion This method uses the global id for an issue and/or article and returns its first image asset (i.e. placement = 1, type = image)
+    
+    @param  issueId The global id for the issue
+    
+    @param articleId The global id for the article
+    
+    @return Asset object
+    */
     public class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
         
@@ -356,7 +390,17 @@ public class Asset: RLMObject {
         return nil
     }
     
-    //Retrieve number of assets for an issue/article
+    /**
+    @brief Retrieve number of assets for an issue/article
+    
+    @discussion This method uses the global id for an issue and/or article and returns the number of assets it has
+    
+    @param  issueId The global id for the issue
+    
+    @param articleId The global id for the article
+    
+    @return asset count for the issue and/or article
+    */
     public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
         let realm = RLMRealm.defaultRealm()
         
@@ -370,7 +414,19 @@ public class Asset: RLMObject {
         return 0
     }
     
-    //Retrieve all assets for an issue/article (of a specific type: optional)
+    /**
+    @brief Retrieve all assets for an issue/article of a specific type
+    
+    @discussion This method uses the global id for an issue and/or article and the assets in an array. It takes in an optional type parameter. If specified, only assets of that type will be returned
+    
+    @param  issueId The global id for the issue
+    
+    @param articleId The global id for the article
+    
+    @param type The type of asset. If nil, all assets will be returned
+    
+    @return array of assets following the conditions
+    */
     public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -399,7 +455,15 @@ public class Asset: RLMObject {
         return nil
     }
     
-    //Retrieve a specific asset
+    /**
+    @brief Retrieve a specific asset
+    
+    @discussion This method inputs the global id of an asset and returns the Asset object
+    
+    @param  assetId The global id for the asset
+    
+    @return asset object for the global id. Returns nil if the asset is not found
+    */
     public class func getAsset(assetId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
         
@@ -413,7 +477,17 @@ public class Asset: RLMObject {
         return nil
     }
     
-    //Retrieve all sound files for an article/issue as a playlist/array
+    /**
+    @brief Retrieve all sound files for an article/issue as a playlist/array
+    
+    @discussion This method inputs the global id of an issue and/or article and returns all sound assets for it in an array
+    
+    @param  issueId The global id for the issue
+    
+    @param  articleId The global id for the article
+    
+    @return Array of sound asset objects for the given issue and/or article
+    */
     public class func getPlaylistFor(issueId: String, articleId: String) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
         

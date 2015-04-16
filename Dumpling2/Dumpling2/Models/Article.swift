@@ -11,31 +11,52 @@ import UIKit
 var assetPattern: String = "<!-- \\[ASSET: .+\\] -->"
 var assetPatternParts: [String] = ["<!-- [ASSET: ", "] -->"]
 
+/** A model object for Articles */
 //Article object
 public class Article: RLMObject {
+    /// Global id of an article - this is unique for each article */
     dynamic public var globalId = ""
+    /// Article title */
     dynamic public var title = ""
+    /// Article description */
     dynamic public var articleDesc = "" //description
     dynamic public var slug = ""
     dynamic public var dek = ""
+    /// Article content */
     dynamic public var body = ""
+    /// Permanent link to the article */
     dynamic public var permalink = "" //keeping URLs as string - we might need to append parts to get the final
+    /// Article URL */
     dynamic public var url = ""
+    /// URL to the article's source */
     dynamic public var sourceURL = ""
+    /// Article author's name */
     dynamic public var authorName = ""
+    /// Link to the article author's profile */
     dynamic public var authorURL = ""
+    /// Section under which the article falls */
     dynamic public var section = ""
+    /// Type of article */
     dynamic public var articleType = ""
+    /// Keywords which the article falls under */
     dynamic public var keywords = ""
+    /// Article commentary */
     dynamic public var commentary = ""
+    /// Article published date */
     dynamic public var date = NSDate()
+    /// Article metadata */
     dynamic public var metadata = ""
     dynamic public var versionStashed = ""
+    /// Placement of the article in an issue */
     dynamic public var placement = 0
+    /// URL for the article's feature image */
     dynamic public var mainImageURL = ""
+    /// URL for the article's thumbnail image */
     dynamic public var thumbImageURL = ""
+    /// Whether the article is featured for the given issue or not */
     dynamic public var isFeatured = false
-    dynamic var issueId = "" //globalId of issue, can be blank for independent articles
+    /// Global id for the issue the article belongs to. This can be blank for independent articles */
+    dynamic var issueId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"
@@ -209,7 +230,15 @@ public class Article: RLMObject {
     
     //MARK: Class methods
     
-    //Get Article from API and add to Realm
+    /**
+    @brief Get Article from API and add to the database
+    
+    @discussion This method accepts an article's global id, gets its details from Magnet API and adds it to the database.
+    
+    To use it, simply call @cArticle.createIndependentArticle(articleIdHere)
+    
+    @param  articleId The global id for the article
+    */
     public class func createIndependentArticle(articleId: String) {
         let requestURL = "\(baseURL)articles/\(articleId)"
         
@@ -298,7 +327,15 @@ public class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Delete articles and assets for a specific issue
+    /**
+    @brief Delete articles and assets for a specific issue
+    
+    @discussion This method accepts an issue's global id and deletes all articles from the database which belong to that issue
+    
+    To use it, simply call @cArticle.deleteArticlesFor(issueIdHere)
+    
+    @param  issueId The global id of the issue whose articles have to be deleted
+    */
     public class func deleteArticlesFor(issueId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
@@ -321,10 +358,21 @@ public class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Get all articles for any issue (or if nil, all issues)
-    //Articles for only a specific type (optional)
-    //Articles excluding a specific type (optional) - all params can be used in conjunction
-    //At least one of the params is needed
+    /**
+    @brief Get all articles fulfiling certain conditions
+    
+    @discussion This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array.
+    
+    All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
+    
+    @param  issueId The global id of the issue whose articles have to be searched
+    
+    @param type The article type which should be searched and returned
+    
+    @param excludeType The article type which should not be included in the search
+    
+    @return an array of articles fulfiling the conditions
+    */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -360,7 +408,17 @@ public class Article: RLMObject {
         return nil
     }
     
-    //Get all articles for an issue (or if nil, all issues) with specific keywords
+    /**
+    @brief Get all articles for an issue with specific keywords
+    
+    @discussion This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
+    
+    @param  keywords An array of String values with keywords that the article should have. If any of the keywords match, the article will be selected
+    
+    @param issueId Global id for the issue which the articles must belong to. This parameter is optional
+    
+    @return an array of articles fulfiling the conditions
+    */
     public class func searchArticlesWith(keywords: [String], issueId: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -398,7 +456,15 @@ public class Article: RLMObject {
         return nil
     }
     
-    //Get all  featured articles for a specific issue
+    /**
+    @brief Get all  featured articles for a specific issue
+    
+    @discussion This method accepts an issue's global id and returns all articles for the issue which are featured
+    
+    @param issueId Global id for the issue whose featured articles are needed
+    
+    @return an array of featured articles for the issue
+    */
     public class func getFeaturedArticlesFor(issueId: NSString) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -417,14 +483,25 @@ public class Article: RLMObject {
         return nil
     }
     
-    //Change the asset pattern
+    /**
+    @brief Change the asset pattern
+    
+    @discussion This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
+    The default asset pattern is @c<!-- \\[ASSET: .+\\] -->
+    
+    @param newPattern The regex to identify pattern for asset placeholders
+    */
     public class func setAssetPattern(newPattern: String) {
         assetPattern = newPattern
     }
     
     //MARK: Instance methods
     
-    //Save an Article to the database
+    /**
+    @brief Save an Article to the database
+    
+    @discussion This method can be called on an Article object to save it back to the database
+    */
     public func saveArticle() {
         let realm = RLMRealm.defaultRealm()
         
@@ -434,7 +511,14 @@ public class Article: RLMObject {
     }
     
     //MARK: This is to be revisited
-    //Replace asset pattern with actual assets in an Article body
+    /**
+    @brief Replace asset pattern with actual assets in an Article body
+    
+    @discussion This method replaces the asset placeholders in the body of the Article with actual assets using HTML codes
+    Images are replaced with <img> tags, Audio with <audio> tag and videos with <video> tag
+    
+    @return HTML body of the article with actual assets in place of placeholders
+    */
     public func replacePatternsWithAssets() -> NSString {
         //Should work for images, audio, video or any other types of assets
         var regex = NSRegularExpression(pattern: assetPattern, options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
@@ -506,7 +590,13 @@ public class Article: RLMObject {
         return updatedBody
     }
     
-    //Get all articles newer than a specific article
+    /**
+    @brief Get all articles newer than a specific article
+    
+    @discussion This method returns all articles for an issue whose publish date is newer than the published date of current article
+    
+    @return an array of articles newer than the current article (in the same issue)
+    */
     public func getNewerArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -525,7 +615,13 @@ public class Article: RLMObject {
         return nil
     }
     
-    //Get all articles older than a specific article
+    /**
+    @brief Get all articles older than a specific article
+    
+    @discussion This method returns all articles for an issue whose publish date is before the published date of current article
+    
+    @return an array of articles older than the current article (in the same issue)
+    */
     public func getOlderArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
@@ -544,7 +640,13 @@ public class Article: RLMObject {
         return nil
     }
     
-    //Get details for a specific key from custom meta of an article
+    /**
+    @brief Get value for a specific key from custom meta of an article
+    
+    @discussion This method returns the value for a specific key from the custom metadata of the article
+    
+    @return an object for the key from the custom metadata (or nil)
+    */
     public func getValue(key: NSString) -> AnyObject? {
         
         var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
