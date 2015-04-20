@@ -68,7 +68,6 @@
 		FFCF42531A7A582B00E847E8 /* RLMSchema.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCF42461A7A582B00E847E8 /* RLMSchema.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCF42561A7A592100E847E8 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCF42551A7A592100E847E8 /* Realm */; };
 		FFCF6D0F1A7F42BF008DF718 /* Dumpling2.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCB3AFC1A78A12700F52BC6 /* Dumpling2.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FFD158FC1AC0181B00BA8E16 /* Methods.md in Sources */ = {isa = PBXBuildFile; fileRef = FFD158FB1AC0181B00BA8E16 /* Methods.md */; };
 		FFD501BE1AB18E140091A194 /* RLMObjectBase.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD501BD1AB18E140091A194 /* RLMObjectBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFDAD91B1AB6FA9600506EBF /* LRNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDAD91A1AB6FA9600506EBF /* LRNetworkManager.swift */; };
 /* End PBXBuildFile section */
@@ -197,7 +196,6 @@
 		FFCF42451A7A582B00E847E8 /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
 		FFCF42461A7A582B00E847E8 /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema.h; sourceTree = "<group>"; };
 		FFCF42551A7A592100E847E8 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
-		FFD158FB1AC0181B00BA8E16 /* Methods.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = Methods.md; path = Dumpling2/Methods.md; sourceTree = "<group>"; };
 		FFD501BD1AB18E140091A194 /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
 		FFDAD91A1AB6FA9600506EBF /* LRNetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LRNetworkManager.swift; path = Helpers/LRNetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -329,7 +327,6 @@
 		FFCB3AED1A78A12700F52BC6 = {
 			isa = PBXGroup;
 			children = (
-				FFD158FB1AC0181B00BA8E16 /* Methods.md */,
 				FFCA0FC01A80DBF1000C9AFD /* AFNetworking */,
 				FFCF423A1A7A582B00E847E8 /* RHeaders */,
 				FFCB3B131A78E42600F52BC6 /* Resources */,
@@ -782,7 +779,6 @@
 				FFCA0FE61A80DBF1000C9AFD /* AFURLSessionManager.m in Sources */,
 				FFCB3B241A78E42800F52BC6 /* RLMSupport.swift in Sources */,
 				FFCB3B3A1A78E5ED00F52BC6 /* IssueHandler.swift in Sources */,
-				FFD158FC1AC0181B00BA8E16 /* Methods.md in Sources */,
 				FFCA0FD91A80DBF1000C9AFD /* AFHTTPSessionManager.m in Sources */,
 				FFDAD91B1AB6FA9600506EBF /* LRNetworkManager.swift in Sources */,
 				FFCB3B431A78E5F600F52BC6 /* Magazine.swift in Sources */,
