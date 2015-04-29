@@ -1,8 +1,21 @@
 # Dumpling
 
-Dumpling is a framework using which you can publish issues/articles as apps easily by connecting with the Magnet API.
+Dumpling is a framework using which you can publish issues/articles as apps easily by connecting with the Magnet API or using the zip files created by Linechef.
 
-Dumpling has been written with Swift 1.2 and is very easy to use and integrate. This short guide is to help you understand the methods available to you with Dumpling framework.
+The framework lets you get an issue's details in 2 ways
+
+1. Parse through a zip file for an issue (in the application bundle)
+2. Get an issue id (or an individual article's id) and retrieve the information from Magnet
+
+Dumpling has been written with Swift 1.2 and is very easy to use and integrate. This short guide is to help you understand the usage of Dumpling in your projects and the methods available to you with the framework.
+
+## Dependencies
+
+1. The Dumpling framework looks for **AFNetworking** libraries for making calls to the Magnet API. AFNetworking is included as a part of the framework
+
+2. Dumpling uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately
+
+3. Dumpling uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 
 ## IssueHandler
@@ -203,3 +216,62 @@ Realm object for Assets. Also has methods for directly dealing with assets
 
 ###Instance methods (public)
 1. **saveAsset()** This method lets you save an Asset object back to the database in case some changes are made to it
+
+
+## ReaderHelper
+
+Class which helps store and retrieve user reading status
+
+###Class methods (public)
+1. **saveIssue(issueId: String)** This method accepts the global id of an issue and saves it to user defaults. If nil, will remove saved issue (used when switching between issues or you want to remove saved state)
+
+2. **saveArticle(articleId: String)** This method accepts the global id of an article and saves it to user defaults. If nil, will remove saved article (used when switching between articles or user is not viewing any article as of now)
+
+3. **saveAsset(assetId: String)** This method accepts the global id of an asset and saves it to user defaults. If nil, will remove saved asset (used when moving away from viewing an asset or if you wish to remove saved state)
+
+4. **saveReadingPercentageFor(articleId: String, readingPercentage: Float)** This method saves the reading status for given article in percentage. The percentage value is calculated as current *y* position of article content (scroll position) / height of article container
+
+5. **retrieveCurrentIssue()** ```returns String``` returns the global id of the current issue
+
+6. **retrieveCurrentArticle()** ```returns String``` returns the global id of the current article
+
+7. **retrieveCurrentAsset()** ```returns String``` returns the global id of the current active asset
+
+8. **getReadingPercentageFor(articleId: String)** ```returns Float``` retrieves last saved reading percentage for given article. To use this value, multiply the return value with the article content height and set it as the content offset for the view holding the content
+
+9. **getDictionaryForCloud()** ```returns Dictionary<String, AnyObject>``` This method returns a dictionary containing saved values for current issue, article, asset and reading percentage for an article. The keys used are *CurrentIssue*, *CurrentArticle*, *CurrentAsset* and *ArticlePercent-<article_id_here>*
+
+10. **saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>)** saves specific values from a key for current issue, current article, current asset and article reading percentage back to user defaults (for using while app is active). The keys used should be the same as above
+
+
+## Notifications
+
+Dumpling issues notifications at various stages of a download. This information can be used by apps to update progress and app data. The notifications issued by Dumpling include
+
+1. **issueDownloadComplete** This notification is fired when an issue's data is downloaded from Magnet and saved back to the database. The articles and assets might still be downloading at this stage
+
+2. **articlesDownloadComplete** This notification is fired when the data for all articles in an issue are downloaded and saved back to the database. It is not necessary that all assets have been downloaded at this point
+
+3. **downloadComplete** This notification is fired when everthing related to an issue is downloaded (issue, articles, assets)
+
+
+## Usage
+
+```
+//For zipped files
+let appleId = "org.bomb.mag.issue.20150101"
+var issueHandler = IssueHandler()
+issueHandler.addIssueZip(appleId)
+
+//For issues from API
+issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
+```
+
+
+## Additional notes
+
+1. If you wish to publish your issue on Newsstand, make sure your project's plist has the *UINewsstandApp* key with a *true* value. You will also need to add NewsstandKit.framework to your project
+
+2. In order to use iCloud for syncing reading status, add CloudKit.framework to your project, turn on iCloud in the target's *Capabilities* section for *Key-value storage*. The sample project (**DumplingDemo**) uses the default container for storing and retrieving values. If you wish to use a custom container, the code will change accordingly
+
+3. If you turn on App Groups for multiple projects and instantiate **IssueHandler** with the appropriate shared folder, you can read the data across multiple apps. To do this, you will need an app id with *App Groups* enabled and set the app group in *Capabilities* for all projects sharing the data

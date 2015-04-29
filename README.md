@@ -2,7 +2,7 @@
 
 Hello there! Dumpling 2 is intended to be compiled into a framework as a client to [Magnet API](https://github.com/29thStPublishing/Magnet-API)
 
-The project has 2 targets - the **Dumpling2** target (the framework) and a **D2consumer** target (which will use the framework)
+The project has 2 targets - the **Dumpling2** target (the framework) and a **DumplingDemo** target (which will use the framework)
 
 The framework lets you get an issue's details in 2 ways
 1. Parse through a zip file for an issue (in the application bundle)
@@ -35,6 +35,8 @@ It provides a default convenience initializer. Optionally you can specify a fold
 
 **LRNetworkManager** is a singleton subclass of AFHTTPRequestOperationManager. All network operations should be through this file. It sends requests to the Magnet API and downloads data as well as files
 
+**ReaderHelper** has methods to save reading status of articles (issue, current article or asset, reading position) and retrieve them
+
 
 ### Usage
 
@@ -48,13 +50,15 @@ issueHandler.addIssueZip(appleId)
 issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
 ```
 
-### Other points
+### Additional notes
 
 1. To check whether data was inserted into Realm properly or not, you can use Realm browser. The browser can be found in their [release zip](http://static.realm.io/downloads/cocoa/latest) under browser/. Open the Documents directory for your app on Simulator. You will find the Realm database here (if you have not specified a different folder path when initializing IssueHandler). Open the database with Realm browser and you can browse throguh all the data
-2. To see how the framework can be used for adding data to the database (using a zip or from the API), compile and run the D2consumer target
-3. To see how the framework can be used for reading data from the database, compile and run the D2Reader target
 
-**NOTE** - D2Reader and D2consumer will only be able to work (and share the Realm database) if they have App Sharing turned on and you use a folder name (app groups) shared by both when creating IssueHandler object. For that you will need an app id with App Groups enabled and set the app group in Capabilities for both D2consumer and D2Reader. Without these, you will have to use the "Read" call from within the Consumer target.
+2. If you wish to publish your issue on Newsstand, make sure your project's plist has the *UINewsstandApp* key with a *true* value. Make sure you add NewsstandKit.framework to your project
+
+3. In order to use iCloud for syncing reading status, add CloudKit.framework to your project, turn on iCloud in the target's Capabilities section for Key-value storage. The sample project uses the default container for storing and retrieving values. If you wish to use a custom container, the code will change accordingly
+
+4. If you turn on App Groups for multiple projects and instantiate **IssueHandler** with the appropriate folder, you can read the data across multiple apps. To do this, you will need an app id with App Groups enabled and set the app group in Capabilities for all projects sharing the data.
 
 
 *The Documents directory is here ~/Library/Developer/CoreSimulator/Devices/Your_simulator_UDID/data/Containers/Data/Application/Your_app_UDID/Documents

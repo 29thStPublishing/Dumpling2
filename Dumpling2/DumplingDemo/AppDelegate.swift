@@ -1,12 +1,13 @@
 //
 //  AppDelegate.swift
-//  D2Reader
+//  DumplingDemo
 //
-//  Created by Lata Rastogi on 24/02/15.
+//  Created by Lata Rastogi on 22/04/15.
 //  Copyright (c) 2015 29th Street. All rights reserved.
 //
 
 import UIKit
+import Dumpling2
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -27,6 +28,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        //Sync current reading status to iCloud for use on next launch
+        self.syncToiCloud()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -39,6 +43,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    //Sync current read status to iCloud
+    func syncToiCloud() {
+        var cloudStore = NSUbiquitousKeyValueStore.defaultStore()
+        var dictionary = ReaderHelper.getDictionaryForCloud()
+        cloudStore.setDictionary(dictionary, forKey: "ReadingSync")
     }
 
 
