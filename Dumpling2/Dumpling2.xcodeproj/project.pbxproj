@@ -665,6 +665,11 @@
 					};
 					FFD86B5D1AE7AA13003E357B = {
 						CreatedOnToolsVersion = 6.3;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 					FFD86B731AE7AA13003E357B = {
 						CreatedOnToolsVersion = 6.3;

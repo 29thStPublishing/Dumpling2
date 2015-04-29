@@ -82,9 +82,10 @@ class MasterViewController: UITableViewController {
     func loadFromiCloud() {
         //Get all saved values for read sync from iCloud in a dictionary
         var cloudStore = NSUbiquitousKeyValueStore.defaultStore()
-        var dictionary: Dictionary<String, AnyObject> = cloudStore.dictionaryForKey("ReadingSync") as! Dictionary<String, AnyObject>
-        //Save dictionary values from iCloud to user defaults - to be used while app is active
-        ReaderHelper.saveDictionaryToUserDefaults(dictionary)
+        if let dictionary: Dictionary<String, AnyObject> = cloudStore.dictionaryForKey("ReadingSync") as? Dictionary<String, AnyObject> {
+            //Save dictionary values from iCloud to user defaults - to be used while app is active
+            ReaderHelper.saveDictionaryToUserDefaults(dictionary)
+        }
         
         //Load next view with appropriate article and position - if applicable
         if let articleId = ReaderHelper.retrieveCurrentArticle() {
