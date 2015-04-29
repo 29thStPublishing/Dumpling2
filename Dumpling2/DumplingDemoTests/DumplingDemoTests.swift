@@ -1,15 +1,15 @@
 //
-//  D2ReaderTests.swift
-//  D2ReaderTests
+//  DumplingDemoTests.swift
+//  DumplingDemoTests
 //
-//  Created by ngamacmini24 on 24/02/15.
+//  Created by Lata Rastogi on 22/04/15.
 //  Copyright (c) 2015 29th Street. All rights reserved.
 //
 
 import UIKit
 import XCTest
 
-class D2ReaderTests: XCTestCase {
+class DumplingDemoTests: XCTestCase {
     
     override func setUp() {
         super.setUp()

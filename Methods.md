@@ -136,6 +136,32 @@ Realm object for Assets. Also has methods for directly dealing with assets
 1. **saveAsset()** lets you save an Asset object to Realm
 
 
+## ReaderHelper
+
+Class which helps store and retrieve user reading status
+
+###Class methods (public)
+1. **saveIssue(issueId:)** saves current active issue. If nil, will remove saved issue
+
+2. **saveArticle(articleId:)** saves current active article. If nil, will remove saved article
+
+3. **saveAsset(assetId:)** saves asset being viewed currently. If nil, will remove saved asset
+
+4. **saveReadingPercentageFor(articleId:, readingPercentage:)** saves the reading status for current article in percentage (= current y position of article content / height of article)
+
+5. **retrieveCurrentIssue()** returns the global id of the current issue
+
+6. **retrieveCurrentArticle()** returns the global id of the current article
+
+7. **retrieveCurrentAsset()** returns the global id of the current active asset
+
+8. **getReadingPercentageFor(articleId:)** retrieves last saved reading percentage for given article
+
+9. **getDictionaryForCloud()** returns a dictionary containing saved values for current issue, article, asset and reading percentage for an article
+
+10. **saveDictionaryToUserDefaults(savedValues:)** saves specific values from a key for current issue, current article, current asset and article reading percentage back to user defaults (for using while app is active)
+
+
 ## Helper
 
 Helper class
