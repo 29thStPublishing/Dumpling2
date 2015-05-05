@@ -18,17 +18,16 @@
 
 #import <Foundation/Foundation.h>
 
-/*#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>*/
-#import "RLMArray.h"
-#import "RLMMigration.h"
-#import "RLMObject.h"
-#import "RLMPlatform.h"
-#import "RLMRealm.h"
-#import "RLMResults.h"
-#import "RLMSchema.h"
+@class RLMRealm;
+@class RLMSchema;
+@class RLMObjectSchema;
+
+@interface RLMObjectBase : NSObject
+
+@property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
+
+- (instancetype)init;
+
++ (NSString *)className;
+
+@end

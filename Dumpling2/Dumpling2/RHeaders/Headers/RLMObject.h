@@ -18,7 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-//#import <Realm/RLMObjectBase.h>
 #import "RLMObjectBase.h"
 
 @class RLMRealm;

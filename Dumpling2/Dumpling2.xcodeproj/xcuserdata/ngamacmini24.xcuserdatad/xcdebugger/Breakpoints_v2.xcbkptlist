@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "D2consumer/ViewController.swift"
-            timestampString = "450689962.987296"
+            filePath = "DumplingDemo/DetailViewController.swift"
+            timestampString = "451978538.329954"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
-            landmarkName = "updateIssueStatus(_:)"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
+            landmarkName = "configureView()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "DumplingDemo/DetailViewController.swift"
-            timestampString = "451978538.329954"
+            filePath = "Dumpling2/Handlers/IssueHandler.swift"
+            timestampString = "452497320.265222"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
-            landmarkName = "configureView()"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
+            landmarkName = "init(folder:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

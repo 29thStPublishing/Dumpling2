@@ -18,12 +18,12 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         return Singleton.sharedInstance
     }
     
-    override init() {
-        super.init()
-    }
-    
     override init(baseURL:NSURL) {
         super.init(baseURL: baseURL)
+    }
+    
+    init() {
+        super.init(baseURL: nil)
     }
 
     required init(coder aDecoder: NSCoder) {

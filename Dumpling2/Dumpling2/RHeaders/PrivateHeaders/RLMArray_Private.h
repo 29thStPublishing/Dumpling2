@@ -17,32 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMArray.h"
-#import "RLMObject.h"
 
-@interface RLMRealm (Swift)
-+ (void)resetRealmState;
-@end
-
-@interface RLMArray (Swift)
-
-// FIXME - remove when we delete legacy swift support
+@interface RLMArray ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
-
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-
-@end
-
-@interface RLMResults (Swift)
-
-- (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat args:(va_list)args;
-- (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-
-@end
-
-@interface RLMObject (Swift)
-
-+ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
-+ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
-
+- (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 @end

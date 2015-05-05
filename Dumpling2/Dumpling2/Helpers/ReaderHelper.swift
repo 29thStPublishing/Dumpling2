@@ -9,7 +9,7 @@
 import UIKit
 
 /** Class which helps store and retrieve user reading status */
-public class ReaderHelper {
+public class ReaderHelper: NSObject {
 
     /**
     @brief Save current active issue

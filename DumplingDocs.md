@@ -23,29 +23,33 @@ Dumpling has been written with Swift 1.2 and is very easy to use and integrate. 
 This is the main class and the starting point of Dumpling
 
 ###Methods
-1. **init()** Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved
+1. **init(folder: NSString)** Initializes the IssueHandler with the given folder. This is where the database and assets will be saved
 
-2. **init(folder: NSString)** Initializes the IssueHandler with the given folder. This is where the database and assets will be saved
+    **NOTE:** The initializer requires an API key. If you wish to pass an API key to the initializer, use one of the below initializers. This method will look for a ```String``` with the key ```APIKey``` in your project's **Info.plist**
+```
+<key>APIKey</key>
+<string>19dc497bc4d6481cb827dd3e4637a8e3</string>
+```
 
-3. **init(apikey: NSString)** Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+2. **init(apikey: NSString)** Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
 
-4. **init(folder: NSString, apikey: NSString)** Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The API key is your Client API key provided by 29.io
+3. **init(folder: NSString, apikey: NSString)** Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The API key is your Client API key provided by 29.io
 
-5. **getCurrentSchemaVersion()** ```returns UInt``` Find current schema version
+4. **getCurrentSchemaVersion()** ```returns UInt``` Find current schema version
 
-6. **addIssueZip(appleId: NSString)** The method uses an Apple id, gets a zip file from the project Bundle with the name appleId.zip, extracts its contents and adds the issue, articles and assets to the database
+5. **addIssueZip(appleId: NSString)** The method uses an Apple id, gets a zip file from the project Bundle with the name appleId.zip, extracts its contents and adds the issue, articles and assets to the database
 
-7. **addIssueFromAPI(issueId: String)** The method uses the global id of an issue, gets its content from the Magnet API and adds it to the database
+6. **addIssueFromAPI(issueId: String)** The method uses the global id of an issue, gets its content from the Magnet API and adds it to the database
 
-8. **listIssues()** The method is for testing only. It prints the available issues for a client api key
+7. **listIssues()** The method is for testing only. It prints the available issues for a client api key
 
-9. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
+8. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
 
-10. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
+9. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
 
-11. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
+10. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
 
-12. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
+11. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
 
 
 ## Issue
