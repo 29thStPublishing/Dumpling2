@@ -13,7 +13,7 @@ import NewsstandKit
 public class IssueHandler: NSObject {
     
     var defaultFolder: NSString!
-    var activeDownloads: NSMutableDictionary
+    var activeDownloads: NSMutableDictionary!
     //activeDownloads is a dictionary of issueIds (keys). Each issueId has a dictionary.
     //Each entry in the dictionary has the key = request url, value = completion_status (true, false)
     
@@ -24,12 +24,25 @@ public class IssueHandler: NSObject {
     
     @discussion Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved
     */
-    public override convenience init() {
+    /*public convenience override init() {
+        //super.init()
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        self.init(folder: docsDir)
-    }
+        self.defaultFolder = docsDir
+        self.activeDownloads = NSMutableDictionary()
+        
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        
+        var mainBundle = NSBundle.mainBundle()
+        if let key: String = mainBundle.objectForInfoDictionaryKey("APIKey") as? String {
+            apiKey = key
+        }
+        else {
+            return nil
+        }
+    }*/
     
     /**
     @brief Initializer object
@@ -38,12 +51,21 @@ public class IssueHandler: NSObject {
     
     @param folder The folder where the database and downloaded assets should be saved
     */
-    public init(folder: NSString){
+    public init?(folder: NSString){
+        super.init()
         self.defaultFolder = folder
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        
+        var mainBundle = NSBundle.mainBundle()
+        if let key: String = mainBundle.objectForInfoDictionaryKey("APIKey") as? String {
+            apiKey = key
+        }
+        else {
+            return nil
+        }
     }
     
     /**
