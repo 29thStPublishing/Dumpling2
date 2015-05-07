@@ -41,9 +41,9 @@
 /**
  Get all objects of a given type in this Realm.
 
- @param className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
+ :param: className   The name of the RLMObject subclass to retrieve on e.g. `MyClass.className`.
 
- @return    An RLMResults of all objects in this realm of the given type.
+ :return:    An RLMResults of all objects in this realm of the given type.
 
  @see       RLMObject allObjects
  */
@@ -54,10 +54,10 @@
 
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
 
- @param className       The type of objects you are looking for (name of the class).
- @param predicateFormat The predicate format string which can accept variable arguments.
+ :param: className       The type of objects you are looking for (name of the class).
+ :param: predicateFormat The predicate format string which can accept variable arguments.
 
- @return    An RLMResults of results matching the given predicate.
+ :return:    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
@@ -68,10 +68,10 @@
 
  The preferred way to get objects of a single class is to use the class methods on RLMObject.
 
- @param className   The type of objects you are looking for (name of the class).
- @param predicate   The predicate to filter the objects.
+ :param: className   The type of objects you are looking for (name of the class).
+ :param: predicate   The predicate to filter the objects.
 
- @return    An RLMResults of results matching the given predicate.
+ :return:    An RLMResults of results matching the given predicate.
 
  @see       RLMObject objectsWhere:
  */
@@ -80,7 +80,7 @@
 /**
  Create an RLMObject of type `className` in the Realm with a given object.
 
- @param object  The object used to populate the object. This can be any key/value coding compliant
+ :param: object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if any required properties are not present and no default is set.
@@ -95,11 +95,11 @@
 /**
  Initialize an RLMObjectSchema with classname, objectClass, and an array of properties
 
- @param objectClassName     The name of the class used to refer to objects of this type.
- @param objectClass         The objective-c class used when creating instances of this type.
- @param properties          An array RLMProperty describing the persisted properties for this type.
+ :param: objectClassName     The name of the class used to refer to objects of this type.
+ :param: objectClass         The objective-c class used when creating instances of this type.
+ :param: properties          An array RLMProperty describing the persisted properties for this type.
 
- @return    An initialized instance of RLMObjectSchema.
+ :return:    An initialized instance of RLMObjectSchema.
  */
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;
 @end
@@ -108,12 +108,12 @@
 /**
  Initialize an RLMProperty
 
- @param name            The property name.
- @param type            The property type.
- @param objectClassName The object type used for Object and Array types.
- @param attributes      A bitmask of attributes for this property.
+ :param: name            The property name.
+ :param: type            The property type.
+ :param: objectClassName The object type used for Object and Array types.
+ :param: attributes      A bitmask of attributes for this property.
 
- @return    An initialized instance of RLMProperty.
+ :return:    An initialized instance of RLMProperty.
  */
 - (instancetype)initWithName:(NSString *)name
                         type:(RLMPropertyType)type

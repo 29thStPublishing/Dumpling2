@@ -35,11 +35,11 @@
 /**
  Returns a request with the specified parameters encoded into a copy of the original request.
 
- @param request The original request.
- @param parameters The parameters to be encoded.
- @param error The error that occurred while attempting to encode the request parameters.
+ :param: request The original request.
+ :param: parameters The parameters to be encoded.
+ :param: error The error that occurred while attempting to encode the request parameters.
 
- @return A serialized request.
+ :return: A serialized request.
  */
 - (NSURLRequest *)requestBySerializingRequest:(NSURLRequest *)request
                                withParameters:(id)parameters
@@ -122,7 +122,7 @@ typedef NS_ENUM(NSUInteger, AFHTTPRequestQueryStringSerializationStyle) {
  - `Accept-Language` with the contents of `NSLocale +preferredLanguages`
  - `User-Agent` with the contents of various bundle identifiers and OS designations
  
- @discussion To add or remove default request headers, use `setValue:forHTTPHeaderField:`.
+ :discussion: To add or remove default request headers, use `setValue:forHTTPHeaderField:`.
  */
 @property (readonly, nonatomic, strong) NSDictionary *HTTPRequestHeaders;
 
@@ -134,8 +134,8 @@ typedef NS_ENUM(NSUInteger, AFHTTPRequestQueryStringSerializationStyle) {
 /**
  Sets the value for the HTTP headers set in request objects made by the HTTP client. If `nil`, removes the existing value for that header.
 
- @param field The HTTP header to set a default value for
- @param value The value set as default for the specified header, or `nil`
+ :param: field The HTTP header to set a default value for
+ :param: value The value set as default for the specified header, or `nil`
  */
 - (void)setValue:(NSString *)value
 forHTTPHeaderField:(NSString *)field;
@@ -143,17 +143,17 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Returns the value for the HTTP headers set in the request serializer.
 
- @param field The HTTP header to retrieve the default value for
+ :param: field The HTTP header to retrieve the default value for
 
- @return The value set as default for the specified header, or `nil`
+ :return: The value set as default for the specified header, or `nil`
  */
 - (NSString *)valueForHTTPHeaderField:(NSString *)field;
 
 /**
  Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a basic authentication value with Base64-encoded username and password. This overwrites any existing value for this header.
 
- @param username The HTTP basic auth username
- @param password The HTTP basic auth password
+ :param: username The HTTP basic auth username
+ :param: password The HTTP basic auth password
  */
 - (void)setAuthorizationHeaderFieldWithUsername:(NSString *)username
                                        password:(NSString *)password;
@@ -181,7 +181,7 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Set the method of query string serialization according to one of the pre-defined styles.
 
- @param style The serialization style.
+ :param: style The serialization style.
 
  @see AFHTTPRequestQueryStringSerializationStyle
  */
@@ -190,7 +190,7 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Set the a custom method of query string serialization according to the specified block.
 
- @param block A block that defines a process of encoding parameters into a query string. This block returns the query string and takes three arguments: the request, the parameters to encode, and the error that occurred when attempting to encode parameters for the given request.
+ :param: block A block that defines a process of encoding parameters into a query string. This block returns the query string and takes three arguments: the request, the parameters to encode, and the error that occurred when attempting to encode parameters for the given request.
  */
 - (void)setQueryStringSerializationWithBlock:(NSString * (^)(NSURLRequest *request, id parameters, NSError * __autoreleasing *error))block;
 
@@ -210,12 +210,12 @@ forHTTPHeaderField:(NSString *)field;
 
  If the HTTP method is `GET`, `HEAD`, or `DELETE`, the parameters will be used to construct a url-encoded query string that is appended to the request's URL. Otherwise, the parameters will be encoded according to the value of the `parameterEncoding` property, and set as the request body.
 
- @param method The HTTP method for the request, such as `GET`, `POST`, `PUT`, or `DELETE`. This parameter must not be `nil`.
- @param URLString The URL string used to create the request URL.
- @param parameters The parameters to be either set as a query string for `GET` requests, or the request HTTP body.
- @param error The error that occured while constructing the request.
+ :param: method The HTTP method for the request, such as `GET`, `POST`, `PUT`, or `DELETE`. This parameter must not be `nil`.
+ :param: URLString The URL string used to create the request URL.
+ :param: parameters The parameters to be either set as a query string for `GET` requests, or the request HTTP body.
+ :param: error The error that occured while constructing the request.
 
- @return An `NSMutableURLRequest` object.
+ :return: An `NSMutableURLRequest` object.
  */
 - (NSMutableURLRequest *)requestWithMethod:(NSString *)method
                                  URLString:(NSString *)URLString
@@ -235,13 +235,13 @@ forHTTPHeaderField:(NSString *)field;
 
  Multipart form requests are automatically streamed, reading files directly from disk along with in-memory data in a single HTTP body. The resulting `NSMutableURLRequest` object has an `HTTPBodyStream` property, so refrain from setting `HTTPBodyStream` or `HTTPBody` on this request object, as it will clear out the multipart form body stream.
 
- @param method The HTTP method for the request. This parameter must not be `GET` or `HEAD`, or `nil`.
- @param URLString The URL string used to create the request URL.
- @param parameters The parameters to be encoded and set in the request HTTP body.
- @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol.
- @param error The error that occured while constructing the request.
+ :param: method The HTTP method for the request. This parameter must not be `GET` or `HEAD`, or `nil`.
+ :param: URLString The URL string used to create the request URL.
+ :param: parameters The parameters to be encoded and set in the request HTTP body.
+ :param: block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol.
+ :param: error The error that occured while constructing the request.
 
- @return An `NSMutableURLRequest` object
+ :return: An `NSMutableURLRequest` object
  */
 - (NSMutableURLRequest *)multipartFormRequestWithMethod:(NSString *)method
                                               URLString:(NSString *)URLString
@@ -252,11 +252,11 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Creates an `NSMutableURLRequest` by removing the `HTTPBodyStream` from a request, and asynchronously writing its contents into the specified file, invoking the completion handler when finished.
 
- @param request The multipart form request. The `HTTPBodyStream` property of `request` must not be `nil`.
- @param fileURL The file URL to write multipart form contents to.
- @param handler A handler block to execute.
+ :param: request The multipart form request. The `HTTPBodyStream` property of `request` must not be `nil`.
+ :param: fileURL The file URL to write multipart form contents to.
+ :param: handler A handler block to execute.
 
- @discussion There is a bug in `NSURLSessionTask` that causes requests to not send a `Content-Length` header when streaming contents from an HTTP body, which is notably problematic when interacting with the Amazon S3 webservice. As a workaround, this method takes a request constructed with `multipartFormRequestWithMethod:URLString:parameters:constructingBodyWithBlock:error:`, or any other request with an `HTTPBodyStream`, writes the contents to the specified file and returns a copy of the original request with the `HTTPBodyStream` property set to `nil`. From here, the file can either be passed to `AFURLSessionManager -uploadTaskWithRequest:fromFile:progress:completionHandler:`, or have its contents read into an `NSData` that's assigned to the `HTTPBody` property of the request.
+ :discussion: There is a bug in `NSURLSessionTask` that causes requests to not send a `Content-Length` header when streaming contents from an HTTP body, which is notably problematic when interacting with the Amazon S3 webservice. As a workaround, this method takes a request constructed with `multipartFormRequestWithMethod:URLString:parameters:constructingBodyWithBlock:error:`, or any other request with an `HTTPBodyStream`, writes the contents to the specified file and returns a copy of the original request with the `HTTPBodyStream` property set to `nil`. From here, the file can either be passed to `AFURLSessionManager -uploadTaskWithRequest:fromFile:progress:completionHandler:`, or have its contents read into an `NSData` that's assigned to the `HTTPBody` property of the request.
 
  @see https://github.com/AFNetworking/AFNetworking/issues/1398
  */
@@ -278,11 +278,11 @@ forHTTPHeaderField:(NSString *)field;
 
  The filename and MIME type for this data in the form will be automatically generated, using the last path component of the `fileURL` and system associated MIME type for the `fileURL` extension, respectively.
 
- @param fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+ :param: fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
+ :param: name The name to be associated with the specified data. This parameter must not be `nil`.
+ :param: error If an error occurs, upon return contains an `NSError` object that describes the problem.
 
- @return `YES` if the file data was successfully appended, otherwise `NO`.
+ :return: `YES` if the file data was successfully appended, otherwise `NO`.
  */
 - (BOOL)appendPartWithFileURL:(NSURL *)fileURL
                          name:(NSString *)name
@@ -291,13 +291,13 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
 
- @param fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
- @param fileName The file name to be used in the `Content-Disposition` header. This parameter must not be `nil`.
- @param mimeType The declared MIME type of the file data. This parameter must not be `nil`.
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+ :param: fileURL The URL corresponding to the file whose content will be appended to the form. This parameter must not be `nil`.
+ :param: name The name to be associated with the specified data. This parameter must not be `nil`.
+ :param: fileName The file name to be used in the `Content-Disposition` header. This parameter must not be `nil`.
+ :param: mimeType The declared MIME type of the file data. This parameter must not be `nil`.
+ :param: error If an error occurs, upon return contains an `NSError` object that describes the problem.
 
- @return `YES` if the file data was successfully appended otherwise `NO`.
+ :return: `YES` if the file data was successfully appended otherwise `NO`.
  */
 - (BOOL)appendPartWithFileURL:(NSURL *)fileURL
                          name:(NSString *)name
@@ -308,11 +308,11 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the data from the input stream and the multipart form boundary.
 
- @param inputStream The input stream to be appended to the form data
- @param name The name to be associated with the specified input stream. This parameter must not be `nil`.
- @param fileName The filename to be associated with the specified input stream. This parameter must not be `nil`.
- @param length The length of the specified input stream in bytes.
- @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
+ :param: inputStream The input stream to be appended to the form data
+ :param: name The name to be associated with the specified input stream. This parameter must not be `nil`.
+ :param: fileName The filename to be associated with the specified input stream. This parameter must not be `nil`.
+ :param: length The length of the specified input stream in bytes.
+ :param: mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
  */
 - (void)appendPartWithInputStream:(NSInputStream *)inputStream
                              name:(NSString *)name
@@ -323,10 +323,10 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Appends the HTTP header `Content-Disposition: file; filename=#{filename}; name=#{name}"` and `Content-Type: #{mimeType}`, followed by the encoded file data and the multipart form boundary.
 
- @param data The data to be encoded and appended to the form data.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
- @param fileName The filename to be associated with the specified data. This parameter must not be `nil`.
- @param mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
+ :param: data The data to be encoded and appended to the form data.
+ :param: name The name to be associated with the specified data. This parameter must not be `nil`.
+ :param: fileName The filename to be associated with the specified data. This parameter must not be `nil`.
+ :param: mimeType The MIME type of the specified data. (For example, the MIME type for a JPEG image is image/jpeg.) For a list of valid MIME types, see http://www.iana.org/assignments/media-types/. This parameter must not be `nil`.
  */
 - (void)appendPartWithFileData:(NSData *)data
                           name:(NSString *)name
@@ -336,8 +336,8 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Appends the HTTP headers `Content-Disposition: form-data; name=#{name}"`, followed by the encoded data and the multipart form boundary.
 
- @param data The data to be encoded and appended to the form data.
- @param name The name to be associated with the specified data. This parameter must not be `nil`.
+ :param: data The data to be encoded and appended to the form data.
+ :param: name The name to be associated with the specified data. This parameter must not be `nil`.
  */
 
 - (void)appendPartWithFormData:(NSData *)data
@@ -347,8 +347,8 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Appends HTTP headers, followed by the encoded data and the multipart form boundary.
 
- @param headers The HTTP headers to be appended to the form data.
- @param body The data to be encoded and appended to the form data. This parameter must not be `nil`.
+ :param: headers The HTTP headers to be appended to the form data.
+ :param: body The data to be encoded and appended to the form data. This parameter must not be `nil`.
  */
 - (void)appendPartWithHeaders:(NSDictionary *)headers
                          body:(NSData *)body;
@@ -358,8 +358,8 @@ forHTTPHeaderField:(NSString *)field;
 
  When uploading over a 3G or EDGE connection, requests may fail with "request body stream exhausted". Setting a maximum packet size and delay according to the recommended values (`kAFUploadStream3GSuggestedPacketSize` and `kAFUploadStream3GSuggestedDelay`) lowers the risk of the input stream exceeding its allocated bandwidth. Unfortunately, there is no definite way to distinguish between a 3G, EDGE, or LTE connection over `NSURLConnection`. As such, it is not recommended that you throttle bandwidth based solely on network reachability. Instead, you should consider checking for the "request body stream exhausted" in a failure block, and then retrying the request with throttled bandwidth.
 
- @param numberOfBytes Maximum packet size, in number of bytes. The default packet size for an input stream is 16kb.
- @param delay Duration of delay each time a packet is read. By default, no delay is set.
+ :param: numberOfBytes Maximum packet size, in number of bytes. The default packet size for an input stream is 16kb.
+ :param: delay Duration of delay each time a packet is read. By default, no delay is set.
  */
 - (void)throttleBandwidthWithPacketSize:(NSUInteger)numberOfBytes
                                   delay:(NSTimeInterval)delay;
@@ -381,7 +381,7 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Creates and returns a JSON serializer with specified reading and writing options.
 
- @param writingOptions The specified JSON writing options.
+ :param: writingOptions The specified JSON writing options.
  */
 + (instancetype)serializerWithWritingOptions:(NSJSONWritingOptions)writingOptions;
 
@@ -407,8 +407,8 @@ forHTTPHeaderField:(NSString *)field;
 /**
  Creates and returns a property list serializer with a specified format, read options, and write options.
 
- @param format The property list format.
- @param writeOptions The property list write options.
+ :param: format The property list format.
+ :param: writeOptions The property list write options.
 
  @warning The `writeOptions` property is currently unused.
  */

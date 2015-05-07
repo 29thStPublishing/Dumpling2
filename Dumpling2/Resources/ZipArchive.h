@@ -27,31 +27,31 @@ typedef void(^ZipArchiveProgressUpdateBlock)(int percentage, int filesProcessed,
 	
 /**
     @protocol
-    @discussion  methods for a delegate to receive error notifications and control overwriting of files
+    :discussion:  methods for a delegate to receive error notifications and control overwriting of files
 */
 
 @protocol ZipArchiveDelegate <NSObject>
 @optional
 
 /**
-    @brief   Delegate method to be notified of errors
+    :brief:   Delegate method to be notified of errors
     
     ZipArchive calls this selector on the delegate when errors are encountered.
     
-    @param      msg     a string describing the error.
+    :param:      msg     a string describing the error.
     @result     void
 */
 
 -(void) ErrorMessage:(NSString*) msg;
 
 /**
-    @brief   Delegate method to determine if a file should be replaced
+    :brief:   Delegate method to determine if a file should be replaced
     
     When an zip file is being expanded and a file is about to be replaced, this selector
     is called on the delegate to notify that file is about to be replaced. The delegate method
     should return YES to overwrite the file, or NO to skip it.
  
-    @param      file - path to the file to be overwritten.
+    :param:      file - path to the file to be overwritten.
     @result     a BOOL - YES to replace, NO to skip
 */
 
@@ -61,7 +61,7 @@ typedef void(^ZipArchiveProgressUpdateBlock)(int percentage, int filesProcessed,
 
 /**
     @class
-    @brief      An object that can create zip files and expand existing ones.
+    :brief:      An object that can create zip files and expand existing ones.
     This class provides methods to create a zip file (optionally with a password) and
     add files to that zip archive. 
                  
@@ -93,7 +93,7 @@ typedef void(^ZipArchiveProgressUpdateBlock)(int percentage, int filesProcessed,
 @property (nonatomic, assign) ZipArchiveCompression compression;
 
 /**
-    @brief      String encoding to be used when interpreting file names in the zip file.
+    :brief:      String encoding to be used when interpreting file names in the zip file.
 */
 @property (nonatomic, assign) NSStringEncoding stringEncoding;
 

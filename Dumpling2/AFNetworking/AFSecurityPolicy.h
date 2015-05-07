@@ -68,7 +68,7 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 /**
  Returns the shared default security policy, which does not allow invalid certificates, does not validate domain name, and does not validate against pinned certificates or public keys.
 
- @return The default security policy.
+ :return: The default security policy.
  */
 + (instancetype)defaultPolicy;
 
@@ -79,9 +79,9 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 /**
  Creates and returns a security policy with the specified pinning mode.
 
- @param pinningMode The SSL pinning mode.
+ :param: pinningMode The SSL pinning mode.
 
- @return A new security policy.
+ :return: A new security policy.
  */
 + (instancetype)policyWithPinningMode:(AFSSLPinningMode)pinningMode;
 
@@ -94,9 +94,9 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 
  This method should be used when responding to an authentication challenge from a server.
 
- @param serverTrust The X.509 certificate trust of the server.
+ :param: serverTrust The X.509 certificate trust of the server.
 
- @return Whether or not to trust the server.
+ :return: Whether or not to trust the server.
 
  @warning This method has been deprecated in favor of `-evaluateServerTrust:forDomain:`.
  */
@@ -107,10 +107,10 @@ typedef NS_ENUM(NSUInteger, AFSSLPinningMode) {
 
  This method should be used when responding to an authentication challenge from a server.
 
- @param serverTrust The X.509 certificate trust of the server.
- @param domain The domain of serverTrust. If `nil`, the domain will not be validated.
+ :param: serverTrust The X.509 certificate trust of the server.
+ :param: domain The domain of serverTrust. If `nil`, the domain will not be validated.
 
- @return Whether or not to trust the server.
+ :return: Whether or not to trust the server.
  */
 - (BOOL)evaluateServerTrust:(SecTrustRef)serverTrust
                   forDomain:(NSString *)domain;

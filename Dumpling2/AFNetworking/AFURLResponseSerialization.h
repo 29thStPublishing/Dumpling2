@@ -33,11 +33,11 @@
 /**
  The response object decoded from the data associated with a specified response.
 
- @param response The response to be processed.
- @param data The response data to be decoded.
- @param error The error that occurred while attempting to decode the response data.
+ :param: response The response to be processed.
+ :param: data The response data to be decoded.
+ :param: error The error that occurred while attempting to decode the response data.
 
- @return The object decoded from the specified response data.
+ :return: The object decoded from the specified response data.
  */
 - (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
@@ -87,11 +87,11 @@
 
  In its base implementation, this method checks for an acceptable status code and content type. Subclasses may wish to add other domain-specific checks.
 
- @param response The response to be validated.
- @param data The data associated with the response.
- @param error The error that occurred while attempting to validate the response.
+ :param: response The response to be validated.
+ :param: data The data associated with the response.
+ :param: error The error that occurred while attempting to validate the response.
 
- @return `YES` if the response is valid, otherwise `NO`.
+ :return: `YES` if the response is valid, otherwise `NO`.
  */
 - (BOOL)validateResponse:(NSHTTPURLResponse *)response
                     data:(NSData *)data
@@ -128,7 +128,7 @@
 /**
  Creates and returns a JSON serializer with specified reading and writing options.
 
- @param readingOptions The specified JSON reading options.
+ :param: readingOptions The specified JSON reading options.
  */
 + (instancetype)serializerWithReadingOptions:(NSJSONReadingOptions)readingOptions;
 
@@ -172,7 +172,7 @@
 /**
  Creates and returns an XML document serializer with the specified options.
 
- @param mask The XML document options.
+ :param: mask The XML document options.
  */
 + (instancetype)serializerWithXMLDocumentOptions:(NSUInteger)mask;
 
@@ -206,8 +206,8 @@
 /**
  Creates and returns a property list serializer with a specified format, read options, and write options.
 
- @param format The property list format.
- @param readOptions The property list reading options.
+ :param: format The property list format.
+ :param: readOptions The property list reading options.
  */
 + (instancetype)serializerWithFormat:(NSPropertyListFormat)format
                          readOptions:(NSPropertyListReadOptions)readOptions;

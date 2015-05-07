@@ -57,16 +57,16 @@
  your Application on iOS, and in your application's Application Support
  directory on OS X.
 
- @return The default `RLMRealm` instance for the current thread.
+ :return: The default `RLMRealm` instance for the current thread.
  */
 + (instancetype)defaultRealm;
 
 /**
  Obtains an `RLMRealm` instance persisted at a specific file path.
 
- @param path Path to the file you want the data saved in.
+ :param: path Path to the file you want the data saved in.
 
- @return An `RLMRealm` instance.
+ :return: An `RLMRealm` instance.
  */
 + (instancetype)realmWithPath:(NSString *)path;
 
@@ -83,13 +83,13 @@
  on files which cannot be opened in read-write mode, and not just for enforcing
  correctness in code that should not need to write to the Realm.
 
- @param path        Path to the file you want the data saved in.
- @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
- @param error       If an error occurs, upon return contains an `NSError` object
+ :param: path        Path to the file you want the data saved in.
+ :param: readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
+ :param: error       If an error occurs, upon return contains an `NSError` object
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return An `RLMRealm` instance.
+ :return: An `RLMRealm` instance.
  */
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
@@ -99,14 +99,14 @@
  The on-disk storage for encrypted Realms are encrypted using AES256+HMAC-SHA2,
  but otherwise they behave like normal persisted Realms.
 
- @param path        Path to the file you want the data saved in.
- @param key         64-byte key to use to encrypt the data.
- @param readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
- @param error       If an error occurs, upon return contains an `NSError` object
+ :param: path        Path to the file you want the data saved in.
+ :param: key         64-byte key to use to encrypt the data.
+ :param: readonly    BOOL indicating if this Realm is read-only (must use for read-only files)
+ :param: error       If an error occurs, upon return contains an `NSError` object
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return An encrypted `RLMRealm` instance.
+ :return: An encrypted `RLMRealm` instance.
  */
 + (instancetype)realmWithPath:(NSString *)path
                 encryptionKey:(NSData *)key
@@ -125,8 +125,8 @@
  needed, then use `realmWithPath:encryptionKey:readOnly:error:` rather than this
  method.
 
- @param key     64-byte encryption key to use, or `nil` to unset.
- @param path    Realm path to set the encryption key for.
+ :param: key     64-byte encryption key to use, or `nil` to unset.
+ :param: path    Realm path to set the encryption key for.
  */
 + (void)setEncryptionKey:(NSData *)key forRealmsAtPath:(NSString *)path;
 
@@ -143,9 +143,9 @@
  `RLMObject`s, `RLMArray`s, and `RLMResults` that refer to objects persisted in a Realm have a
  strong reference to the relevant `RLMRealm`, as do `RLMNotifcationToken`s.
 
- @param identifier  A string used to identify a particular in-memory Realm.
+ :param: identifier  A string used to identify a particular in-memory Realm.
 
- @return An `RLMRealm` instance.
+ :return: An `RLMRealm` instance.
  */
 + (instancetype)inMemoryRealmWithIdentifier:(NSString *)identifier;
 
@@ -175,7 +175,7 @@
 
  `default.realm` in your application's documents directory on iOS.
 
- @return Location of the default Realm.
+ :return: Location of the default Realm.
 
  @see defaultRealm
  */
@@ -184,7 +184,7 @@
 /**
  Set the default Realm path to a given path.
 
- @param defaultRealmPath    The path to use for the default Realm.
+ :param: defaultRealmPath    The path to use for the default Realm.
 
  @see defaultRealm
  */
@@ -214,9 +214,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
                                      notifications are sent.
  - `RLMRealm` \***realm**:           The realm for which this notification occurred
 
- @param block   A block which is called to process RLMRealm notifications.
+ :param: block   A block which is called to process RLMRealm notifications.
 
- @return A token object which can later be passed to `-removeNotification:`
+ :return: A token object which can later be passed to `-removeNotification:`
          to remove this notification.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block;
@@ -225,7 +225,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Remove a previously registered notification handler using the token returned
  from `-addNotificationBlock:`
 
- @param notificationToken   The token returned from `-addNotificationBlock:`
+ :param: notificationToken   The token returned from `-addNotificationBlock:`
                             corresponding to the notification block to remove.
  */
 - (void)removeNotification:(RLMNotificationToken *)notificationToken;
@@ -302,7 +302,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Update an `RLMRealm` and outstanding objects to point to the most recent data for this `RLMRealm`.
 
- @return    Whether the realm had any updates. Note that this may return YES even if no data has actually changed.
+ :return:    Whether the realm had any updates. Note that this may return YES even if no data has actually changed.
  */
 - (BOOL)refresh;
 
@@ -341,9 +341,9 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Note that if this is called from within a write transaction it writes the
  *current* data, and not data when the last write transaction was committed.
 
- @param path Path to save the Realm to.
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
+ :param: path Path to save the Realm to.
+ :param: error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ :return: YES if the realm was copied successfully. Returns NO if an error occurred.
 */
 - (BOOL)writeCopyToPath:(NSString *)path error:(NSError **)error;
 
@@ -355,10 +355,10 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Note that if this is called from within a write transaction it writes the
  *current* data, and not data when the last write transaction was committed.
 
- @param path Path to save the Realm to.
- @param key 64-byte encryption key to encrypt the new file with
- @param error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
- @return YES if the realm was copied successfully. Returns NO if an error occurred.
+ :param: path Path to save the Realm to.
+ :param: key 64-byte encryption key to encrypt the new file with
+ :param: error On input, a pointer to an error object. If an error occurs, this pointer is set to an actual error object containing the error information. You may specify nil for this parameter if you do not want the error information.
+ :return: YES if the realm was copied successfully. Returns NO if an error occurred.
 */
 - (BOOL)writeCopyToPath:(NSString *)path encryptionKey:(NSData *)key error:(NSError **)error;
 
@@ -404,7 +404,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  The object to be added must be valid and cannot have been previously deleted
  from a Realm (i.e. `isInvalidated`) must be false.
 
- @param object  Object to be added to this Realm.
+ :param: object  Object to be added to this Realm.
  */
 - (void)addObject:(RLMObject *)object;
 
@@ -413,7 +413,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  This is the equivalent of `addObject:` except for an array of objects.
 
- @param array   An enumerable object such as NSArray or RLMResults which contains objects to be added to
+ :param: array   An enumerable object such as NSArray or RLMResults which contains objects to be added to
                 this Realm.
 
  @see   addObject:
@@ -429,7 +429,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  Realm. Use `-[RLMObject createOrUpdateInRealm:withObject:]` to copy values to
  a different Realm.
 
- @param object  Object to be added or updated.
+ :param: object  Object to be added or updated.
  */
 - (void)addOrUpdateObject:(RLMObject *)object;
 
@@ -438,7 +438,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
  This is the equivalent of `addOrUpdateObject:` except for an array of objects.
 
- @param array  `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to this Realm.
+ :param: array  `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to this Realm.
 
  @see   addOrUpdateObject:
  */
@@ -447,14 +447,14 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Delete an object from this Realm.
 
- @param object  Object to be deleted from this Realm.
+ :param: object  Object to be deleted from this Realm.
  */
 - (void)deleteObject:(RLMObject *)object;
 
 /**
  Delete an `NSArray`, `RLMArray`, or `RLMResults` of objects from this Realm.
 
- @param array  `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s to be deleted.
+ :param: array  `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s to be deleted.
  */
 - (void)deleteObjects:(id)array;
 
@@ -469,13 +469,13 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 /**
  Migration block used to migrate a Realm.
 
- @param migration   `RLMMigration` object used to perform the migration. The
+ :param: migration   `RLMMigration` object used to perform the migration. The
                     migration object allows you to enumerate and alter any
                     existing objects which require migration.
 
- @param oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
+ :param: oldSchemaVersion    The schema version of the `RLMRealm` being migrated.
 
- @return    Schema version number for the `RLMRealm` after completing the
+ :return:    Schema version number for the `RLMRealm` after completing the
             migration. Must be greater than `oldSchemaVersion`.
  */
 typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaVersion);
@@ -504,9 +504,9 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
    during the migration. You are required to either supply a default value or to
    manually populate added properties during a migration.
 
- @param version     The current schema version.
- @param block       The block which migrates the Realm to the current version.
- @return            The error that occurred while applying the migration, if any.
+ :param: version     The current schema version.
+ :param: block       The block which migrates the Realm to the current version.
+ :return:            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -516,10 +516,10 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  Specify a schema version and an associated migration block which is applied when
  opening the Realm at realmPath with an old schema version.
 
- @param version     The current schema version.
- @param realmPath   The path at which this schema version and migration block is applied.
- @param block       The block which migrates the Realm to the current version.
- @return            The error that occurred while applying the migration, if any.
+ :param: version     The current schema version.
+ :param: realmPath   The path at which this schema version and migration block is applied.
+ :param: block       The block which migrates the Realm to the current version.
+ :return:            The error that occurred while applying the migration, if any.
 
  @see               RLMMigration
  */
@@ -528,25 +528,25 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 /**
  Get the schema version for a Realm at a given path.
 
- @param realmPath   Path to a Realm file
- @param error       If an error occurs, upon return contains an `NSError` object
+ :param: realmPath   Path to a Realm file
+ :param: error       If an error occurs, upon return contains an `NSError` object
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
+ :return:            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath error:(NSError **)error;
 
 /**
  Get the schema version for an encrypted Realm at a given path.
 
- @param realmPath   Path to a Realm file
- @param key         64-byte encryption key.
- @param error       If an error occurs, upon return contains an `NSError` object
+ :param: realmPath   Path to a Realm file
+ :param: key         64-byte encryption key.
+ :param: error       If an error occurs, upon return contains an `NSError` object
                     that describes the problem. If you are not interested in
                     possible errors, pass in `NULL`.
 
- @return            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
+ :return:            The version of the Realm at `realmPath` or RLMNotVersioned if the version cannot be read.
  */
 + (NSUInteger)schemaVersionAtPath:(NSString *)realmPath encryptionKey:(NSData *)key error:(NSError **)error;
 
@@ -557,8 +557,8 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
  not need to be called explicitly. You can choose to call this method to control 
  exactly when and how migrations are performed.
 
- @param realmPath   The path of the Realm to migrate.
- @return            The error that occurred while applying the migration if any.
+ :param: realmPath   The path of the Realm to migrate.
+ :return:            The error that occurred while applying the migration if any.
 
  @see               RLMMigration
  @see               setSchemaVersion:forRealmAtPath:withMigrationBlock:
@@ -570,9 +570,9 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 
  As `migrateRealmAtPath:`, but for encrypted realms.
 
- @param realmPath   The path of the Realm to migrate.
- @param key         64-byte encryption key.
- @return            The error that occurred while applying the migration, if any.
+ :param: realmPath   The path of the Realm to migrate.
+ :param: key         64-byte encryption key.
+ :return:            The error that occurred while applying the migration, if any.
  */
 + (NSError *)migrateRealmAtPath:(NSString *)realmPath encryptionKey:(NSData *)key;
 
@@ -589,9 +589,9 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 // Retrieve a persisted object with an NSString.
 //
 // @usage RLMObject *object = RLMRealm.defaultRealm[@"name"];
-// @param key The NSString used to identify an object
+// :param: key The NSString used to identify an object
 //
-// @return    RLMObject or nil if no object is stored for the given key.
+// :return:    RLMObject or nil if no object is stored for the given key.
 //
 //-(id)objectForKeyedSubscript:(id <NSCopying>)key;
 
@@ -599,8 +599,8 @@ typedef void (^RLMMigrationBlock)(RLMMigration *migration, NSUInteger oldSchemaV
 // Store an object with an NSString key.
 //
 // @usage RLMRealm.defaultRealm[@"name"] = object;
-// @param obj     The object to be stored.
-// @param key     The key that identifies the object to be used for future lookups.
+// :param: obj     The object to be stored.
+// :param: key     The key that identifies the object to be used for future lookups.
 //
 //-(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 

@@ -93,7 +93,7 @@
 /**
  Helper to return the class name for an RLMObject subclass.
  
- @return    The class name for the model class.
+ :return:    The class name for the model class.
  */
 + (NSString *)className;
 
@@ -106,7 +106,7 @@
  If nested objects are included in the argument, `createInDefaultRealmWithObject:` will be called
  on them.
 
- @param object  The object used to populate the object. This can be any key/value coding compliant
+ :param: object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if any required properties are not present and no default is set.
@@ -126,8 +126,8 @@
  If nested objects are included in the argument, `createInRealm:withObject:` will be called
  on them.
  
- @param realm   The Realm in which this object is persisted.
- @param object  The object used to populate the object. This can be any key/value coding compliant
+ :param: realm   The Realm in which this object is persisted.
+ :param: object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if any required properties are not present and no default is set.
@@ -150,7 +150,7 @@
  
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
- @param object  The object used to populate the object. This can be any key/value coding compliant
+ :param: object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if any required properties are not present and no default is set.
@@ -173,8 +173,8 @@
 
  This is a no-op if the argument is an RLMObject of the same type already backed by the target realm.
 
- @param realm   The Realm in which this object is persisted.
- @param object  The object used to populate the object. This can be any key/value coding compliant
+ :param: realm   The Realm in which this object is persisted.
+ :param: object  The object used to populate the object. This can be any key/value coding compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if any required properties are not present and no default is set.
@@ -211,14 +211,14 @@
 /**
  Return an array of property names for properties which should be indexed. Only supported
  for string properties.
- @return    NSArray of property names.
+ :return:    NSArray of property names.
  */
 + (NSArray *)indexedProperties;
 
 /**
  Implement to indicate the default values to be used for each property.
  
- @return    NSDictionary mapping property names to their default values.
+ :return:    NSDictionary mapping property names to their default values.
  */
 + (NSDictionary *)defaultPropertyValues;
 
@@ -228,7 +228,7 @@
  properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
  Indexes are created automatically for string primary key properties.
 
- @return    Name of the property designated as the primary key.
+ :return:    Name of the property designated as the primary key.
  */
 + (NSString *)primaryKey;
 
@@ -236,7 +236,7 @@
  Implement to return an array of property names to ignore. These properties will not be persisted
  and are treated as transient.
  
- @return    NSArray of property names to ignore.
+ :return:    NSArray of property names to ignore.
  */
 + (NSArray *)ignoredProperties;
 
@@ -249,16 +249,16 @@
 /**
  Get all objects of this type from the default Realm.
  
- @return    An RLMResults of all objects of this type in the default Realm.
+ :return:    An RLMResults of all objects of this type in the default Realm.
  */
 + (RLMResults *)allObjects;
 
 /**
  Get objects matching the given predicate for this type from the default Realm.
  
- @param predicateFormat The predicate format string which can accept variable arguments.
+ :param: predicateFormat The predicate format string which can accept variable arguments.
  
- @return    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
+ :return:    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
  */
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
@@ -266,9 +266,9 @@
 /**
  Get objects matching the given predicate for this type from the default Realm.
 
- @param predicate   The predicate to filter the objects.
+ :param: predicate   The predicate to filter the objects.
 
- @return    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
+ :return:    An RLMResults of objects of the subclass type in the default Realm that match the given predicate
  */
 + (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
@@ -281,7 +281,7 @@
 
  This method requires that `primaryKey` be overridden on the receiving subclass.
 
- @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ :return:    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
 + (instancetype)objectForPrimaryKey:(id)primaryKey;
@@ -295,29 +295,29 @@
 /**
  Get all objects of this type from the specified Realm.
 
- @param realm   The Realm instance to query.
+ :param: realm   The Realm instance to query.
 
- @return        An RLMResults of all objects of this type in the specified Realm.
+ :return:        An RLMResults of all objects of this type in the specified Realm.
  */
 + (RLMResults *)allObjectsInRealm:(RLMRealm *)realm;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.
 
- @param predicateFormat The predicate format string which can accept variable arguments.
- @param realm           The Realm instance to query.
+ :param: predicateFormat The predicate format string which can accept variable arguments.
+ :param: realm           The Realm instance to query.
 
- @return    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
+ :return:    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
  */
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate for this type from the specified Realm.
 
- @param predicate   The predicate to filter the objects.
- @param realm       The Realm instance to query.
+ :param: predicate   The predicate to filter the objects.
+ :param: realm       The Realm instance to query.
 
- @return    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
+ :return:    An RLMResults of objects of the subclass type in the specified Realm that match the given predicate
  */
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm withPredicate:(NSPredicate *)predicate;
 
@@ -330,7 +330,7 @@
 
  This method requires that `primaryKey` be overridden on the receiving subclass.
 
- @return    An object of the subclass type or nil if an object with the given primary key does not exist.
+ :return:    An object of the subclass type or nil if an object with the given primary key does not exist.
  @see       -primaryKey
  */
 + (instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(id)primaryKey;
@@ -339,10 +339,10 @@
  Get an `NSArray` of objects of type `className` which have this object as the given property value. This can
  be used to get the inverse relatshionship value for `RLMObject` and `RLMArray` properties.
 
- @param className   The type of object on which the relationship to query is defined.
- @param property    The name of the property which defines the relationship.
+ :param: className   The type of object on which the relationship to query is defined.
+ :param: property    The name of the property which defines the relationship.
 
- @return    An NSArray of objects of type `className` which have this object as thier value for the `property` property.
+ :return:    An NSArray of objects of type `className` which have this object as thier value for the `property` property.
  */
 - (NSArray *)linkingObjectsOfClass:(NSString *)className forProperty:(NSString *)property;
 
@@ -351,9 +351,9 @@
  with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
  implementation for `hash`.
 
- @param object  The object to compare to.
+ :param: object  The object to compare to.
 
- @return    YES if the object represents the same object in the same RLMRealm.
+ :return:    YES if the object represents the same object in the same RLMRealm.
  */
 - (BOOL)isEqualToObject:(RLMObject *)object;
 
