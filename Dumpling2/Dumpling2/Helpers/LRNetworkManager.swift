@@ -32,7 +32,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
 
     func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
         //let authorization = "method=apikey,token=\(apiKey)"
-        let authorization = "method=clientkey,token=\(apiKey)"
+        let authorization = "method=clientkey,token=\(clientKey)"
         self.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
         
         if methodType == "GET" {

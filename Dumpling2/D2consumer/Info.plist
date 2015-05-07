@@ -38,7 +38,7 @@
 	</array>
 	<key>UINewsstandApp</key>
 	<true/>
-	<key>APIKey</key>
+	<key>ClientKey</key>
 	<string>19dc497bc4d6481cb827dd3e4637a8e3</string>
 </dict>
 </plist>

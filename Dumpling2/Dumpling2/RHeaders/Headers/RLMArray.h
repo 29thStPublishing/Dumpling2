@@ -71,9 +71,9 @@
 /**
  Returns the object at the index specified.
  
- @param index   The index to look up.
+ :param: index   The index to look up.
  
- @return An RLMObject of the class contained by this RLMArray.
+ :return: An RLMObject of the class contained by this RLMArray.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
@@ -82,7 +82,7 @@
  
  Returns `nil` if called on an empty RLMArray.
  
- @return An RLMObject of the class contained by this RLMArray.
+ :return: An RLMObject of the class contained by this RLMArray.
  */
 - (id)firstObject;
 
@@ -91,7 +91,7 @@
 
  Returns `nil` if called on an empty RLMArray.
 
- @return An RLMObject of the class contained by this RLMArray.
+ :return: An RLMObject of the class contained by this RLMArray.
  */
 - (id)lastObject;
 
@@ -109,7 +109,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param object  An RLMObject of the class contained by this RLMArray.
+ :param: object  An RLMObject of the class contained by this RLMArray.
  */
 - (void)addObject:(RLMObject *)object;
 
@@ -118,7 +118,7 @@
  
  @warning This method can only be called during a write transaction.
  
- @param objects     An enumerable object such as NSArray or RLMResults which contains objects of the
+ :param: objects     An enumerable object such as NSArray or RLMResults which contains objects of the
                     same class as this RLMArray.
  */
 - (void)addObjects:(id<NSFastEnumeration>)objects;
@@ -130,8 +130,8 @@
  
  @warning This method can only be called during a write transaction.
  
- @param anObject  An object (of the same type as returned from the objectClassName selector).
- @param index   The array index at which the object is inserted.
+ :param: anObject  An object (of the same type as returned from the objectClassName selector).
+ :param: index   The array index at which the object is inserted.
  */
 - (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index;
 
@@ -142,7 +142,7 @@
 
  @warning This method can only be called during a write transaction.
  
- @param index   The array index identifying the object to be removed.
+ :param: index   The array index identifying the object to be removed.
  */
 - (void)removeObjectAtIndex:(NSUInteger)index;
 
@@ -167,8 +167,8 @@
 
  @warning This method can only be called during a write transaction.
  
- @param index       The array index of the object to be replaced.
- @param anObject    An object (of the same type as returned from the objectClassName selector).
+ :param: index       The array index of the object to be replaced.
+ :param: anObject    An object (of the same type as returned from the objectClassName selector).
  */
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(RLMObject *)anObject;
 
@@ -185,62 +185,62 @@
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
- @param object  An object (of the same type as returned from the objectClassName selector).
+ :param: object  An object (of the same type as returned from the objectClassName selector).
  */
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
 /**
  Gets the index of the first object matching the predicate.
  
- @param predicateFormat The predicate format string which can accept variable arguments.
+ :param: predicateFormat The predicate format string which can accept variable arguments.
  
- @return    Index of object or NSNotFound if the object is not found in this RLMArray.
+ :return:    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ...;
 
 /**
  Gets the index of the first object matching the predicate.
  
- @param predicate   The predicate to filter the objects.
+ :param: predicate   The predicate to filter the objects.
  
- @return    Index of object or NSNotFound if the object is not found in this RLMArray.
+ :return:    Index of object or NSNotFound if the object is not found in this RLMArray.
  */
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicateFormat The predicate format string which can accept variable arguments.
+ :param: predicateFormat The predicate format string which can accept variable arguments.
  
- @return                An RLMResults of objects that match the given predicate
+ :return:                An RLMResults of objects that match the given predicate
  */
 - (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /**
  Get objects matching the given predicate in the RLMArray.
  
- @param predicate   The predicate to filter the objects.
+ :param: predicate   The predicate to filter the objects.
  
- @return            An RLMResults of objects that match the given predicate
+ :return:            An RLMResults of objects that match the given predicate
  */
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate;
 
 /**
  Get a sorted RLMResults from an RLMArray
  
- @param property    The property name to sort by.
- @param ascending   The direction to sort by.
+ :param: property    The property name to sort by.
+ :param: ascending   The direction to sort by.
  
- @return    An RLMResults sorted by the specified property.
+ :return:    An RLMResults sorted by the specified property.
  */
 - (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
 
 /**
  Get a sorted RLMResults from an RLMArray
 
- @param properties  An array of `RLMSortDescriptor`s to sort by.
+ :param: properties  An array of `RLMSortDescriptor`s to sort by.
 
- @return    An RLMResults sorted by the specified properties.
+ :return:    An RLMResults sorted by the specified properties.
  */
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties;
 

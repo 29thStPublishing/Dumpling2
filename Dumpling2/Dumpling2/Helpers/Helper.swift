@@ -10,7 +10,7 @@ import UIKit
 
 //let baseURL: String = "http://52.1.9.236:5601/"
 let baseURL: String = "https://magnet-dev.29.io/"
-var apiKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
+var clientKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"

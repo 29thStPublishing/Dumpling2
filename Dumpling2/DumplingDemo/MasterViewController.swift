@@ -14,7 +14,7 @@ class MasterViewController: UITableViewController {
 
     var objects = NSMutableArray()
     var articles = Array<Article>()
-    var issueHandler = IssueHandler(apikey: "19dc497bc4d6481cb827dd3e4637a8e3")
+    var issueHandler = IssueHandler(clientkey: "19dc497bc4d6481cb827dd3e4637a8e3")
     let issueId = "5500918839cc7634055faf68"
 
 

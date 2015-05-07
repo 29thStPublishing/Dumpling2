@@ -41,8 +41,8 @@
 /**
  Returns an RLMObjectSchema for the given class name in this RLMSchema.
  
- @param className   The object class name.
- @return            RLMObjectSchema for the given class in this RLMSchema.
+ :param: className   The object class name.
+ :return:            RLMObjectSchema for the given class in this RLMSchema.
  
  @see               RLMObjectSchema
  */
@@ -52,8 +52,8 @@
  Look up an RLMObjectSchema for the given class name in this Realm. Throws if there
  is no object of type className in this RLMSchema instance.
  
- @param className   The object class name.
- @return            RLMObjectSchema for the given class in this Realm.
+ :param: className   The object class name.
+ :return:            RLMObjectSchema for the given class in this Realm.
  
  @see               RLMObjectSchema
  */

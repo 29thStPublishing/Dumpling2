@@ -12,7 +12,6 @@ var assetPattern: String = "<!-- \\[ASSET: .+\\] -->"
 var assetPatternParts: [String] = ["<!-- [ASSET: ", "] -->"]
 
 /** A model object for Articles */
-//Article object
 public class Article: RLMObject {
     /// Global id of an article - this is unique for each article */
     dynamic public var globalId = ""
@@ -231,13 +230,11 @@ public class Article: RLMObject {
     //MARK: Class methods
     
     /**
-    @brief Get Article from API and add to the database
+    This method accepts an article's global id, gets its details from Magnet API and adds it to the database.
     
-    @discussion This method accepts an article's global id, gets its details from Magnet API and adds it to the database.
+    :brief: Get Article from API and add to the database
     
-    To use it, simply call @cArticle.createIndependentArticle(articleIdHere)
-    
-    @param  articleId The global id for the article
+    :param:  articleId The global id for the article
     */
     public class func createIndependentArticle(articleId: String) {
         let requestURL = "\(baseURL)articles/\(articleId)"
@@ -328,13 +325,11 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Delete articles and assets for a specific issue
+    This method accepts an issue's global id and deletes all articles from the database which belong to that issue
     
-    @discussion This method accepts an issue's global id and deletes all articles from the database which belong to that issue
+    :brief: Delete articles and assets for a specific issue
     
-    To use it, simply call @cArticle.deleteArticlesFor(issueIdHere)
-    
-    @param  issueId The global id of the issue whose articles have to be deleted
+    :param:  issueId The global id of the issue whose articles have to be deleted
     */
     public class func deleteArticlesFor(issueId: NSString) {
         let realm = RLMRealm.defaultRealm()
@@ -359,19 +354,19 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get all articles fulfiling certain conditions
-    
-    @discussion This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array.
+    This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array.
     
     All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
     
-    @param  issueId The global id of the issue whose articles have to be searched
+    :brief: Get all articles fulfiling certain conditions
     
-    @param type The article type which should be searched and returned
+    :param:  issueId The global id of the issue whose articles have to be searched
     
-    @param excludeType The article type which should not be included in the search
+    :param: type The article type which should be searched and returned
     
-    @return an array of articles fulfiling the conditions
+    :param: excludeType The article type which should not be included in the search
+    
+    :return: an array of articles fulfiling the conditions
     */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -409,15 +404,15 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get all articles for an issue with specific keywords
+    This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
     
-    @discussion This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
+    :brief: Get all articles for an issue with specific keywords
     
-    @param  keywords An array of String values with keywords that the article should have. If any of the keywords match, the article will be selected
+    :param:  keywords An array of String values with keywords that the article should have. If any of the keywords match, the article will be selected
     
-    @param issueId Global id for the issue which the articles must belong to. This parameter is optional
+    :param: issueId Global id for the issue which the articles must belong to. This parameter is optional
     
-    @return an array of articles fulfiling the conditions
+    :return: an array of articles fulfiling the conditions
     */
     public class func searchArticlesWith(keywords: [String], issueId: String?) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -457,13 +452,13 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get all  featured articles for a specific issue
+    This method accepts an issue's global id and returns all articles for the issue which are featured
     
-    @discussion This method accepts an issue's global id and returns all articles for the issue which are featured
+    :brief: Get all  featured articles for a specific issue
     
-    @param issueId Global id for the issue whose featured articles are needed
+    :param: issueId Global id for the issue whose featured articles are needed
     
-    @return an array of featured articles for the issue
+    :return: an array of featured articles for the issue
     */
     public class func getFeaturedArticlesFor(issueId: NSString) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -484,12 +479,12 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Change the asset pattern
+    This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
+    The default asset pattern is `<!-- \\[ASSET: .+\\] -->`
     
-    @discussion This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
-    The default asset pattern is @c<!-- \\[ASSET: .+\\] -->
+    :brief: Change the asset pattern
     
-    @param newPattern The regex to identify pattern for asset placeholders
+    :param: newPattern The regex to identify pattern for asset placeholders
     */
     public class func setAssetPattern(newPattern: String) {
         assetPattern = newPattern
@@ -498,9 +493,9 @@ public class Article: RLMObject {
     //MARK: Instance methods
     
     /**
-    @brief Save an Article to the database
+    This method can be called on an Article object to save it back to the database
     
-    @discussion This method can be called on an Article object to save it back to the database
+    :brief: Save an Article to the database
     */
     public func saveArticle() {
         let realm = RLMRealm.defaultRealm()
@@ -510,14 +505,13 @@ public class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //MARK: This is to be revisited
     /**
-    @brief Replace asset pattern with actual assets in an Article body
+    This method replaces the asset placeholders in the body of the Article with actual assets using HTML codes
+    Images are replaced with HTML img tags, Audio and Video with HTML audio and video tags respectively
     
-    @discussion This method replaces the asset placeholders in the body of the Article with actual assets using HTML codes
-    Images are replaced with <img> tags, Audio with <audio> tag and videos with <video> tag
+    :brief: Replace asset pattern with actual assets in an Article body
     
-    @return HTML body of the article with actual assets in place of placeholders
+    :return: HTML body of the article with actual assets in place of placeholders
     */
     public func replacePatternsWithAssets() -> NSString {
         //Should work for images, audio, video or any other types of assets
@@ -591,11 +585,11 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get all articles newer than a specific article
+    This method returns all articles for an issue whose publish date is newer than the published date of current article
     
-    @discussion This method returns all articles for an issue whose publish date is newer than the published date of current article
+    :brief: Get all articles newer than a specific article
     
-    @return an array of articles newer than the current article (in the same issue)
+    :return: an array of articles newer than the current article (in the same issue)
     */
     public func getNewerArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -616,11 +610,11 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get all articles older than a specific article
+    This method returns all articles for an issue whose publish date is before the published date of current article
     
-    @discussion This method returns all articles for an issue whose publish date is before the published date of current article
+    :brief: Get all articles older than a specific article
     
-    @return an array of articles older than the current article (in the same issue)
+    :return: an array of articles older than the current article (in the same issue)
     */
     public func getOlderArticles() -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -641,11 +635,11 @@ public class Article: RLMObject {
     }
     
     /**
-    @brief Get value for a specific key from custom meta of an article
+    This method returns the value for a specific key from the custom metadata of the article
     
-    @discussion This method returns the value for a specific key from the custom metadata of the article
+    :brief: Get value for a specific key from custom meta of an article
     
-    @return an object for the key from the custom metadata (or nil)
+    :return: an object for the key from the custom metadata (or nil)
     */
     public func getValue(key: NSString) -> AnyObject? {
         

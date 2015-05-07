@@ -41,9 +41,9 @@
 /**
  Returns an NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
 
- @param key The name of the property.
+ :param: key The name of the property.
 
- @return NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
+ :return: NSArray containing the results of invoking `valueForKey:` using key on each of the collection's objects.
  */
 - (id)valueForKey:(NSString *)key;
 
@@ -52,8 +52,8 @@
 
  @warning This method can only be called during a write transaction.
 
- @param value The object value.
- @param key   The name of the property.
+ :param: value The object value.
+ :param: key   The name of the property.
  */
 - (void)setValue:(id)value forKey:(NSString *)key;
 

@@ -12,9 +12,9 @@ import UIKit
 public class ReaderHelper: NSObject {
 
     /**
-    @brief Save current active issue
+    Save current active issue
     
-    @param issueId Global id of the issue which is currently being viewed. If nil, will remove saved issue
+    :param: issueId Global id of the issue which is currently being viewed. If nil, will remove saved issue
     */
     public class func saveIssue(issueId: String?) {
         if issueId == nil {
@@ -25,9 +25,9 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Save current active article
+    Save current active article
     
-    @param articleId Global id of the article which is currently being viewed. If nil, will remove saved article
+    :param: articleId Global id of the article which is currently being viewed. If nil, will remove saved article
     */
     public class func saveArticle(articleId: String?) {
         if articleId == nil {
@@ -38,9 +38,9 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Save asset being viewed
+    Save asset being viewed
     
-    @param assetId Global id of the asset which is currently being viewed. If nil, will remove saved asset
+    :param: assetId Global id of the asset which is currently being viewed. If nil, will remove saved asset
     */
     public class func saveAsset(assetId: String?) {
         if assetId == nil {
@@ -51,11 +51,11 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Save reading status for current article
+    Save reading status for current article
     
-    @param articleId Global id of the article currently being read
+    :param: articleId Global id of the article currently being read
     
-    @param readingPercentage Current position of user in the article in percentage
+    :param: readingPercentage Current position of user in the article in percentage
     */
     public class func saveReadingPercentageFor(articleId: String, readingPercentage: Float) {
         let articleKey = "ArticlePercent-" + articleId
@@ -67,9 +67,9 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Get current active issue
+    Get current active issue
     
-    @return global id of active issue or nil
+    :return: global id of active issue or nil
     */
     public class func retrieveCurrentIssue() -> String? {
         if let issueId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentIssue") as? String {
@@ -79,9 +79,9 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Get current active article
+    Get current active article
     
-    @return global id of active article or nil
+    :return: global id of active article or nil
     */
     public class func retrieveCurrentArticle() -> String? {
         if let articleId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentArticle") as? String {
@@ -91,9 +91,9 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Get current active asset
+    Get current active asset
     
-    @return global id of active asset or nil
+    :return: global id of active asset or nil
     */
     public class func retrieveCurrentAsset() -> String? {
         if let assetId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentAsset") as? String {
@@ -103,11 +103,11 @@ public class ReaderHelper: NSObject {
     }
     
     /**
-    @brief Get last saved reading percentage for given article
+    Get last saved reading percentage for given article
     
-    @param articleId Global id of article for which reading percentage is to be retrieved
+    :param: articleId Global id of article for which reading percentage is to be retrieved
     
-    @return progress of given article's reading in percentage
+    :return: progress of given article's reading in percentage
     */
     public class func getReadingPercentageFor(articleId: String) -> Float {
         let articleKey = "ArticlePercent-" + articleId
@@ -125,9 +125,9 @@ public class ReaderHelper: NSObject {
     //MARK: Dictionary for storing to iCloud
     
     /**
-    @brief Get all saved values for current issue, article, asset and reading percent for an article
+    Get all saved values for current issue, article, asset and reading percent for an article
     
-    @return a dictionary containing saved values for current issue, article, asset and reading percentage for an article
+    :return: a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
     public class func getDictionaryForCloud() -> Dictionary<String, AnyObject> {
         //Get CurrentIssue, CurrentArticle, CurrentAsset, Reading% from NSUserDefaults and save to iCloud
@@ -151,11 +151,11 @@ public class ReaderHelper: NSObject {
     //MARK: Save from dictionary to user defaults
     
     /**
-    @brief Saves current reading status to User defaults
+    This method saves specific values from a key for current issue, current article, current asset and article reading percentage back to user defaults (for using while app is active)
     
-    @description This method saves specific values from a key for current issue, current article, current asset and article reading percentage back to user defaults (for using while app is active)
+    :brief: Saves current reading status to User defaults
     
-    @param savedValues a dictionary containing saved values for current issue, article, asset and reading percentage for an article
+    :param: savedValues a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
     public class func saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>) {
         //If CurrentIssue, CurrentArticle, CurrentAsset, Reading% are on iCloud, retrieve and save to user defaults

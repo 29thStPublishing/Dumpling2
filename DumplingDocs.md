@@ -25,15 +25,15 @@ This is the main class and the starting point of Dumpling
 ###Methods
 1. **init(folder: NSString)** Initializes the IssueHandler with the given folder. This is where the database and assets will be saved
 
-    **NOTE:** The initializer requires an API key. If you wish to pass an API key to the initializer, use one of the below initializers. This method will look for a ```String``` with the key ```APIKey``` in your project's **Info.plist**
+    **NOTE:** The initializer requires a Client key. If you wish to pass a client key to the initializer, use one of the below initializers. This method will look for a ```String``` with the key ```ClientKey``` in your project's **Info.plist**
 ```
-<key>APIKey</key>
+<key>ClientKey</key>
 <string>19dc497bc4d6481cb827dd3e4637a8e3</string>
 ```
 
-2. **init(apikey: NSString)** Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+2. **init(clientkey: NSString)** Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved. The key is used for making calls to the Magnet API
 
-3. **init(folder: NSString, apikey: NSString)** Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The API key is your Client API key provided by 29.io
+3. **init(folder: NSString, clientkey: NSString)** Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The key is your Client API key provided by 29.io
 
 4. **getCurrentSchemaVersion()** ```returns UInt``` Find current schema version
 
@@ -264,11 +264,19 @@ Dumpling issues notifications at various stages of a download. This information 
 ```
 //For zipped files
 let appleId = "org.bomb.mag.issue.20150101"
-var issueHandler = IssueHandler()
-issueHandler.addIssueZip(appleId)
+var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+var docsDir: NSString = docPaths[0] as! NSString
+        
+var issueHandler = IssueHandler(folder: docsDir)
 
-//For issues from API
-issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
+//This nil check is needed. The initializer might return a nil if it doesn't find 
+//"ClientKey" in Info.plist
+if issueHandler != nil {
+    issueHandler.addIssueZip(appleId)
+
+    //For issues from API
+    issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
+}
 ```
 
 

@@ -7,29 +7,27 @@ This document explains the various methods available via the Dumpling2 framework
 This is the main class and the starting point of Dumpling2
 
 ###Public methods
-1. **init()** lets you initialize IssueHandler with data+images stored in the Documents directory and using my API key
+1. **init(folder:)** lets you initialize IssueHandler with a specific folder to save data and images. It looks for a key ```ClientKey``` in the project's Info.plist for the client key. If none is found, a nil object is returned by the method
 
-2. **init(folder:)** lets you initialize IssueHandler with a specific folder to save data and images and using my API key
+2. **init(clientkey:)** lets you initialize IssueHandler with data+images stored in the Documents directory. Calls will be made using client's key. This or the next method is what will be predominantly used
 
-3. **init(apikey:)** lets you initialize IssueHandler with data+images stored in the Documents directory. Calls will be made using client's key. This or the next method is what will be predominantly used
+3. **init(folder: clientkey:)** lets you initialize IssueHandler with a specific folder to save data and images. Calls will be made using client's key
 
-4. **init(folder: apikey:)** lets you initialize IssueHandler with a specific folder to save data and images. Calls will be made using client's key
+4. **getCurrentSchemaVersion()** gets the current schema version for the Realm database. This may be used by clients or 29.io to find out the schema version in case it is needed for debugging issues
 
-5. **getCurrentSchemaVersion()** gets the current schema version for the Realm database. This may be used by clients or 29.io to find out the schema version in case it is needed for debugging issues
+5. **addIssueZip(appleId:)** lets you add an issue to Realm using a zipped file. It will look for a file by the name *appleId*.zip in the project bundle
 
-6. **addIssueZip(appleId:)** lets you add an issue to Realm using a zipped file. It will look for a file by the name *appleId*.zip in the project bundle
+6. **addIssueFromAPI(issueId:)** lets you request an issue with a specific id (issue id) from the Magnet API
 
-7. **addIssueFromAPI(issueId:)** lets you request an issue with a specific id (issue id) from the Magnet API
+7. **listIssues()** prints all available issues - this is only for debugging purposes but can be extended to return the JSON response to clients for their issues (associated with their client keys)
 
-8. **listIssues()** prints all available issues - this is only for debugging purposes but can be extended to return the JSON response to clients for their issues (associated with their client keys)
+8. **searchIssueFor(appleId:)** Searches for an issue with a given Apple id/SKU in Realm. If not available, it will get the issue from Magnet and add to Realm
 
-9. **searchIssueFor(appleId:)** Searches for an issue with a given Apple id/SKU in Realm. If not available, it will get the issue from Magnet and add to Realm
+9. **getIssue(issueId:)** retrieves an issue for a specific issue id from the database and returns an *Issue* object
 
-10. **getIssue(issueId:)** retrieves an issue for a specific issue id from the database and returns an *Issue* object
+10. **addIssueOnNewsstand(issueId:)** lets the client publish an issue from the database to Newsstand library
 
-11. **addIssueOnNewsstand(issueId:)** lets the client publish an issue from the database to Newsstand library
-
-12. **getActiveDownloads()** returns an array of issue ids whose downloads are currently going on (not those whose download is complete)
+11. **getActiveDownloads()** returns an array of issue ids whose downloads are currently going on (not those whose download is complete)
 
 ###Private methods
 1. **checkAndMigrateData(schemaVersion:)** will let 29.io write the migration code for bringing data saved with older schema up to date when the Realm schema changes

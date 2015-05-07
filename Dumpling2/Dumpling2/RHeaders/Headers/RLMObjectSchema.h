@@ -50,9 +50,9 @@
 /**
  Retrieve an RLMProperty object by name.
  
- @param propertyName The property's name.
+ :param: propertyName The property's name.
  
- @return RLMProperty object or nil if there is no property with the given name.
+ :return: RLMProperty object or nil if there is no property with the given name.
  */
 - (RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)propertyName;
 

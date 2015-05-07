@@ -26,8 +26,9 @@ class ViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        var issueHandler = IssueHandler(folder: docsDir)
-        issueHandler!.addIssueZip("org.bomb.mag.issue.20150101")
+        if let issueHandler = IssueHandler(folder: docsDir) {
+            issueHandler.addIssueZip("org.bomb.mag.issue.20150101")
+        }
     }
     
     //Add issue details from API
@@ -37,8 +38,9 @@ class ViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        var issueHandler = IssueHandler(folder: docsDir)
-        issueHandler!.addIssueFromAPI("551477bfaa93900422037b16")
+        if let issueHandler = IssueHandler(folder: docsDir) {
+            issueHandler.addIssueFromAPI("551477bfaa93900422037b16")
+        }
     }
     
     func updateIssueStatus(notif: NSNotification) {

@@ -318,9 +318,9 @@ public class Asset: RLMObject {
     // MARK: Public methods
     
     /**
-    @brief Save an Asset to the database
+    This method lets you save an Asset object back to the database in case some changes are made to it
     
-    @discussion This method lets you save an Asset object back to the database in case some changes are made to it
+    :brief: Save an Asset to the database
     */
     public func saveAsset() {
         let realm = RLMRealm.defaultRealm()
@@ -331,11 +331,11 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Delete a specific asset
+    This method accepts the global id of an asset and deletes it from the database. The file for the asset is also deleted
     
-    @discussion This method accepts the global id of an asset and deletes it from the database. The file for the asset is also deleted
+    :brief: Delete a specific asset
     
-    @param  assetId The global id for the asset
+    :param:  assetId The global id for the asset
     */
     public class func deleteAsset(assetId: NSString) {
         let realm = RLMRealm.defaultRealm()
@@ -357,15 +357,15 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Retrieve first asset for an issue/article
+    This method uses the global id for an issue and/or article and returns its first image asset (i.e. placement = 1, type = image)
     
-    @discussion This method uses the global id for an issue and/or article and returns its first image asset (i.e. placement = 1, type = image)
+    :brief: Retrieve first asset for an issue/article
+
+    :param:  issueId The global id for the issue
     
-    @param  issueId The global id for the issue
+    :param: articleId The global id for the article
     
-    @param articleId The global id for the article
-    
-    @return Asset object
+    :return: Asset object
     */
     public class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
@@ -391,15 +391,15 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Retrieve number of assets for an issue/article
+    This method uses the global id for an issue and/or article and returns the number of assets it has
     
-    @discussion This method uses the global id for an issue and/or article and returns the number of assets it has
+    :brief: Retrieve number of assets for an issue/article
     
-    @param  issueId The global id for the issue
+    :param:  issueId The global id for the issue
     
-    @param articleId The global id for the article
+    :param: articleId The global id for the article
     
-    @return asset count for the issue and/or article
+    :return: asset count for the issue and/or article
     */
     public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
         let realm = RLMRealm.defaultRealm()
@@ -415,17 +415,17 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Retrieve all assets for an issue/article of a specific type
+    This method uses the global id for an issue and/or article and the assets in an array. It takes in an optional type parameter. If specified, only assets of that type will be returned
     
-    @discussion This method uses the global id for an issue and/or article and the assets in an array. It takes in an optional type parameter. If specified, only assets of that type will be returned
+    :brief: Retrieve all assets for an issue/article of a specific type
     
-    @param  issueId The global id for the issue
+    :param:  issueId The global id for the issue
     
-    @param articleId The global id for the article
+    :param: articleId The global id for the article
     
-    @param type The type of asset. If nil, all assets will be returned
+    :param: type The type of asset. If nil, all assets will be returned
     
-    @return array of assets following the conditions
+    :return: array of assets following the conditions
     */
     public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
@@ -456,13 +456,13 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Retrieve a specific asset
+    This method inputs the global id of an asset and returns the Asset object
     
-    @discussion This method inputs the global id of an asset and returns the Asset object
+    :brief: Retrieve a specific asset
     
-    @param  assetId The global id for the asset
+    :param:  assetId The global id for the asset
     
-    @return asset object for the global id. Returns nil if the asset is not found
+    :return: asset object for the global id. Returns nil if the asset is not found
     */
     public class func getAsset(assetId: String) -> Asset? {
         let realm = RLMRealm.defaultRealm()
@@ -478,15 +478,15 @@ public class Asset: RLMObject {
     }
     
     /**
-    @brief Retrieve all sound files for an article/issue as a playlist/array
+    This method inputs the global id of an issue and/or article and returns all sound assets for it in an array
     
-    @discussion This method inputs the global id of an issue and/or article and returns all sound assets for it in an array
+    :brief: Retrieve all sound files for an article/issue as a playlist/array
     
-    @param  issueId The global id for the issue
+    :param:  issueId The global id for the issue
     
-    @param  articleId The global id for the article
+    :param:  articleId The global id for the article
     
-    @return Array of sound asset objects for the given issue and/or article
+    :return: Array of sound asset objects for the given issue and/or article
     */
     public class func getPlaylistFor(issueId: String, articleId: String) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()

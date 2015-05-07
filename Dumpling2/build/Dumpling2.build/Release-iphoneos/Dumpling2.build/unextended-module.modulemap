@@ -4,3 +4,7 @@ framework module Dumpling2 {
   export *
   module * { export * }
 }
+
+module Dumpling2.__Swift {
+    exclude header "Dumpling2-Swift.h"
+}
