@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>5A8A04C4-5C37-4EE6-B0BA-4317E645085A</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>Dumpling2</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>1C6C1F42A0E63709915958AB3B44E13C583AE4DF</key>
 		<string>https://github.com/29thStPublishing/Dumpling2.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Dumpling2/Dumpling2.xcodeproj/project.xcworkspace</string>
+	<string>Dumpling2/Dumpling2.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>1C6C1F42A0E63709915958AB3B44E13C583AE4DF</key>

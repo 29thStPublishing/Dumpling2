@@ -17,34 +17,36 @@ enum AssetType: String {
 
 /** A model object for Assets */
 public class Asset: RLMObject {
-    /// Global id of an asset - this is unique for each asset */
+    /// Global id of an asset - this is unique for each asset
     dynamic public var globalId = ""
-    /// Caption for the asset - used in the final rendered HTML */
+    /// Caption for the asset - used in the final rendered HTML
     dynamic public var caption = ""
-    /// Source attribution for the asset */
+    /// Source attribution for the asset
     dynamic public var source = ""
-    /// File URL for the asset's square thumbnail */
+    /// File URL for the asset's square thumbnail
     dynamic public var squareURL = ""
-    /// File URL for the original asset */
+    /// File URL for the original asset
     dynamic public var originalURL = ""
-    /// File URL for the portrait image of the asset */
+    /// File URL for the portrait image of the asset
     dynamic public var mainPortraitURL = ""
-    /// File URL for the landscape image of the asset */
+    /// File URL for the landscape image of the asset
     dynamic public var mainLandscapeURL = ""
-    /// File URL for the icon image */
+    /// File URL for the icon image
     dynamic public var iconURL = ""
-    /// Custom metadata for the asset */
+    /// Custom metadata for the asset
     dynamic public var metadata = ""
-    /// Asset type. Defaults to a photo. Can be image, sound, video or custom */
+    /// Asset type. Defaults to a photo. Can be image, sound, video or custom
     dynamic public var type = AssetType.Image.rawValue //default to a photo
-    /// Placement of an asset for an article or issue */
+    /// Placement of an asset for an article or issue
     dynamic public var placement = 0
-    /// Folder which stores the asset files - downloaded or unzipped */
+    /// Folder which stores the asset files - downloaded or unzipped
     dynamic public var fullFolderPath = ""
-    /// Global id for the article with which the asset is associated. Can be blank if this is an issue's asset */
+    /// Global id for the article with which the asset is associated. Can be blank if this is an issue's asset
     dynamic public var articleId = ""
-    /// Issue object for the issue with which the asset is associated. Can be a default Issue object if the asset is for an independent article */
+    /// Issue object for the issue with which the asset is associated. Can be a default Issue object if the asset is for an independent article
     dynamic public var issue = Issue()
+    /// Global id of volume the asset is associated with. Can be blank if this is an issue or article asset
+    dynamic public var volumeId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"
@@ -146,7 +148,92 @@ public class Asset: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    //Add asset from API
+    //Add asset from API for volumes
+    class func downloadAndCreateVolumeAsset(assetId: NSString, volume: Volume, placement: Int, delegate: AnyObject?) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let requestURL = "\(baseURL)media/\(assetId)"
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allMedia: NSArray = response.valueForKey("media") as! NSArray
+                let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
+                //Update Asset now
+                
+                realm.beginWriteTransaction()
+                
+                var currentAsset = Asset()
+                currentAsset.globalId = mediaFile.valueForKey("id") as! String
+                currentAsset.caption = mediaFile.valueForKey("title") as! String
+                currentAsset.volumeId = volume.globalId
+                
+                var meta = mediaFile.objectForKey("meta") as! NSDictionary
+                var dataType = meta.objectForKey("type") as! NSString
+                if dataType.isEqualToString("image") {
+                    currentAsset.type = AssetType.Image.rawValue
+                }
+                else if dataType.isEqualToString("audio") {
+                    currentAsset.type = AssetType.Sound.rawValue
+                }
+                else if dataType.isEqualToString("video") {
+                    currentAsset.type = AssetType.Video.rawValue
+                }
+                else {
+                    currentAsset.type = dataType as String
+                }
+                currentAsset.placement = placement
+                
+                let fileUrl = mediaFile.valueForKey("url") as! String
+                let finalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                
+                networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                    (status:AnyObject?, error:NSError?) -> () in
+                    if status != nil {
+                        let completed = status as! NSNumber
+                        if completed.boolValue {
+                            //Mark asset download as done
+                            if delegate != nil {
+                                (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                            }
+                        }
+                    }
+                    else if let err = error {
+                        println("Error: " + err.description)
+                        if delegate != nil {
+                            (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                        }
+                    }
+                }
+                
+                currentAsset.originalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                
+                if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
+                    if metadata.isKindOfClass(NSDictionary) {
+                        currentAsset.metadata = Helper.stringFromJSON(metadata)!
+                    }
+                    else {
+                        currentAsset.metadata = metadata as! String
+                    }
+                }
+                
+                realm.addOrUpdateObject(currentAsset)
+                realm.commitWriteTransaction()
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+                if delegate != nil {
+                    (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                }
+            }
+            
+        }
+    }
+    
+    //Add asset from API - for issues or articles
     class func downloadAndCreateAsset(assetId: NSString, issue: Issue, articleId: String, placement: Int, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
         
@@ -196,14 +283,14 @@ public class Asset: RLMObject {
                         if completed.boolValue {
                             //Mark asset download as done
                             if delegate != nil {
-                                (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
+                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
                             }
                         }
                     }
                     else if let err = error {
                         println("Error: " + err.description)
                         if delegate != nil {
-                            (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
                         }
                     }
                 }
@@ -225,7 +312,7 @@ public class Asset: RLMObject {
             else if let err = error {
                 println("Error: " + err.description)
                 if delegate != nil {
-                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
                 }
             }
             
@@ -280,6 +367,26 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "articleId IN %@", articles)
+        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        var fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as! Asset
+            let originalURL = assetDetails.originalURL
+            fileManager.removeItemAtPath(originalURL, error: nil)
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
+    }
+    
+    //Delete all assets for multiple issues
+    class func deleteAssetsForIssues(issues: NSArray) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issue.globalId IN %@", issues)
         var results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved

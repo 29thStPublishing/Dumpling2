@@ -38,8 +38,12 @@ class ViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        if let issueHandler = IssueHandler(folder: docsDir) {
-            issueHandler.addIssueFromAPI("551477bfaa93900422037b16")
+        /*if let issueHandler = IssueHandler(folder: docsDir) {
+            issueHandler.addIssueFromAPI("551477bfaa93900422037b16", volumeId: nil)
+        }*/
+        if let volumeHandler = VolumeHandler(folder: docsDir) {
+            //volumeHandler.listVolumes()
+            volumeHandler.addVolumeFromAPI("555a27de352c7d6d5b888c3e")
         }
     }
     

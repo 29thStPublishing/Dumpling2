@@ -8,13 +8,13 @@
 
 import UIKit
 
-//let baseURL: String = "http://52.1.9.236:5601/"
-let baseURL: String = "https://magnet-dev.29.io/"
+//let baseURL: String = "https://magnet-dev.29.io/"
+let baseURL: String = "https://api.29.io/"
 var clientKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
-let DOWNLOAD_COMPLETE: String = "downloadComplete" //Issue + Article + Issue assets + Article assets downloaded
+let DOWNLOAD_COMPLETE: String = "downloadComplete" //Volume + Issues + Article + Volume assets + Issue assets + Article assets downloaded
 
 class Helper {
     
@@ -43,14 +43,17 @@ class Helper {
     }
 
     //Date from string of ISO format
-    class func publishedDateFromISO(string: String) -> NSDate {
-        var dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        var posix = NSLocale(localeIdentifier: "en_US_POSIX")
-        dateFormatter.locale = posix
+    class func publishedDateFromISO(string: String?) -> NSDate {
+        if !isNilOrEmpty(string) {
+            var dateFormatter = NSDateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            var posix = NSLocale(localeIdentifier: "en_US_POSIX")
+            dateFormatter.locale = posix
         
-        var date = dateFormatter.dateFromString(string)
-        return date!
+            var date = dateFormatter.dateFromString(string!)
+            return date!
+        }
+        return NSDate()
     }
     
     class func isiPhone() -> Bool {
@@ -91,6 +94,21 @@ class Helper {
             }
         }
         return nil
+    }
+    
+    class func isNilOrEmpty(string: String?) -> Bool {
+        if let str = string {
+            if str.isEmpty {
+                //Not nil but empty
+                return true
+            }
+        }
+        else {
+            //Nil, return false
+            return true
+        }
+        //Not nil and not empty
+        return false
     }
     
     //Unpack a zip file
