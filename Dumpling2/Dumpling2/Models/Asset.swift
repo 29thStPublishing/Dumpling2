@@ -472,10 +472,23 @@ public class Asset: RLMObject {
     
     :param: articleId The global id for the article
     
+    :param: volumeId The global id for the volume
+    
     :return: Asset object
     */
-    public class func getFirstAssetFor(issueId: String, articleId: String) -> Asset? {
+    public class func getFirstAssetFor(issueId: String, articleId: String, volumeId: String?) -> Asset? {
         let realm = RLMRealm.defaultRealm()
+        
+        if Helper.isNilOrEmpty(issueId) {
+            if let vol = volumeId {
+                let predicate = NSPredicate(format: "volumeId = %@ AND placement = 1 AND type = %@", vol, "image")
+                var assets = Asset.objectsWithPredicate(predicate)
+                
+                if assets.count > 0 {
+                    return assets.firstObject() as? Asset
+                }
+            }
+        }
         
         if issueId == "" {
             let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
@@ -506,10 +519,23 @@ public class Asset: RLMObject {
     
     :param: articleId The global id for the article
     
+    :param: volumeId The global id of the volume
+    
     :return: asset count for the issue and/or article
     */
-    public class func getNumberOfAssetsFor(issueId: String, articleId: String) -> UInt {
+    public class func getNumberOfAssetsFor(issueId: String, articleId: String, volumeId: String?) -> UInt {
         let realm = RLMRealm.defaultRealm()
+        
+        if Helper.isNilOrEmpty(issueId) {
+            if let vol = volumeId {
+                let predicate = NSPredicate(format: "volumeId = %@", vol)
+                var assets = Asset.objectsWithPredicate(predicate)
+                
+                if assets.count > 0 {
+                    return assets.count
+                }
+            }
+        }
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
         var assets = Asset.objectsWithPredicate(predicate)
@@ -530,14 +556,23 @@ public class Asset: RLMObject {
     
     :param: articleId The global id for the article
     
+    :param: volumeId The global id for the volume
+    
     :param: type The type of asset. If nil, all assets will be returned
     
     :return: array of assets following the conditions
     */
-    public class func getAssetsFor(issueId: String, articleId: String, type: String?) -> Array<Asset>? {
+    public class func getAssetsFor(issueId: String, articleId: String, volumeId: String?, type: String?) -> Array<Asset>? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()
+        
+        if !Helper.isNilOrEmpty(volumeId) {
+            if let vol = volumeId {
+                let predicate = NSPredicate(format: "volumeId = %@", vol)
+                subPredicates.addObject(predicate)
+            }
+        }
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
         subPredicates.addObject(predicate)

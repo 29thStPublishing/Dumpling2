@@ -129,7 +129,7 @@ public class Volume: RLMObject {
     
     :return: an array of volumes
     */
-    public func getVolumes() -> Array<Volume>? {
+    public class func getVolumes() -> Array<Volume>? {
         let realm = RLMRealm.defaultRealm()
         
         var volumes: RLMResults = Volume.allObjects()

@@ -137,17 +137,23 @@ public class Issue: RLMObject {
     }
     
     /**
-    This method returns all issues for a given volume
+    This method returns all issues for a given volume or if volumeId is nil, all issues
     
     :param: volumeId Global id of the volume whose issues have to be retrieved
     
-    :return: an array of issues for given volume
+    :return: an array of issues for given volume or all issues if volumeId is nil
     */
-    public func getIssuesForVolume(volumeId: String) -> Array<Issue>? {
+    public func getIssues(volumeId: String?) -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
-        
-        let predicate = NSPredicate(format: "volumeId = %@", volumeId)
-        var issues = Issue.objectsWithPredicate(predicate)
+
+        var issues: RLMResults
+        if let volId = volumeId {
+            let predicate = NSPredicate(format: "volumeId = %@", volumeId)
+            issues = Issue.objectsWithPredicate(predicate)
+        }
+        else {
+            issues = Issue.allObjects()
+        }
         
         if issues.count > 0 {
             var array = Array<Issue>()
@@ -162,22 +168,20 @@ public class Issue: RLMObject {
     }
     
     /**
-    This method returns all issues
+    This method inputs the global id of an issue and returns the Issue object
     
-    :return: an array of issues
+    :param:  issueId The global id for the issue
+    
+    :return: issue object for the global id. Returns nil if the issue is not found
     */
-    public func getIssues() -> Array<Issue>? {
+    public class func getIssue(issueId: String) -> Issue? {
         let realm = RLMRealm.defaultRealm()
         
-        var issues: RLMResults = Issue.allObjects()
+        let predicate = NSPredicate(format: "globalId = %@", issueId)
+        var issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
-            var array = Array<Issue>()
-            for object in issues {
-                let obj: Issue = object as! Issue
-                array.append(obj)
-            }
-            return array
+            return issues.firstObject() as? Issue
         }
         
         return nil
