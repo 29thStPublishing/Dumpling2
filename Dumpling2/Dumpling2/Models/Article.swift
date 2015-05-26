@@ -13,48 +13,48 @@ var assetPatternParts: [String] = ["<!-- [ASSET: ", "] -->"]
 
 /** A model object for Articles */
 public class Article: RLMObject {
-    /// Global id of an article - this is unique for each article */
+    /// Global id of an article - this is unique for each article
     dynamic public var globalId = ""
-    /// Article title */
+    /// Article title
     dynamic public var title = ""
-    /// Article description */
+    /// Article description
     dynamic public var articleDesc = "" //description
     dynamic public var slug = ""
     dynamic public var dek = ""
-    /// Article content */
+    /// Article content
     dynamic public var body = ""
-    /// Permanent link to the article */
+    /// Permanent link to the article
     dynamic public var permalink = "" //keeping URLs as string - we might need to append parts to get the final
-    /// Article URL */
+    /// Article URL
     dynamic public var url = ""
-    /// URL to the article's source */
+    /// URL to the article's source
     dynamic public var sourceURL = ""
-    /// Article author's name */
+    /// Article author's name
     dynamic public var authorName = ""
-    /// Link to the article author's profile */
+    /// Link to the article author's profile
     dynamic public var authorURL = ""
-    /// Section under which the article falls */
+    /// Section under which the article falls
     dynamic public var section = ""
-    /// Type of article */
+    /// Type of article
     dynamic public var articleType = ""
-    /// Keywords which the article falls under */
+    /// Keywords which the article falls under
     dynamic public var keywords = ""
-    /// Article commentary */
+    /// Article commentary
     dynamic public var commentary = ""
-    /// Article published date */
+    /// Article published date
     dynamic public var date = NSDate()
-    /// Article metadata */
+    /// Article metadata
     dynamic public var metadata = ""
     dynamic public var versionStashed = ""
-    /// Placement of the article in an issue */
+    /// Placement of the article in an issue
     dynamic public var placement = 0
-    /// URL for the article's feature image */
+    /// URL for the article's feature image
     dynamic public var mainImageURL = ""
-    /// URL for the article's thumbnail image */
+    /// URL for the article's thumbnail image
     dynamic public var thumbImageURL = ""
-    /// Whether the article is featured for the given issue or not */
+    /// Whether the article is featured for the given issue or not
     dynamic public var isFeatured = false
-    /// Global id for the issue the article belongs to. This can be blank for independent articles */
+    /// Global id for the issue the article belongs to. This can be blank for independent articles
     dynamic var issueId = ""
     
     override public class func primaryKey() -> String {
@@ -194,7 +194,7 @@ public class Article: RLMObject {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
                         if delegate != nil {
-                            (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)
                     }
@@ -211,18 +211,39 @@ public class Article: RLMObject {
                 
                 if delegate != nil {
                     //Mark article as done
-                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 1)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
                 }
             }
             else if let err = error {
                 println("Error: " + err.description)
                 if delegate != nil {
                     //Mark article as done - even if with errors
-                    (delegate as! IssueHandler).updateStatusDictionary(issue.globalId, url: requestURL, status: 2)
+                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
                 }
             }
             
         }
+    }
+    
+    class func deleteArticlesForIssues(issues: NSArray) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "issueId IN %@", issues)
+        var articles = Article.objectsInRealm(realm, withPredicate: predicate)
+        
+        var articleIds = NSMutableArray()
+        //go through each article and delete all assets associated with it
+        for article in articles {
+            let article = article as! Article
+            articleIds.addObject(article.globalId)
+        }
+
+        Asset.deleteAssetsForArticles(articleIds)
+        
+        //Delete articles
+        realm.beginWriteTransaction()
+        realm.deleteObjects(articles)
+        realm.commitWriteTransaction()
     }
     
     // MARK: Public methods

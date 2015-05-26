@@ -21,8 +21,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636FF7BD1B0097D7006FF05A /* AccessControl.swift */; };
+		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
+		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
 		FF1A70061AEA5F85001B350F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF1A70051AEA5F85001B350F /* CloudKit.framework */; };
-		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; };
+		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FFCA0FD41A80DBF1000C9AFD /* AFHTTPRequestOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCA0FD51A80DBF1000C9AFD /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = FFCA0FC21A80DBF1000C9AFD /* AFHTTPRequestOperation.m */; };
 		FFCA0FD61A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCA0FC31A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -62,6 +65,8 @@
 		FFCB3B9F1A79076700F52BC6 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCB3B9E1A79076700F52BC6 /* libc++.dylib */; };
 		FFCF42561A7A592100E847E8 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCF42551A7A592100E847E8 /* Realm */; };
 		FFCF6D0F1A7F42BF008DF718 /* Dumpling2.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCB3AFC1A78A12700F52BC6 /* Dumpling2.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFD0EDAE1AFC9C500055A102 /* Purchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD0EDAD1AFC9C500055A102 /* Purchase.swift */; };
+		FFD0EDB01AFCA8F00055A102 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFD0EDAF1AFCA8F00055A102 /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FFD86B631AE7AA13003E357B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD86B621AE7AA13003E357B /* AppDelegate.swift */; };
 		FFD86B651AE7AA13003E357B /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD86B641AE7AA13003E357B /* MasterViewController.swift */; };
 		FFD86B671AE7AA13003E357B /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD86B661AE7AA13003E357B /* DetailViewController.swift */; };
@@ -122,6 +127,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		636FF7BD1B0097D7006FF05A /* AccessControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessControl.swift; sourceTree = "<group>"; };
+		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
+		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
 		FF1A70051AEA5F85001B350F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NewsstandKit.framework; path = System/Library/Frameworks/NewsstandKit.framework; sourceTree = SDKROOT; };
 		FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
@@ -166,6 +174,8 @@
 		FFCB3B9B1A78FFF300F52BC6 /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
 		FFCB3B9E1A79076700F52BC6 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		FFCF42551A7A592100E847E8 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
+		FFD0EDAD1AFC9C500055A102 /* Purchase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Purchase.swift; sourceTree = "<group>"; };
+		FFD0EDAF1AFCA8F00055A102 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		FFD86B5E1AE7AA13003E357B /* DumplingDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DumplingDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFD86B611AE7AA13003E357B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FFD86B621AE7AA13003E357B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -209,6 +219,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFD0EDB01AFCA8F00055A102 /* StoreKit.framework in Frameworks */,
 				FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */,
 				FFCB3B9F1A79076700F52BC6 /* libc++.dylib in Frameworks */,
 				FFCB3B311A78E51D00F52BC6 /* libz.dylib in Frameworks */,
@@ -238,6 +249,7 @@
 		F1B16F3685C54536E0868F50 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FFD0EDAF1AFCA8F00055A102 /* StoreKit.framework */,
 				FF1A70051AEA5F85001B350F /* CloudKit.framework */,
 				FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */,
 			);
@@ -297,6 +309,7 @@
 		FFCB3AF91A78A12700F52BC6 /* Dumpling2 */ = {
 			isa = PBXGroup;
 			children = (
+				FFD0EDAC1AFC9C500055A102 /* Payments */,
 				FFCB3B3B1A78E5F500F52BC6 /* Models */,
 				FFCB3B381A78E5ED00F52BC6 /* Handlers */,
 				FFCB3B321A78E58600F52BC6 /* Helpers */,
@@ -340,6 +353,7 @@
 			isa = PBXGroup;
 			children = (
 				FFCB3B391A78E5ED00F52BC6 /* IssueHandler.swift */,
+				63CED8501B130B0A00C4200C /* VolumeHandler.swift */,
 			);
 			path = Handlers;
 			sourceTree = "<group>";
@@ -351,6 +365,7 @@
 				FFCB3B3D1A78E5F500F52BC6 /* Asset.swift */,
 				FFCB3B3E1A78E5F500F52BC6 /* Issue.swift */,
 				FFCB3B3F1A78E5F500F52BC6 /* Magazine.swift */,
+				63CED84E1B1300A100C4200C /* Volume.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -387,6 +402,15 @@
 			);
 			name = RHeaders;
 			path = Dumpling2/RHeaders;
+			sourceTree = "<group>";
+		};
+		FFD0EDAC1AFC9C500055A102 /* Payments */ = {
+			isa = PBXGroup;
+			children = (
+				FFD0EDAD1AFC9C500055A102 /* Purchase.swift */,
+				636FF7BD1B0097D7006FF05A /* AccessControl.swift */,
+			);
+			path = Payments;
 			sourceTree = "<group>";
 		};
 		FFD86B5F1AE7AA13003E357B /* DumplingDemo */ = {
@@ -675,11 +699,15 @@
 				FFCA0FE61A80DBF1000C9AFD /* AFURLSessionManager.m in Sources */,
 				FFCB3B241A78E42800F52BC6 /* RLMSupport.swift in Sources */,
 				FFCB3B3A1A78E5ED00F52BC6 /* IssueHandler.swift in Sources */,
+				63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */,
+				63CED84F1B1300A100C4200C /* Volume.swift in Sources */,
 				FFCA0FD91A80DBF1000C9AFD /* AFHTTPSessionManager.m in Sources */,
 				FFDAD91B1AB6FA9600506EBF /* LRNetworkManager.swift in Sources */,
 				FFCB3B431A78E5F600F52BC6 /* Magazine.swift in Sources */,
 				FFCA0FDC1A80DBF1000C9AFD /* AFNetworkReachabilityManager.m in Sources */,
 				FFD86B831AE7B352003E357B /* ReaderHelper.swift in Sources */,
+				636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */,
+				FFD0EDAE1AFC9C500055A102 /* Purchase.swift in Sources */,
 				FFCA0FD71A80DBF1000C9AFD /* AFHTTPRequestOperationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -997,6 +1025,7 @@
 				FFA6EC691AFB6C8300DBBB9D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FFCB3AF11A78A12700F52BC6 /* Build configuration list for PBXProject "Dumpling2" */ = {
 			isa = XCConfigurationList;

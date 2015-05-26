@@ -10,32 +10,56 @@ import UIKit
 
 /** A model object for Issue */
 public class Issue: RLMObject {
-    /// Global id of an issue - this is unique for each issue */
+    /// Global id of an issue - this is unique for each issue
     dynamic public var globalId = ""
-    /// SKU or Apple Id for an issue */
+    /// SKU or Apple Id for an issue
     dynamic var appleId = ""
-    /// Title of the issue */
+    /// Title of the issue
     dynamic public var title = ""
-    /// Description of the issue */
+    /// Description of the issue
     dynamic public var issueDesc = "" //description
-    /// Folder saving all the assets for the issue */
+    /// Folder saving all the assets for the issue
     dynamic public var assetFolder = ""
-    /// Global id of the asset which is the cover image of the issue */
+    /// Global id of the asset which is the cover image of the issue
     dynamic public var coverImageId = "" //globalId of asset
-    /// File URL for the icon image */
+    /// File URL for the icon image
     dynamic public var iconImageURL = ""
-    /// Published date for the issue */
+    /// Published date for the issue
     dynamic public var publishedDate = NSDate()
-    /// Last updated date for the issue */
+    /// Last updated date for the issue
     dynamic public var lastUpdateDate = ""
-    /// Display date for an issue */
+    /// Display date for an issue
     dynamic public var displayDate = ""
-    /// Custom metadata of the issue */
+    /// Custom metadata of the issue
     dynamic public var metadata = ""
-    //dynamic var magazine = Magazine()
+    ///Global id of the volume to which the issue belongs (can be blank if this is an independent issue)
+    dynamic var volumeId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"
+    }
+    
+    // MARK: Private methods
+
+    // Delete all issues for a volume - this will delete the issues, their assets, articles and article assets
+    class func deleteIssuesForVolume(volumeId: NSString) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "volumeId = %@", volumeId)
+        var results = Issue.objectsWithPredicate(predicate)
+        
+        var issueIds = NSMutableArray()
+        for issue in results {
+            let singleIssue = issue as! Issue
+            issueIds.addObject(singleIssue.globalId)
+        }
+        
+        Article.deleteArticlesForIssues(issueIds)
+        Asset.deleteAssetsForIssues(issueIds)
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        realm.commitWriteTransaction()
     }
     
     // MARK: Public methods
@@ -107,6 +131,53 @@ public class Issue: RLMObject {
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
+        }
+        
+        return nil
+    }
+    
+    /**
+    This method returns all issues for a given volume
+    
+    :param: volumeId Global id of the volume whose issues have to be retrieved
+    
+    :return: an array of issues for given volume
+    */
+    public func getIssuesForVolume(volumeId: String) -> Array<Issue>? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "volumeId = %@", volumeId)
+        var issues = Issue.objectsWithPredicate(predicate)
+        
+        if issues.count > 0 {
+            var array = Array<Issue>()
+            for object in issues {
+                let obj: Issue = object as! Issue
+                array.append(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    /**
+    This method returns all issues
+    
+    :return: an array of issues
+    */
+    public func getIssues() -> Array<Issue>? {
+        let realm = RLMRealm.defaultRealm()
+        
+        var issues: RLMResults = Issue.allObjects()
+        
+        if issues.count > 0 {
+            var array = Array<Issue>()
+            for object in issues {
+                let obj: Issue = object as! Issue
+                array.append(obj)
+            }
+            return array
         }
         
         return nil

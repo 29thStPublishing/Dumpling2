@@ -107,46 +107,8 @@ public class IssueHandler: NSObject {
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        //Call this if the schema version has changed - pass new schema version as integer
-        //IssueHandler.checkAndMigrateData(2)
     }
-    
-    /**
-    Find current schema version
-    
-    :return: the current schema version for the database
-    */
-    public class func getCurrentSchemaVersion() -> UInt {
-        var currentSchemaVersion: UInt = RLMRealm.schemaVersionAtPath(RLMRealm.defaultRealmPath(), error: nil)
         
-        if currentSchemaVersion < 0 {
-            return 0
-        }
-        
-        return currentSchemaVersion
-    }
-
-    //Check and migrate Realm data if needed
-    class func checkAndMigrateData(schemaVersion: UInt) {
-        
-        var currentSchemaVersion: UInt = getCurrentSchemaVersion()
-        
-        if currentSchemaVersion < schemaVersion {
-            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealm.defaultRealmPath(),
-                withMigrationBlock: { migration, oldSchemaVersion in
-                    
-                    //Enumerate through the models and migrate data as needed
-                    /*migration.enumerateObjects(MyClass.className()) { oldObject, newObject in
-                        // Make the necessary changes for migration
-                        if oldSchemaVersion < 1 {
-                            //Use old object and new object
-                        }
-                    }*/
-                }
-            )
-        }
-    }
-    
     // MARK: Use zip
     
     /**
@@ -203,11 +165,19 @@ public class IssueHandler: NSObject {
     
     :param: appleId The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
     */
-    public func addIssueFromAPI(issueId: String) {
+    public func addIssueFromAPI(issueId: String, volumeId: String?) {
         
         let requestURL = "\(baseURL)issues/\(issueId)"
         
-        self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: issueId)
+        if volumeId == nil {
+            //Independent issue - have an entry with the issueId key
+            self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: issueId)
+        }
+        else if let volId = volumeId {
+            //Issue of a volume. Add the issue as one of the downloads for the volume
+            self.updateStatusDictionary(volId, issueId: issueId, url: requestURL, status: 0)
+            //self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volId)
+        }
         
         var networkManager = LRNetworkManager.sharedInstance
         
@@ -218,12 +188,12 @@ public class IssueHandler: NSObject {
                 var allIssues: NSArray = response.valueForKey("issues") as! NSArray
                 let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
                 //Update issue now
-                self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String)
+                self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
             }
             else if let err = error {
                 println("Error: " + err.description)
                 //Mark issue download as failed
-                self.updateStatusDictionary(issueId, url: "\(baseURL)issues/\(issueId)", status: 2)
+                self.updateStatusDictionary(volumeId, issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 2)
             }
         }
     }
@@ -298,7 +268,7 @@ public class IssueHandler: NSObject {
     }
     
     //Add or create issue details (from API)
-    func updateIssueFromAPI(issue: NSDictionary, globalId: String) -> Int {
+    func updateIssueFromAPI(issue: NSDictionary, globalId: String, volumeId: String?) -> Int {
         let realm = RLMRealm.defaultRealm()
         var results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
@@ -320,6 +290,10 @@ public class IssueHandler: NSObject {
         currentIssue.title = issue.valueForKey("title") as! String
         currentIssue.issueDesc = issue.valueForKey("description") as! String
         
+        if let volId = volumeId {
+            currentIssue.volumeId = volId
+        }
+        
         var meta = issue.valueForKey("meta") as! NSDictionary
         var updatedInfo = meta.valueForKey("updated") as! NSDictionary
         
@@ -327,11 +301,9 @@ public class IssueHandler: NSObject {
             currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as! String
         }
         currentIssue.displayDate = meta.valueForKey("displayDate") as! String
-        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as! String)
+        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as? String)
         currentIssue.appleId = issue.valueForKey("sku") as! String
         
-        //SKU SHOULD NEVER be blank. Right now it is blank. So using globalId
-        //currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.globalId)"
         currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         var isDir: ObjCBool = false
@@ -369,7 +341,7 @@ public class IssueHandler: NSObject {
                 //Download images and create Asset object for issue
                 //Add asset to Issue dictionary
                 let assetid = assetDict.valueForKey("id") as! NSString
-                self.updateStatusDictionary(globalId, url: "\(baseURL)media/\(assetId)", status: 0)
+                self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)media/\(assetId)", status: 0)
                 Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)
             }
         }
@@ -380,15 +352,12 @@ public class IssueHandler: NSObject {
             //Insert article
             //Add article and its assets to Issue dictionary
             let articleId = articleDict.valueForKey("id") as! NSString
-            self.updateStatusDictionary(globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+            self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
             Article.createArticleForId(articleId, issue: currentIssue, placement: index+1, delegate: self)
         }
         
         //Mark issue URL as done
-        self.updateStatusDictionary(globalId, url: "\(baseURL)issues/\(globalId)", status: 1)
-        
-        //Fire a notification that issue's data is saved
-        NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: globalId, forKey: "issue") as! [String : String])
+        self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)issues/\(globalId)", status: 1)
         
         return 0
     }
@@ -442,7 +411,13 @@ public class IssueHandler: NSObject {
                     var allIssues: NSArray = response.valueForKey("issues") as! NSArray
                     let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
                     //Update issue now
-                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String)
+                    var issueVolumes = issueDetails.objectForKey("volumes") as! NSArray
+                    var volumeId: String?
+                    if issueVolumes.count > 0 {
+                        var volumeDict: NSDictionary = issueVolumes.firstObject as! NSDictionary
+                        volumeId = volumeDict.valueForKey("id") as? String
+                    }
+                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
                 }
                 else if let err = error {
                     println("Error: " + err.description)
@@ -536,12 +511,25 @@ public class IssueHandler: NSObject {
     //MARK: Downloads tracking
     
     //status = 0 for not started, 1 for complete, 2 for error
-    func updateStatusDictionary(issueId: String, url: String, status: Int) {
+    func updateStatusDictionary(volumeId: String?, issueId: String, url: String, status: Int) {
         var dictionaryLock = NSLock()
         dictionaryLock.lock()
-        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as! NSDictionary)
-        issueStatus.setValue(NSNumber(integer: status), forKey: url)
-        self.activeDownloads.setValue(issueStatus, forKey: issueId)
+
+        var issueStatus: NSMutableDictionary = NSMutableDictionary()
+        if !Helper.isNilOrEmpty(volumeId) {
+            if let volId = volumeId {
+                issueStatus = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(volId) as! NSDictionary)
+                issueStatus.setValue(NSNumber(integer: status), forKey: url)
+                self.activeDownloads.setValue(issueStatus, forKey: volId)
+            }
+        }
+        else {
+            //Volume id is empty. This is an independent issue
+            issueStatus = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as! NSDictionary)
+            issueStatus.setValue(NSNumber(integer: status), forKey: url)
+            self.activeDownloads.setValue(issueStatus, forKey: issueId)
+        }
+        
         dictionaryLock.unlock()
         
         //Check if all values 1 or 2 for the dictionary, send out a notification
@@ -556,56 +544,101 @@ public class IssueHandler: NSObject {
         else {
             //All articles downloaded (with or without errors)
             NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
-            
-            if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
-            }
-            else {
-                //Issue download complete (with or without errors)
-                //MARK: Note - Can send status as well
-                NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
-            }
-        }
-    }
-    
-    /**
-    Find download % progress for an issue
-    
-    :param: issueId Global id of the issue
-    
-    :return: Download progress (in percentage) for the issue
-    */
-    public func findDownloadProgress(issueId: String) -> Int {
-        var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueId) as! NSDictionary)
-        var values = issueStatus.allValues
-        var occurrences = 0
-        for value in values {
-            occurrences += (value.integerValue != 0) ? 1 : 0
         }
         
-        let percent = occurrences * 100 / values.count
-        return percent
+        predicate = NSPredicate(format: "SELF contains[c] %@", "/issues/")
+        var issueKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
+        
+        values = issueStatus.objectsForKeys(issueKeys, notFoundMarker: NSNumber(integer: 0))
+        if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All issues not downloaded yet
+        }
+        else {
+            //All issues downloaded (with or without errors) - there might be multiple for a volume
+            var userInfoDict: NSDictionary
+            if !Helper.isNilOrEmpty(volumeId) {
+                let volId = volumeId
+                userInfoDict = NSDictionary(object: volId!, forKey: "volume")
+            }
+            else {
+                userInfoDict = NSDictionary(object: issueId, forKey: "issue")
+            }
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
+        }
+        
+        if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
+        }
+        else {
+            //Issue or volume download complete (with or without errors)
+            var userInfoDict: NSDictionary
+            if !Helper.isNilOrEmpty(volumeId) {
+                let volId = volumeId
+                userInfoDict = NSDictionary(object: volId!, forKey: "volume")
+            }
+            else {
+                userInfoDict = NSDictionary(object: issueId, forKey: "issue")
+            }
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
+        }
     }
     
     /**
-    Get issue ids whose download not complete yet
+    Find download % progress for an issue or volume. The method requires either a volume's global id or an issue's global id. The issue's global id should be used only if it is an independent issue (i.e. not belonging to any volume)
     
-    :return: array with issue ids whose download is not complete
+    :param: issueId Global id of an issue
+    
+    :param: volumeId Global id of a volume
+    
+    :return: Download progress (in percentage) for the issue or volume
+    */
+    public func findDownloadProgress(volumeId: String?, issueId: String?) -> Int {
+        if let volId = volumeId {
+            var volumeStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(volId) as! NSDictionary)
+            var values = volumeStatus.allValues
+            var occurrences = 0
+            for value in values {
+                occurrences += (value.integerValue != 0) ? 1 : 0
+            }
+            
+            let percent = occurrences * 100 / values.count
+            return percent
+        }
+        if let issueGlobalId = issueId {
+            var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueGlobalId) as! NSDictionary)
+            var values = issueStatus.allValues
+            var occurrences = 0
+            for value in values {
+                occurrences += (value.integerValue != 0) ? 1 : 0
+            }
+            
+            let percent = occurrences * 100 / values.count
+            return percent
+        }
+        
+        return 0
+    }
+    
+    /**
+    Get issue/volume ids whose download not complete yet
+    
+    :return: array with issue/volume ids whose download is not complete
     */
     public func getActiveDownloads() -> NSArray? {
         //Return issueId whose download is not complete yet
-        var issueIds = NSMutableArray(array: self.activeDownloads.allKeys)
-        for (issueid, urls) in self.activeDownloads {
+        var globalIds = NSMutableArray(array: self.activeDownloads.allKeys)
+        for (globalid, urls) in self.activeDownloads {
             var stats = urls.allValues //get all URLs status for the issueId
         
             if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
             }
             else {
                 //Issue download complete - remove from array to be returned
-                issueIds.removeObject(issueid)
+                globalIds.removeObject(globalid)
             }
         }
         
-        return issueIds
+        return globalIds
     }
     
 }
