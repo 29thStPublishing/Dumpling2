@@ -131,8 +131,6 @@ public class VolumeHandler: NSObject {
     public func addVolumeFromAPI(globalId: String) {
         
         let requestURL = "\(baseURL)volumes/\(globalId)"
-        
-        //TODO: self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: issueId)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
         var networkManager = LRNetworkManager.sharedInstance

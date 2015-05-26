@@ -19,7 +19,7 @@ The information from both is added into a Realm database.
 
 ### Classes
 
-**Magazine** has the properties associated with a magazine object. This class is currently not used. This is a subclass of RLMObject.
+**Volume** has the properties associated with a volume object. This is a subclass of RLMObject.
 
 **Issue** has the properties associated with an Issue. This is a subclass of RLMObject.
 
@@ -27,9 +27,11 @@ The information from both is added into a Realm database.
 
 **Asset** stores the proerties and details of an asset (sound or image) associated with an issue or an article. It has methods for creating an asset, deleting assets for an article, deleting assets for an issue and getting the cover asset for an article/issue. This is a subclass of RLMObject.
 
-**IssueHandler** is the main class where all the action happens. The class takes in the Apple id of an issue (also the name of the zip file - available in the app bundle). It extracts the zip file and creates the Issue, Article and Asset objects necessary. The class also lets you get an issue from the database if one exists (search by Apple id)
+**VolumeHandler** is the main class where all the action happens. The class takes in the global id of a volume, retrieves its data from the server and saves it to the database (issues, assets, articles)
 
-It provides a default convenience initializer. Optionally you can specify a folder where all assets and the database should be stored and an API key for usage
+You need to provide a client key for the API calls to work
+
+**IssueHandler** is the class which deals with issues, their articles and assets. It also takes in the Apple id of an issue (also the name of the zip file - available in the app bundle), extracts the zip file and creates the Issue, Article and Asset objects necessary.
 
 **Helper** class stores the various functions used throughout the framework like finding the device type and resolution, getting string from date (and other way round), getting JSON object from string (and other way round). It also stores the constants in the project like the base URL for Magnet and notification names (for download completion)
 
@@ -43,11 +45,21 @@ It provides a default convenience initializer. Optionally you can specify a fold
 ```
 //For zipped files
 let appleId = "org.bomb.mag.issue.20150101"
-var issueHandler = IssueHandler()
-issueHandler.addIssueZip(appleId)
 
-//For issues from API
-issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
+var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+var docsDir: NSString = docPaths[0] as! NSString
+        
+var volumeHandler = VolumeHandler(folder: docsDir)
+
+//This nil check is needed. The initializer might return a nil if it doesn't find 
+//"ClientKey" in Info.plist
+if volumeHandler != nil {
+	//Issue from a ZIP
+    volumeHandler.issueHandler.addIssueZip(appleId)
+
+    //For volumes from API
+    volumeHandler.addVolumeFromAPI("555a27de352c7d6d5b888c3e") //The volume's global id
+}
 ```
 
 ### Additional notes
@@ -58,7 +70,7 @@ issueHandler.addIssueFromAPI("54c829c639cc76043772948d") //The issue id
 
 3. In order to use iCloud for syncing reading status, add CloudKit.framework to your project, turn on iCloud in the target's Capabilities section for Key-value storage. The sample project uses the default container for storing and retrieving values. If you wish to use a custom container, the code will change accordingly
 
-4. If you turn on App Groups for multiple projects and instantiate **IssueHandler** with the appropriate folder, you can read the data across multiple apps. To do this, you will need an app id with App Groups enabled and set the app group in Capabilities for all projects sharing the data.
+4. If you turn on App Groups for multiple projects and instantiate **VolumeHandler** and **IssueHandler** with the appropriate folder, you can read the data across multiple apps. To do this, you will need an app id with App Groups enabled and set the app group in Capabilities for all projects sharing the data.
 
 
 *The Documents directory is here ~/Library/Developer/CoreSimulator/Devices/Your_simulator_UDID/data/Containers/Data/Application/Your_app_UDID/Documents

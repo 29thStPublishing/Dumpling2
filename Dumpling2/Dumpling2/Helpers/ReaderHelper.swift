@@ -12,6 +12,19 @@ import UIKit
 public class ReaderHelper: NSObject {
 
     /**
+    Save current active volume
+    
+    :param: volumeId Global id of the volume which is currently being viewed. If nil, will remove saved volume
+    */
+    public class func saveVolume(volumeId: String?) {
+        if volumeId == nil {
+            NSUserDefaults.standardUserDefaults().removeObjectForKey("CurrentVolume")
+            return
+        }
+        NSUserDefaults.standardUserDefaults().setValue(volumeId, forKey: "CurrentVolume")
+    }
+    
+    /**
     Save current active issue
     
     :param: issueId Global id of the issue which is currently being viewed. If nil, will remove saved issue
@@ -64,6 +77,18 @@ public class ReaderHelper: NSObject {
             percentValue = 0.0
         }
         NSUserDefaults.standardUserDefaults().setValue(NSString(format: "%.2f", percentValue), forKey: articleKey)
+    }
+    
+    /**
+    Get current active volume
+    
+    :return: global id of active volume or nil
+    */
+    public class func retrieveCurrentVolume() -> String? {
+        if let volumeId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentVolume") as? String {
+            return volumeId
+        }
+        return nil
     }
     
     /**
@@ -132,6 +157,11 @@ public class ReaderHelper: NSObject {
     public class func getDictionaryForCloud() -> Dictionary<String, AnyObject> {
         //Get CurrentIssue, CurrentArticle, CurrentAsset, Reading% from NSUserDefaults and save to iCloud
         var values = Dictionary<String, AnyObject>()
+        
+        if let volumeId = retrieveCurrentVolume() {
+            values["CurrentVolume"] = volumeId
+        }
+        
         if let issueId = retrieveCurrentIssue() {
             values["CurrentIssue"] = issueId
         }
@@ -158,7 +188,10 @@ public class ReaderHelper: NSObject {
     :param: savedValues a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
     public class func saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>) {
-        //If CurrentIssue, CurrentArticle, CurrentAsset, Reading% are on iCloud, retrieve and save to user defaults
+        //If CurrentVolume, CurrentIssue, CurrentArticle, CurrentAsset, Reading% are on iCloud, retrieve and save to user defaults
+        if let volumeId: String = savedValues["CurrentVolume"] as? String {
+            saveVolume(volumeId)
+        }
         if let issueId: String = savedValues["CurrentIssue"] as? String {
             saveIssue(issueId)
         }

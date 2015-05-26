@@ -425,6 +425,26 @@ public class Article: RLMObject {
     }
     
     /**
+    This method inputs the global id of an article and returns the Article object
+    
+    :param:  articleId The global id for the article
+    
+    :return: article object for the global id. Returns nil if the article is not found
+    */
+    public class func getArticle(articleId: String) -> Article? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = %@", articleId)
+        var articles = Article.objectsWithPredicate(predicate)
+        
+        if articles.count > 0 {
+            return articles.firstObject() as? Article
+        }
+        
+        return nil
+    }
+    
+    /**
     This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
     
     :brief: Get all articles for an issue with specific keywords
