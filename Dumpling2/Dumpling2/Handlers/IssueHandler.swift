@@ -250,7 +250,7 @@ public class IssueHandler: NSObject {
         }
         
         //define cover image for issue
-        if let firstAsset = Asset.getFirstAssetFor(currentIssue.globalId, articleId: "") {
+        if let firstAsset = Asset.getFirstAssetFor(currentIssue.globalId, articleId: "", volumeId: currentIssue.volumeId) {
             realm.beginWriteTransaction()
             currentIssue.coverImageId = firstAsset.globalId
             realm.addOrUpdateObject(currentIssue)

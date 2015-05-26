@@ -148,7 +148,7 @@ public class Issue: RLMObject {
 
         var issues: RLMResults
         if let volId = volumeId {
-            let predicate = NSPredicate(format: "volumeId = %@", volumeId)
+            let predicate = NSPredicate(format: "volumeId = %@", volId)
             issues = Issue.objectsWithPredicate(predicate)
         }
         else {
