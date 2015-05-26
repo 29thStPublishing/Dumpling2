@@ -116,7 +116,7 @@ public class Article: RLMObject {
         }
         
         //Set thumbnail for article
-        if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId) {
+        if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId, volumeId: nil) {
             currentArticle.thumbImageURL = firstAsset.squareURL as String
         }
         
@@ -201,7 +201,7 @@ public class Article: RLMObject {
                 }
                 
                 //Set thumbnail for article
-                if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId as String) {
+                if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId as String, volumeId: nil) {
                     currentArticle.thumbImageURL = firstAsset.originalURL as String
                 }
                 
@@ -336,7 +336,7 @@ public class Article: RLMObject {
         }
         
         //Set thumbnail for article
-        if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId) {
+        if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId, volumeId: nil) {
             currentArticle.thumbImageURL = firstAsset.originalURL as String
         }
         
