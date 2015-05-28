@@ -1,0 +1,125 @@
+//
+//  ArticleHandler.swift
+//  Dumpling2
+//
+//  Created by Lata Rastogi on 28/05/15.
+//  Copyright (c) 2015 29th Street. All rights reserved.
+//
+
+import Foundation
+
+/** Starter class which adds independent articles to the database */
+public class ArticleHandler: NSObject {
+    
+    var defaultFolder: NSString!
+    
+    // MARK: Initializers
+    
+    /**
+    Initializes the ArticleHandler with the given folder. This is where the database and assets will be saved. The method expects to find a key `ClientKey` in the project's Info.plist with your client key. If none is found, the method returns a nil
+    
+    :param: folder The folder where the database and downloaded assets should be saved
+    */
+    public init?(folder: NSString){
+        super.init()
+        self.defaultFolder = folder
+        
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        
+        var mainBundle = NSBundle.mainBundle()
+        if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
+            clientKey = key
+        }
+        else {
+            return nil
+        }
+    }
+    
+    /**
+    Initializes the ArticleHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+    
+    :param: clientkey Client API key to be used for making calls to the Magnet API
+    */
+    public init(clientkey: NSString) {
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        self.defaultFolder = docsDir
+        clientKey = clientKey as String
+        
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        
+    }
+    
+    /**
+    Initializes the ArticleHandler with a custom directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
+    
+    :param: folder The folder where the database and downloaded assets should be saved
+    
+    :param: clientkey Client API key to be used for making calls to the Magnet API
+    */
+    public init(folder: NSString, clientkey: NSString) {
+        self.defaultFolder = folder
+        clientKey = clientkey as String
+        
+        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        
+    }
+    
+    /**
+    The method uses the global id of an article, gets its content from the Magnet API and adds it to the database
+    
+    :brief: Get Article details from API and add to database
+    
+    :param: globalId The global id for the article
+    */
+    public func addArticleFromAPI(globalId: String) {
+        
+        Article.createIndependentArticle(globalId)
+    }
+    
+    public func addAllArticles() {
+        let requestURL = "\(baseURL)articles/"
+
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                
+                if allArticles.count > 0 {
+                    for (index, articleDict) in enumerate(allArticles) {
+                        let articleId = articleDict.valueForKey("id") as! NSString
+                        Article.createIndependentArticle(articleId as String)
+                    }
+                }
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
+    /**
+    Get paginated articles (array) from the database
+    
+    :param: page Page number for results (starts at 0)
+    
+    :param: count Number of items to be returned (specify as 0 if you need all articles)
+    
+    :return: Array of independent articles (without any issueIds)
+    */
+    public func getAllArticles(page: Int, count: Int) -> Array<Article>? {
+        
+        let realm = RLMRealm.defaultRealm()
+        
+        var array: Array<Article>? = Article.getArticlesFor("", type: nil, excludeType: nil, count: count, page: page)
+        return array
+    }
+    
+}
