@@ -387,9 +387,13 @@ public class Article: RLMObject {
     
     :param: excludeType The article type which should not be included in the search
     
+    :param: count Number of articles to be returned
+    
+    :param: page Page number (will be used with count)
+    
     :return: an array of articles fulfiling the conditions
     */
-    public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?) -> Array<Article>? {
+    public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?, count: Int, page: Int) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
         
         var subPredicates = NSMutableArray()
@@ -410,12 +414,24 @@ public class Article: RLMObject {
         
         if subPredicates.count > 0 {
             let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
-            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
+            var articles: RLMResults
+            
+            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
+            
             if articles.count > 0 {
                 var array = Array<Article>()
                 for object in articles {
                     let obj: Article = object as! Article
                     array.append(obj)
+                }
+                
+                //If count > 0, return only values in that range
+                if count > 0 {
+                    var startIndex = page * count
+                    var endIndex = (array.count > startIndex+count) ? (startIndex+count) : array.count
+                    var slicedArray = Array(array[startIndex...endIndex])
+                    
+                    return slicedArray
                 }
                 return array
             }

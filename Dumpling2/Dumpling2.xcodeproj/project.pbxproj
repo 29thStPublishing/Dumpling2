@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634BA6121B17230A007B2630 /* ArticleHandler.swift */; };
 		636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636FF7BD1B0097D7006FF05A /* AccessControl.swift */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
 		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
@@ -127,6 +128,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		634BA6121B17230A007B2630 /* ArticleHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleHandler.swift; sourceTree = "<group>"; };
 		636FF7BD1B0097D7006FF05A /* AccessControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessControl.swift; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
 		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
@@ -354,6 +356,7 @@
 			children = (
 				FFCB3B391A78E5ED00F52BC6 /* IssueHandler.swift */,
 				63CED8501B130B0A00C4200C /* VolumeHandler.swift */,
+				634BA6121B17230A007B2630 /* ArticleHandler.swift */,
 			);
 			path = Handlers;
 			sourceTree = "<group>";
@@ -693,6 +696,7 @@
 				FFCB3B411A78E5F600F52BC6 /* Asset.swift in Sources */,
 				FFCA0FE41A80DBF1000C9AFD /* AFURLResponseSerialization.m in Sources */,
 				FFCB3B401A78E5F500F52BC6 /* Article.swift in Sources */,
+				634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */,
 				FFCA0FE21A80DBF1000C9AFD /* AFURLRequestSerialization.m in Sources */,
 				FFCA0FDE1A80DBF1000C9AFD /* AFSecurityPolicy.m in Sources */,
 				FFCA0FD51A80DBF1000C9AFD /* AFHTTPRequestOperation.m in Sources */,

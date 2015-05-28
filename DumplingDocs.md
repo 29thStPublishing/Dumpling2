@@ -80,6 +80,30 @@ This class handles adding issues to the database. If using a VolumeHandler, you 
 10. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
 
 
+## ArticleHandler
+
+This class created for managing independent articles
+
+###Methods
+1. **init(folder: NSString)** Initializes the ArticleHandler with the given folder. This is where the database and assets will be saved
+
+    **NOTE:** The initializer requires a Client key. If you wish to pass a client key to the initializer, use one of the below initializers. This method will look for a ```String``` with the key ```ClientKey``` in your project's **Info.plist**
+```
+<key>ClientKey</key>
+<string>Your Key Here</string>
+```
+
+2. **init(clientkey: NSString)** Initializes the ArticleHandler with the Documents directory. This is where the database and assets will be saved. The key is used for making calls to the Magnet API
+
+3. **init(folder: NSString, clientkey: NSString)** Initializes the ArticleHandler with a custom directory. This is where the database and assets will be saved. The key is your Client API key provided by 29.io
+
+4. **addArticleFromAPI(globalId: String)** The method uses the global id of an article, gets its content from the Magnet API and adds it to the database as an independent article
+
+5. **addAllArticles()** Gets all the articles for a client key from the API and adds it to the database
+
+7. **getAllArticles(page: Int, count: Int)** ```returns Array<Article> or nil``` The method returns a paginated list of independent articles from the database. If you need all articles, specify count as 0. The page index starts at 0
+
+
 ## Volume
 
 Realm object for Volumes. Also has methods for directly dealing with volumes
@@ -232,7 +256,7 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 2. **deleteArticlesFor(issueId: NSString)** This method accepts an issue's global id and deletes all articles from the database which belong to that issue
 
-3. **getArticlesFor(issueId: String?, type: String?, excludeType: String?)** ```returns Array<Article>``` This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array. All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
+3. **getArticlesFor(issueId: String?, type: String?, excludeType: String?, count: Int, page: Int)** ```returns Array<Article>``` This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array. All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
 
 4. **searchArticlesWith(keywords: [String], issueId: String?)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
 
