@@ -253,6 +253,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 23. **issueId** ```String``` Global id for the issue the article belongs to. This can be blank for independent articles
 
+24. **appleId** ```String``` Apple id/SKU fir the article. Will be blank if the article cannot be sold individually
+
 ###Class methods (public)
 1. **deleteArticlesFor(issueId: NSString)** This method accepts an issue's global id and deletes all articles from the database which belong to that issue
 
@@ -262,7 +264,7 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 4. **getFeaturedArticlesFor(issueId: NSString)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for the issue which are featured
 
-5. **getArticle(articleId: NSString)** ```returns Article or nil``` This method accepts an article's global id and returns the Article object or nil if not found
+5. **getArticle(articleId: String?, appleId: String?)** ```returns Article or nil``` This method accepts an article's global id or SKU/Apple id and returns the Article object or nil if not found. At least one of the params should be non-empty
 
 6. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
     The default asset pattern is ```<!-- \\[ASSET: .+\\] -->```

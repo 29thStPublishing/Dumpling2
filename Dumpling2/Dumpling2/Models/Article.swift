@@ -58,6 +58,8 @@ public class Article: RLMObject {
     dynamic public var isFeatured = false
     /// Global id for the issue the article belongs to. This can be blank for independent articles
     dynamic var issueId = ""
+    ///SKU/Apple id for the article - will be used when articles are sold individually
+    dynamic var appleId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"
@@ -85,6 +87,10 @@ public class Article: RLMObject {
         var updateDate = article.objectForKey("date_last_updated") as! String
         if updateDate != "" {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
+        }
+        
+        if let sku = article.objectForKey("sku") as? String {
+            currentArticle.appleId = sku
         }
         
         var meta = article.valueForKey("meta") as! NSDictionary
@@ -170,6 +176,10 @@ public class Article: RLMObject {
                 currentArticle.articleType = articleInfo.valueForKey("type") as! String
                 currentArticle.commentary = articleInfo.valueForKey("commentary") as! String
                 currentArticle.slug = articleInfo.valueForKey("slug") as! String
+                
+                if let sku = articleInfo.valueForKey("sku") as? String {
+                    currentArticle.appleId = sku
+                }
                 
                 var meta = articleInfo.objectForKey("meta") as! NSDictionary
                 var featured = meta.valueForKey("featured") as! NSNumber
@@ -312,6 +322,10 @@ public class Article: RLMObject {
         currentArticle.articleType = article.valueForKey("type") as! String
         currentArticle.commentary = article.valueForKey("commentary") as! String
         currentArticle.slug = article.valueForKey("slug") as! String
+        
+        if let sku = article.valueForKey("sku") as? String {
+            currentArticle.appleId = sku
+        }
         
         var meta = article.objectForKey("meta") as! NSDictionary
         var featured = meta.valueForKey("featured") as! NSNumber
@@ -469,16 +483,28 @@ public class Article: RLMObject {
     }
     
     /**
-    This method inputs the global id of an article and returns the Article object
+    This method inputs the global id or Apple id of an article and returns the Article object
     
     :param:  articleId The global id for the article
     
-    :return: article object for the global id. Returns nil if the article is not found
+    :param: appleId The apple id/SKU for the article
+    
+    :return: article object for the global/Apple id. Returns nil if the article is not found
     */
-    public class func getArticle(articleId: String) -> Article? {
+    public class func getArticle(articleId: String?, appleId: String?) -> Article? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "globalId = %@", articleId)
+        var predicate: NSPredicate
+        if !Helper.isNilOrEmpty(articleId) {
+            predicate = NSPredicate(format: "globalId = %@", articleId!)
+        }
+        else if !Helper.isNilOrEmpty(appleId) {
+            predicate = NSPredicate(format: "appleId = %@", appleId!)
+        }
+        else {
+            return nil
+        }
+
         var articles = Article.objectsWithPredicate(predicate)
         
         if articles.count > 0 {
