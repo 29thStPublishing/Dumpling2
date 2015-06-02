@@ -12,6 +12,7 @@ import Foundation
 public class ArticleHandler: NSObject {
     
     var defaultFolder: NSString!
+    var issueHandler: IssueHandler!
     
     // MARK: Initializers
     
@@ -30,6 +31,7 @@ public class ArticleHandler: NSObject {
         var mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
+            issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         }
         else {
             return nil
@@ -47,6 +49,7 @@ public class ArticleHandler: NSObject {
         
         self.defaultFolder = docsDir
         clientKey = clientKey as String
+        issueHandler = IssueHandler(folder: self.defaultFolder, clientkey: clientKey)
         
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
@@ -63,6 +66,7 @@ public class ArticleHandler: NSObject {
     public init(folder: NSString, clientkey: NSString) {
         self.defaultFolder = folder
         clientKey = clientkey as String
+        issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
         let defaultRealmPath = "\(self.defaultFolder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
@@ -77,8 +81,10 @@ public class ArticleHandler: NSObject {
     :param: globalId The global id for the article
     */
     public func addArticleFromAPI(globalId: String) {
+        let requestURL = "\(baseURL)articles/\(globalId)"
+        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
-        Article.createIndependentArticle(globalId)
+        Article.createIndependentArticle(globalId, delegate: self.issueHandler)
     }
     
     public func addAllArticles() {
@@ -91,11 +97,13 @@ public class ArticleHandler: NSObject {
             if data != nil {
                 var response: NSDictionary = data as! NSDictionary
                 var allArticles: NSArray = response.valueForKey("articles") as! NSArray
-                
                 if allArticles.count > 0 {
                     for (index, articleDict) in enumerate(allArticles) {
                         let articleId = articleDict.valueForKey("id") as! NSString
-                        Article.createIndependentArticle(articleId as String)
+                        let requestURL = "\(baseURL)articles/\(articleId)"
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        
+                        Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
                 }
             }

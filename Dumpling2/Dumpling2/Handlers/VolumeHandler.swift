@@ -181,6 +181,9 @@ public class VolumeHandler: NSObject {
         if let pubDate = meta.valueForKey("publishedDate") as? String {
             currentVolume.publishedDate = Helper.publishedDateFromISO(pubDate)
         }
+        if let publishedVal = meta.valueForKey("published") as? NSNumber {
+            currentVolume.published = publishedVal.boolValue
+        }
         currentVolume.publisher = meta.valueForKey("publishedBy") as! String
         
         var keywords = volume.objectForKey("keywords") as! NSArray
