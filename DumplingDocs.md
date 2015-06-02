@@ -247,24 +247,24 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 20. **thumbImageURL** ```String``` URL for the article's thumbnail image
 
-21. **isFeatured** ```BOOL``` Whether the article is featured for the given issue or not
+21. **isPublished** ```BOOL``` Whether the article is published or in draft
 
-22. **issueId** ```String``` Global id for the issue the article belongs to. This can be blank for independent articles
+22. **isFeatured** ```BOOL``` Whether the article is featured for the given issue or not
+
+23. **issueId** ```String``` Global id for the issue the article belongs to. This can be blank for independent articles
 
 ###Class methods (public)
-1. **createIndependentArticle(articleId: String)** This method accepts an article's global id, gets its details from Magnet API and adds it to the database
+1. **deleteArticlesFor(issueId: NSString)** This method accepts an issue's global id and deletes all articles from the database which belong to that issue
 
-2. **deleteArticlesFor(issueId: NSString)** This method accepts an issue's global id and deletes all articles from the database which belong to that issue
+2. **getArticlesFor(issueId: String?, type: String?, excludeType: String?, count: Int, page: Int)** ```returns Array<Article>``` This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array. All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
 
-3. **getArticlesFor(issueId: String?, type: String?, excludeType: String?, count: Int, page: Int)** ```returns Array<Article>``` This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array. All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
+3. **searchArticlesWith(keywords: [String], issueId: String?)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
 
-4. **searchArticlesWith(keywords: [String], issueId: String?)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
+4. **getFeaturedArticlesFor(issueId: NSString)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for the issue which are featured
 
-5. **getFeaturedArticlesFor(issueId: NSString)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for the issue which are featured
+5. **getArticle(articleId: NSString)** ```returns Article or nil``` This method accepts an article's global id and returns the Article object or nil if not found
 
-6. **getArticle(articleId: NSString)** ```returns Article or nil``` This method accepts an article's global id and returns the Article object or nil if not found
-
-7. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
+6. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
     The default asset pattern is ```<!-- \\[ASSET: .+\\] -->```
 
 ###Instance methods (public)
@@ -402,4 +402,4 @@ if volumeHandler != nil {
 
 2. In order to use iCloud for syncing reading status, add CloudKit.framework to your project, turn on iCloud in the target's *Capabilities* section for *Key-value storage*. The sample project (**DumplingDemo**) uses the default container for storing and retrieving values. If you wish to use a custom container, the code will change accordingly
 
-3. If you turn on App Groups for multiple projects and instantiate **IssueHandler** and **VolumeHandler** with the appropriate shared folder, you can read the data across multiple apps. To do this, you will need an app id with *App Groups* enabled and set the app group in *Capabilities* for all projects sharing the data
+3. If you turn on App Groups for multiple projects and instantiate **IssueHandler**, **VolumeHandler** and **ArticleHandler** with the appropriate shared folder, you can read the data across multiple apps. To do this, you will need an app id with *App Groups* enabled and set the app group in *Capabilities* for all projects sharing the data

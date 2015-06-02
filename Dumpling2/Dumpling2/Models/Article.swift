@@ -52,6 +52,8 @@ public class Article: RLMObject {
     dynamic public var mainImageURL = ""
     /// URL for the article's thumbnail image
     dynamic public var thumbImageURL = ""
+    /// Status of article (published or not)
+    dynamic public var isPublished = false
     /// Whether the article is featured for the given issue or not
     dynamic public var isFeatured = false
     /// Global id for the issue the article belongs to. This can be blank for independent articles
@@ -85,7 +87,12 @@ public class Article: RLMObject {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
         }
         
-        var metadata: AnyObject! = article.objectForKey("metadata")
+        var meta = article.valueForKey("meta") as! NSDictionary
+        if let published = meta.valueForKey("published") as? NSNumber {
+            currentArticle.isPublished = published.boolValue
+        }
+        
+        var metadata: AnyObject! = article.objectForKey("customMeta")
         if metadata.isKindOfClass(NSDictionary) {
             currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
         }
@@ -167,6 +174,9 @@ public class Article: RLMObject {
                 var meta = articleInfo.objectForKey("meta") as! NSDictionary
                 var featured = meta.valueForKey("featured") as! NSNumber
                 currentArticle.isFeatured = featured.boolValue
+                if let published = meta.valueForKey("published") as? NSNumber {
+                    currentArticle.isPublished = published.boolValue
+                }
                 
                 var updated = meta.valueForKey("updated") as! NSDictionary
                 if let updateDate: String = updated.valueForKey("date") as? String {
@@ -246,18 +256,16 @@ public class Article: RLMObject {
         realm.commitWriteTransaction()
     }
     
-    // MARK: Public methods
-    
-    //MARK: Class methods
-    
     /**
     This method accepts an article's global id, gets its details from Magnet API and adds it to the database.
     
     :brief: Get Article from API and add to the database
     
     :param:  articleId The global id for the article
+    
+    :param: delegate Used to update the status of article download
     */
-    public class func createIndependentArticle(articleId: String) {
+    class func createIndependentArticle(articleId: String, delegate: AnyObject?) {
         let requestURL = "\(baseURL)articles/\(articleId)"
         
         var networkManager = LRNetworkManager.sharedInstance
@@ -269,19 +277,27 @@ public class Article: RLMObject {
                 var allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 
-                self.addArticle(articleInfo)
+                self.addArticle(articleInfo, delegate: delegate)
                 
             }
             else if let err = error {
+                //Update article status - error
+                if delegate != nil {
+                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                }
                 println("Error: " + err.description)
             }
         }
     }
     
+    // MARK: Public methods
+    
+    //MARK: Class methods
+    
     //Create article not associated with any issue
     //The structure expected for the dictionary is the same as currently used in Magnet
     //Images will be stored in Documents folder by default for such articles
-    class func addArticle(article: NSDictionary) {
+    class func addArticle(article: NSDictionary, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
         
         var currentArticle = Article()
@@ -300,6 +316,9 @@ public class Article: RLMObject {
         var meta = article.objectForKey("meta") as! NSDictionary
         var featured = meta.valueForKey("featured") as! NSNumber
         currentArticle.isFeatured = featured.boolValue
+        if let published = meta.valueForKey("published") as? NSNumber {
+            currentArticle.isPublished = published.boolValue
+        }
         
         var updated = meta.valueForKey("updated") as! NSDictionary
         if let updateDate: String = updated.valueForKey("date") as? String {
@@ -331,13 +350,22 @@ public class Article: RLMObject {
         if articleMedia.count > 0 {
             for (index, assetDict) in enumerate(articleMedia) {
                 //Download images and create Asset object for issue
-                Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as! NSString, issue: issue, articleId: currentArticle.globalId, placement: index+1, delegate: nil)
+                let assetid = assetDict.valueForKey("id") as! NSString
+                if delegate != nil {
+                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                }
+                Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as! NSString, issue: issue, articleId: currentArticle.globalId, placement: index+1, delegate: delegate)
             }
         }
         
         //Set thumbnail for article
         if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId, volumeId: nil) {
             currentArticle.thumbImageURL = firstAsset.originalURL as String
+        }
+        
+        //Article downloaded (not necessarily assets)
+        if delegate != nil {
+            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
         }
         
         realm.beginWriteTransaction()

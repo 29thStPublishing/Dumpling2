@@ -283,18 +283,29 @@ public class Asset: RLMObject {
                         if completed.boolValue {
                             //Mark asset download as done
                             if delegate != nil {
-                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                                if !issue.globalId.isEmpty {
+                                    //This is an issue's asset or an article's (belonging to an issue) asset
+                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                                }
+                                else {
+                                    //This is an independent article's asset
+                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                                }
                             }
                         }
                     }
                     else if let err = error {
                         println("Error: " + err.description)
                         if delegate != nil {
-                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                            if !issue.globalId.isEmpty {
+                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                            }
+                            else {
+                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                            }
                         }
                     }
                 }
-                //currentAsset.saveFileFromURL(fileUrl, toFolder: "\(issue.assetFolder)/")
                 currentAsset.originalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -312,7 +323,12 @@ public class Asset: RLMObject {
             else if let err = error {
                 println("Error: " + err.description)
                 if delegate != nil {
-                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                    if !issue.globalId.isEmpty {
+                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                    }
+                    else {
+                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                    }
                 }
             }
             
