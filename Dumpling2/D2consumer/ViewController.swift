@@ -43,13 +43,13 @@ class ViewController: UIViewController {
         }*/
         if let articleHandler = ArticleHandler(folder: docsDir) {
             articleHandler.addAllArticles()
-            //volumeHandler.addVolumeFromAPI("555a27de352c7d6d5b888c3e")
         }
     }
     
     func updateArticleStatus(notif: NSNotification) {
         println("#####DOWNLOADED######")
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        var articles = Article.getArticlesFor(nil, key: "subsection", value: "hello", count: 0, page: 0)
+        //NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 }
 
