@@ -249,6 +249,32 @@ public class VolumeHandler: NSObject {
     }
     
     /**
+    This method gets all available volumes for a client key, downloads it and saves it to the database
+    */
+    public func addAllVolumes() {
+        let requestURL = "\(baseURL)volumes/"
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                if allVolumes.count > 0 {
+                    for (index, volumeDict) in enumerate(allVolumes) {
+                        let volumeId = volumeDict.valueForKey("id") as! String
+                        self.addVolumeFromAPI(volumeId)
+                    }
+                }
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
+    /**
     Get volume details from database for a specific global id
     
     :param: volumeId global id of the volume

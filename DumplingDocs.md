@@ -47,6 +47,8 @@ This is the main class and the starting point of Dumpling
 
 7. **listVolumes()** The method is for testing only. It prints the available volumes for a client api key
 
+8. **addAllVolumes()** This method gets all the volumes for a given client key and adds them to the database
+
 
 ## IssueHandler
 

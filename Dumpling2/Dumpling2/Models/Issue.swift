@@ -143,7 +143,7 @@ public class Issue: RLMObject {
     
     :return: an array of issues for given volume or all issues if volumeId is nil
     */
-    public func getIssues(volumeId: String?) -> Array<Issue>? {
+    public class func getIssues(volumeId: String?) -> Array<Issue>? {
         let realm = RLMRealm.defaultRealm()
 
         var issues: RLMResults
