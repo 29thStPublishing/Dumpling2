@@ -132,7 +132,9 @@ public class Volume: RLMObject {
     public class func getVolumes() -> Array<Volume>? {
         let realm = RLMRealm.defaultRealm()
         
-        var volumes: RLMResults = Volume.allObjects()
+        var predicate = NSPredicate(format: "published = %@", NSNumber(bool: true))
+        
+        var volumes: RLMResults = Volume.objectsWithPredicate(predicate)
         
         if volumes.count > 0 {
             var array = Array<Volume>()
@@ -188,7 +190,7 @@ public class Volume: RLMObject {
     public func getOlderVolumes() -> Array<Volume>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate)
+        let predicate = NSPredicate(format: "publishedDate < %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
         var volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
         
         if volumes.count > 0 {
@@ -213,7 +215,7 @@ public class Volume: RLMObject {
     public func getNewerVolumes() -> Array<Volume>? {
         let realm = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate)
+        let predicate = NSPredicate(format: "publishedDate > %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
         var volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
         
         if volumes.count > 0 {
