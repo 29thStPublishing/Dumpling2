@@ -19,7 +19,7 @@ public protocol AccessControl {
     
     :param: userId User id for which web purchases should be checked. This param is optional. If nil, web purchases will not be checked for
     */
-     func restorePurchases(userId: AnyObject?)
+    func restorePurchases(userId: AnyObject?)
     
     /**
     This method retrieves all web purchases for the user whose id is passed. If any issues purchased are not available, they will be downloaded, saved to the database and made available

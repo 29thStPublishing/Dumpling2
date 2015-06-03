@@ -260,13 +260,15 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 2. **getArticlesFor(issueId: String?, type: String?, excludeType: String?, count: Int, page: Int)** ```returns Array<Article>``` This method accepts an issue's global id, type of article to be found and type of article to be excluded. It retrieves all articles which meet these conditions and returns them in an array. All parameters are optional. At least one of the parameters is needed when making this call. The parameters follow AND conditions
 
-3. **searchArticlesWith(keywords: [String], issueId: String?)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
+3. **issueId: NSString?, key: String, value: String, count: Int, page: Int)** ```returns Array<Article>``` This method accepts an issue's global id, a key and a value to be searched. It retrieves all articles which belong to the issue (or any regardless of issue if nil) and have a specific value for the given key. The key and value params are necessary. If you do not want paginated results, pass count as 0
 
-4. **getFeaturedArticlesFor(issueId: NSString)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for the issue which are featured
+4. **searchArticlesWith(keywords: [String], issueId: String?)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for an issue (or if nil, all issues) with specific keywords
 
-5. **getArticle(articleId: String?, appleId: String?)** ```returns Article or nil``` This method accepts an article's global id or SKU/Apple id and returns the Article object or nil if not found. At least one of the params should be non-empty
+5. **getFeaturedArticlesFor(issueId: NSString)** ```returns Array<Article>``` This method accepts an issue's global id and returns all articles for the issue which are featured
 
-6. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
+6. **getArticle(articleId: String?, appleId: String?)** ```returns Article or nil``` This method accepts an article's global id or SKU/Apple id and returns the Article object or nil if not found. At least one of the params should be non-empty
+
+7. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
     The default asset pattern is ```<!-- \\[ASSET: .+\\] -->```
 
 ###Instance methods (public)

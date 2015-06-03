@@ -355,9 +355,9 @@ public class Article: RLMObject {
         
         var issue = Issue()
         
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as! NSString
-        issue.assetFolder = cacheDir as String
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        issue.assetFolder = docsDir as String
         
         //Add all assets of the article (will add images and sound)
         var articleMedia = article.objectForKey("media") as! NSArray
@@ -470,7 +470,86 @@ public class Article: RLMObject {
                 //If count > 0, return only values in that range
                 if count > 0 {
                     var startIndex = page * count
-                    var endIndex = (array.count > startIndex+count) ? (startIndex+count) : array.count
+                    var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
+                    var slicedArray = Array(array[startIndex...endIndex])
+                    
+                    return slicedArray
+                }
+                return array
+            }
+        }
+        
+        return nil
+    }
+    
+    /**
+    This method accepts an issue's global id and the key and value for article search. It retrieves all articles which meet these conditions and returns them in an array.
+    
+    The key and value are needed. Other articles are optional. To ignore pagination, pass the count as 0
+    
+    :param:  issueId The global id of the issue whose articles have to be searched
+    
+    :param: key The key whose values need to be searched. Please ensure this has the same name as the properties available. The value can be any of the Article properties, keywords or customMeta keys
+    
+    :param: value The value of the key for the articles to be retrieved
+    
+    :param: count Number of articles to be returned
+    
+    :param: page Page number (will be used with count)
+    
+    :return: an array of articles fulfiling the conditions
+    */
+    public class func getArticlesFor(issueId: NSString?, key: String, value: String, count: Int, page: Int) -> Array<Article>? {
+        let realm = RLMRealm.defaultRealm()
+        
+        var subPredicates = NSMutableArray()
+        
+        if issueId != nil {
+            var predicate = NSPredicate(format: "issueId = %@", issueId!)
+            subPredicates.addObject(predicate)
+        }
+        var testArticle = Article()
+        var properties: NSArray = testArticle.objectSchema.properties
+        
+        var foundProperty = false
+        for property: RLMProperty in properties as! [RLMProperty] {
+            let propertyName = property.name
+            if propertyName == key {
+                //This is the property we are looking for
+                foundProperty = true
+                break
+            }
+        }
+        
+        if foundProperty {
+            //This is a property
+            var keyPredicate = NSPredicate(format: "%K = %@", key, value)
+            subPredicates.addObject(keyPredicate)
+        }
+        else {
+            //Is a customMeta key
+            var checkString = "\"\(key)\":\"\(value)\""
+            var subPredicate = NSPredicate(format: "metadata CONTAINS %@", checkString)
+            subPredicates.addObject(subPredicate)
+        }
+        
+        if subPredicates.count > 0 {
+            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
+            var articles: RLMResults
+            
+            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
+            
+            if articles.count > 0 {
+                var array = Array<Article>()
+                for object in articles {
+                    let obj: Article = object as! Article
+                    array.append(obj)
+                }
+                
+                //If count > 0, return only values in that range
+                if count > 0 {
+                    var startIndex = page * count
+                    var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
                     var slicedArray = Array(array[startIndex...endIndex])
                     
                     return slicedArray
