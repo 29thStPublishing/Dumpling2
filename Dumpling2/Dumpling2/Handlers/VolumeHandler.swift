@@ -26,9 +26,19 @@ public class VolumeHandler: NSObject {
     */
     public init?(folder: NSString){
         super.init()
-        self.defaultFolder = folder
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
+        
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         var mainBundle = NSBundle.mainBundle()
@@ -52,11 +62,11 @@ public class VolumeHandler: NSObject {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        self.defaultFolder = docsDir
+        self.defaultFolder = "/Documents"
         clientKey = clientKey as String
-        self.issueHandler = IssueHandler(folder: self.defaultFolder, clientkey: clientKey)
+        self.issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(docsDir)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
@@ -71,12 +81,23 @@ public class VolumeHandler: NSObject {
     :param: clientkey Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
-        self.defaultFolder = folder
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
+        
         clientKey = clientkey as String
         
         self.issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         //Call this if the schema version has changed - pass new schema version as integer
@@ -193,15 +214,25 @@ public class VolumeHandler: NSObject {
         
         currentVolume.assetFolder = "\(self.defaultFolder)/\(currentVolume.globalId)"
         
+        var folderPath: String
+        if self.defaultFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docsDir: NSString = docPaths[0] as! NSString
+            folderPath = currentVolume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+        }
+        else {
+            folderPath = currentVolume.assetFolder
+        }
+        
         var isDir: ObjCBool = false
-        if NSFileManager.defaultManager().fileExistsAtPath(currentVolume.assetFolder, isDirectory: &isDir) {
+        if NSFileManager.defaultManager().fileExistsAtPath(folderPath, isDirectory: &isDir) {
             if isDir {
                 //Folder already exists. Do nothing
             }
         }
         else {
             //Folder doesn't exist, create folder where assets will be downloaded
-            NSFileManager.defaultManager().createDirectoryAtPath(currentVolume.assetFolder, withIntermediateDirectories: true, attributes: nil, error: nil)
+            NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil, error: nil)
         }
         
         var assetId = volume.valueForKey("featuredImage") as! String

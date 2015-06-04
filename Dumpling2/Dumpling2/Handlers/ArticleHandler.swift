@@ -23,9 +23,20 @@ public class ArticleHandler: NSObject {
     */
     public init?(folder: NSString){
         super.init()
-        self.defaultFolder = folder
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
+        
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         var mainBundle = NSBundle.mainBundle()
@@ -47,11 +58,11 @@ public class ArticleHandler: NSObject {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        self.defaultFolder = docsDir
+        self.defaultFolder = "/Documents"
         clientKey = clientKey as String
-        issueHandler = IssueHandler(folder: self.defaultFolder, clientkey: clientKey)
+        issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(docsDir)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
@@ -64,11 +75,21 @@ public class ArticleHandler: NSObject {
     :param: clientkey Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
-        self.defaultFolder = folder
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
         clientKey = clientkey as String
         issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }

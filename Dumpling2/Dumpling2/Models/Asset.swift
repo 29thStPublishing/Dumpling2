@@ -101,10 +101,10 @@ public class Asset: RLMObject {
         currentAsset.type = type
         
         var value = asset.objectForKey("crop_350_350") as! String
-        currentAsset.squareURL = "\(issue.assetFolder)/\(value)"
+        currentAsset.squareURL = value
         
         value = asset.objectForKey("file_name") as! String
-        currentAsset.originalURL = "\(issue.assetFolder)/\(value)"
+        currentAsset.originalURL = value
         
         var main_portrait = ""
         var main_landscape = ""
@@ -116,25 +116,25 @@ public class Asset: RLMObject {
         if let cover = asset.objectForKey("cover") as? NSDictionary {
             var key = "cover_main_\(device)_portrait\(quality)"
             value = cover.objectForKey(key) as! String
-            main_portrait = "\(issue.assetFolder)/\(value)"
+            main_portrait = value
             
             key = "cover_main_\(device)_landscape\(quality)"
             if let val = cover.objectForKey(key) as? String {
-                main_landscape = "\(issue.assetFolder)/\(val)"
+                main_landscape = val
             }
             
             key = "cover_icon_iphone_portrait_retinal"
             value = cover.objectForKey(key) as! String
-            icon = "\(issue.assetFolder)/\(value)"
+            icon = value
         }
         else if let cropDict = asset.objectForKey("crop") as? NSDictionary {
             var key = "main_\(device)_portrait\(quality)"
             value = cropDict.objectForKey(key) as! String
-            main_portrait = "\(issue.assetFolder)/\(value)"
+            main_portrait = value
             
             key = "main_\(device)_landscape\(quality)"
             if let val = cropDict.objectForKey(key) as? String {
-                main_landscape = "\(issue.assetFolder)/\(val)"
+                main_landscape = val
             }
         }
         
@@ -188,7 +188,17 @@ public class Asset: RLMObject {
                 currentAsset.placement = placement
                 
                 let fileUrl = mediaFile.valueForKey("url") as! String
-                let finalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                
+                var finalURL: String
+                if volume.assetFolder.hasPrefix("/Documents") {
+                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                    var docsDir: NSString = docPaths[0] as! NSString
+                    let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                    finalURL = "\(finalFolder)/\(fileUrl.lastPathComponent)"
+                }
+                else {
+                    finalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
                     (status:AnyObject?, error:NSError?) -> () in
@@ -209,7 +219,7 @@ public class Asset: RLMObject {
                     }
                 }
                 
-                currentAsset.originalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                currentAsset.originalURL = fileUrl.lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -274,7 +284,16 @@ public class Asset: RLMObject {
                 currentAsset.placement = placement
                 
                 let fileUrl = mediaFile.valueForKey("url") as! String
-                let finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                var finalURL: String
+                if issue.assetFolder.hasPrefix("/Documents") {
+                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                    var docsDir: NSString = docPaths[0] as! NSString
+                    let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                    finalURL = "\(finalFolder)/\(fileUrl.lastPathComponent)"
+                }
+                else {
+                    finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
                     (status:AnyObject?, error:NSError?) -> () in
@@ -306,7 +325,7 @@ public class Asset: RLMObject {
                         }
                     }
                 }
-                currentAsset.originalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                currentAsset.originalURL = fileUrl.lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -368,8 +387,8 @@ public class Asset: RLMObject {
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.originalURL
-            fileManager.removeItemAtPath(originalURL, error: nil)
+            let originalURL = assetDetails.getAssetPath()
+            fileManager.removeItemAtPath(originalURL!, error: nil)
         }
         
         realm.beginWriteTransaction()
@@ -389,8 +408,8 @@ public class Asset: RLMObject {
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.originalURL
-            fileManager.removeItemAtPath(originalURL, error: nil)
+            let originalURL = assetDetails.getAssetPath()
+            fileManager.removeItemAtPath(originalURL!, error: nil)
         }
         
         realm.beginWriteTransaction()
@@ -409,8 +428,8 @@ public class Asset: RLMObject {
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.originalURL
-            fileManager.removeItemAtPath(originalURL, error: nil)
+            let originalURL = assetDetails.getAssetPath()
+            fileManager.removeItemAtPath(originalURL!, error: nil)
         }
         
         realm.beginWriteTransaction()
@@ -429,8 +448,8 @@ public class Asset: RLMObject {
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.originalURL
-            fileManager.removeItemAtPath(originalURL, error: nil)
+            let originalURL = assetDetails.getAssetPath()
+            fileManager.removeItemAtPath(originalURL!, error: nil)
         }
         
         realm.beginWriteTransaction()
@@ -470,8 +489,8 @@ public class Asset: RLMObject {
         var fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.originalURL
-            fileManager.removeItemAtPath(originalURL, error: nil)
+            let originalURL = assetDetails.getAssetPath()
+            fileManager.removeItemAtPath(originalURL!, error: nil)
         }
         
         realm.beginWriteTransaction()
@@ -661,6 +680,43 @@ public class Asset: RLMObject {
             return array
         }
         
+        return nil
+    }
+    
+    /**
+    This method returns the path of the asset file for the current object
+    
+    :return: Path of the asset file or nil if not found
+    */
+    public func getAssetPath() -> String? {
+        let fileURL = self.originalURL
+        if !Helper.isNilOrEmpty(fileURL) {
+            var assetFolder = self.issue.assetFolder
+            if Helper.isNilOrEmpty(assetFolder) {
+                let realm = RLMRealm.defaultRealm()
+                
+                let predicate = NSPredicate(format: "globalId = %@", volumeId)
+                var volumes = Volume.objectsWithPredicate(predicate)
+                
+                if volumes.count > 0 {
+                    let volume: Volume = volumes.firstObject() as! Volume
+                    assetFolder = volume.assetFolder
+                }
+            }
+            
+            if !Helper.isNilOrEmpty(assetFolder) {
+                //Found the asset folder. Get the file now
+                var folderPath = assetFolder
+                if assetFolder.hasPrefix("/Documents") {
+                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                    var docsDir: NSString = docPaths[0] as! NSString
+                    folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                }
+                
+                var filePath = "\(folderPath)/\(fileURL)"
+                return filePath
+            }
+        }
         return nil
     }
 }

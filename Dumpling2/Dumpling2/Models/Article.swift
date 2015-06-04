@@ -130,7 +130,7 @@ public class Article: RLMObject {
         
         //Set thumbnail for article
         if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId, volumeId: nil) {
-            currentArticle.thumbImageURL = firstAsset.squareURL as String
+            currentArticle.thumbImageURL = firstAsset.globalId as String
         }
         
         //Insert article sound files
@@ -222,7 +222,7 @@ public class Article: RLMObject {
                 
                 //Set thumbnail for article
                 if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId as String, volumeId: nil) {
-                    currentArticle.thumbImageURL = firstAsset.originalURL as String
+                    currentArticle.thumbImageURL = firstAsset.globalId as String
                 }
                 
                 realm.beginWriteTransaction()
@@ -357,7 +357,7 @@ public class Article: RLMObject {
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
-        issue.assetFolder = docsDir as String
+        issue.assetFolder = "/Documents"
         
         //Add all assets of the article (will add images and sound)
         var articleMedia = article.objectForKey("media") as! NSArray
@@ -374,7 +374,7 @@ public class Article: RLMObject {
         
         //Set thumbnail for article
         if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId, volumeId: nil) {
-            currentArticle.thumbImageURL = firstAsset.originalURL as String
+            currentArticle.thumbImageURL = firstAsset.globalId as String
         }
         
         //Article downloaded (not necessarily assets)
@@ -407,7 +407,6 @@ public class Article: RLMObject {
             articleIds.addObject(article.globalId)
         }
         
-        //Asset.deleteAssetsForIssue(issueId)
         Asset.deleteAssetsForArticles(articleIds)
         
         //Delete articles
@@ -727,8 +726,8 @@ public class Article: RLMObject {
                 //Find asset with the global id
                 if let asset = Asset.getAsset(matchedString as String) {
                     //Use the asset - generate an HTML with the asset file URL (image, audio, video)
-                    var originalAssetPath = asset.originalURL
-                    let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath)
+                    var originalAssetPath = asset.getAssetPath()
+                    let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath!)
                     
                     //Replace with HTML tags
                     var finalHTML = "<div class='article_image'>"

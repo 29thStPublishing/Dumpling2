@@ -313,13 +313,11 @@ Realm object for Assets. Also has methods for directly dealing with assets
 
 11. **placement** ```Integer``` Placement of an asset for an article or issue
 
-12. **fullFolderPath** ```String``` Folder which stores the asset files - downloaded or unzipped
+12. **articleId** ```String``` Global id for the article with which the asset is associated. Can be blank if this is an issue's asset
 
-13. **articleId** ```String``` Global id for the article with which the asset is associated. Can be blank if this is an issue's asset
+13. **issue** ```Issue``` Issue object for the issue with which the asset is associated. Can be a default Issue object if the asset is for an independent article
 
-14. **issue** ```Issue``` Issue object for the issue with which the asset is associated. Can be a default Issue object if the asset is for an independent article
-
-15. **volumeId** ```String``` Global id of the volume with which the asset is associated. Can be blank if this is an issue or article asset
+14. **volumeId** ```String``` Global id of the volume with which the asset is associated. Can be blank if this is an issue or article asset
 
 ###Class methods (public)
 1. **deleteAsset(assetId: NSString)** This method accepts the global id of an asset and deletes it from the database. The file for the asset is also deleted
@@ -336,6 +334,8 @@ Realm object for Assets. Also has methods for directly dealing with assets
 
 ###Instance methods (public)
 1. **saveAsset()** This method lets you save an Asset object back to the database in case some changes are made to it
+
+2. **getAssetPath()** ```returns String``` This method returns the path of the asset file (using the ```originalURL``` property) for the current object. Use this method to access the file path instead of directly using ```originalURL```
 
 
 ## ReaderHelper
