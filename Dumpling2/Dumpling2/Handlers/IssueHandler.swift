@@ -53,10 +53,21 @@ public class IssueHandler: NSObject {
     */
     public init?(folder: NSString){
         super.init()
-        self.defaultFolder = folder
+        
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
         self.activeDownloads = NSMutableDictionary()
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         var mainBundle = NSBundle.mainBundle()
@@ -79,15 +90,12 @@ public class IssueHandler: NSObject {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        self.defaultFolder = docsDir
+        self.defaultFolder = "/Documents" //docsDir
         clientKey = clientKey as String
         self.activeDownloads = NSMutableDictionary()
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(docsDir)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        
-        //Call this if the schema version has changed - pass new schema version as integer
-        //IssueHandler.checkAndMigrateData(2)
     }
     
     /**
@@ -100,11 +108,21 @@ public class IssueHandler: NSObject {
     :param: clientkey Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
-        self.defaultFolder = folder
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
         clientKey = clientkey as String
         self.activeDownloads = NSMutableDictionary()
         
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
+        let defaultRealmPath = "\(folder)/default.realm"
         RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
@@ -125,8 +143,18 @@ public class IssueHandler: NSObject {
         var defaultZipPath = "\(appPath)/\(appleId).zip"
         var newZipDir = "\(self.defaultFolder)/\(appleId)"
         
+        var folderPath: String
+        if self.defaultFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docsDir: NSString = docPaths[0] as! NSString
+            folderPath = newZipDir.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+        }
+        else {
+            folderPath = newZipDir
+        }
+        
         var isDir: ObjCBool = false
-        if NSFileManager.defaultManager().fileExistsAtPath(newZipDir, isDirectory: &isDir) {
+        if NSFileManager.defaultManager().fileExistsAtPath(folderPath, isDirectory: &isDir) {
             if isDir {
                 //Issue directory already exists. Do nothing
             }
@@ -141,6 +169,11 @@ public class IssueHandler: NSObject {
         
         //Get the contents of latest.json from the folder
         var jsonPath = "\(self.defaultFolder)/\(appleId)/latest.json"
+        if self.defaultFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docsDir: NSString = docPaths[0] as! NSString
+            jsonPath = jsonPath.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+        }
         
         var fullJSON = NSString(contentsOfFile: jsonPath, encoding: NSUTF8StringEncoding, error: &error)
         
@@ -186,9 +219,10 @@ public class IssueHandler: NSObject {
             if data != nil {
                 var response: NSDictionary = data as! NSDictionary
                 var allIssues: NSArray = response.valueForKey("issues") as! NSArray
-                let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
-                //Update issue now
-                self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
+                if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
+                    //Update issue now
+                    self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
+                }
             }
             else if let err = error {
                 println("Error: " + err.description)
@@ -306,15 +340,25 @@ public class IssueHandler: NSObject {
         
         currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
+        var folderPath: String
+        if self.defaultFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docsDir: NSString = docPaths[0] as! NSString
+            folderPath = currentIssue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+        }
+        else {
+            folderPath = currentIssue.assetFolder
+        }
+        
         var isDir: ObjCBool = false
-        if NSFileManager.defaultManager().fileExistsAtPath(currentIssue.assetFolder, isDirectory: &isDir) {
+        if NSFileManager.defaultManager().fileExistsAtPath(folderPath, isDirectory: &isDir) {
             if isDir {
                 //Folder already exists. Do nothing
             }
         }
         else {
             //Folder doesn't exist, create folder where assets will be downloaded
-            NSFileManager.defaultManager().createDirectoryAtPath(currentIssue.assetFolder, withIntermediateDirectories: true, attributes: nil, error: nil)
+            NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil, error: nil)
         }
         
         var assetId = issue.valueForKey("coverPhone") as! String
@@ -497,7 +541,7 @@ public class IssueHandler: NSObject {
             if savedIssue != nil {
                 if let coverImageId = savedIssue?.coverImageId {
                     var asset = Asset.getAsset(coverImageId)
-                    if let coverImgURL = asset?.originalURL {
+                    if let coverImgURL = asset?.getAssetPath() {
                         var coverImg = UIImage(contentsOfFile: coverImgURL)
                         UIApplication.sharedApplication().setNewsstandIconImage(coverImg)
                         UIApplication.sharedApplication().applicationIconBadgeNumber = 0

@@ -11,6 +11,9 @@ import Dumpling2
 
 class ViewController: UIViewController {
 
+    var issueHandler: IssueHandler?
+    var volumeHandler: VolumeHandler?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -26,8 +29,9 @@ class ViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        if let issueHandler = IssueHandler(folder: docsDir) {
-            issueHandler.addIssueZip("org.bomb.mag.issue.20150101")
+        if let iHandler = IssueHandler(folder: docsDir) {
+            self.issueHandler = iHandler
+            self.issueHandler!.addIssueZip("org.bomb.mag.issue.20150101")
         }
     }
     
@@ -38,17 +42,22 @@ class ViewController: UIViewController {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        /*if let issueHandler = IssueHandler(folder: docsDir) {
-            issueHandler.addIssueFromAPI("551477bfaa93900422037b16", volumeId: nil)
-        }*/
-        if let articleHandler = ArticleHandler(folder: docsDir) {
-            articleHandler.addAllArticles()
+        if let vHandler = VolumeHandler(folder: docsDir) {
+            self.volumeHandler = vHandler
+            self.volumeHandler!.addVolumeFromAPI("555a27de352c7d6d5b888c3e")
         }
+        
+        /*if let iHandler = IssueHandler(folder: docsDir) {
+            self.issueHandler = iHandler
+            self.issueHandler!.addIssueFromAPI("555cbf28ae2eea2ae23783b3", volumeId: nil)
+        }*/
+        /*if let articleHandler = ArticleHandler(folder: docsDir) {
+            articleHandler.addAllArticles()
+        }*/
     }
     
     func updateArticleStatus(notif: NSNotification) {
         println("#####DOWNLOADED######")
-        var articles = Article.getArticlesFor(nil, key: "subsection", value: "hello", count: 0, page: 0)
         //NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 }
