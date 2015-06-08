@@ -37,23 +37,23 @@ class ViewController: UIViewController {
     
     //Add issue details from API
     @IBAction func useAPI () {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateArticleStatus:", name: "downloadComplete", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateArticleStatus:", name: "allDownloadsComplete", object: nil)
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
         
-        if let vHandler = VolumeHandler(folder: docsDir) {
+        /*if let vHandler = VolumeHandler(folder: docsDir) {
             self.volumeHandler = vHandler
             self.volumeHandler!.addVolumeFromAPI("555a27de352c7d6d5b888c3e")
-        }
+        }*/
         
         /*if let iHandler = IssueHandler(folder: docsDir) {
             self.issueHandler = iHandler
             self.issueHandler!.addIssueFromAPI("555cbf28ae2eea2ae23783b3", volumeId: nil)
         }*/
-        /*if let articleHandler = ArticleHandler(folder: docsDir) {
+        if let articleHandler = ArticleHandler(folder: docsDir) {
             articleHandler.addAllArticles()
-        }*/
+        }
     }
     
     func updateArticleStatus(notif: NSNotification) {

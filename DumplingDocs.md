@@ -376,7 +376,9 @@ Dumpling issues notifications at various stages of a download. This information 
 
 2. **articlesDownloadComplete** This notification is fired when the data for all articles in an issue are downloaded and saved back to the database. It is not necessary that all assets have been downloaded at this point
 
-3. **downloadComplete** This notification is fired when everthing related to a volume or an independent issue is downloaded (issues, articles, assets)
+3. **downloadComplete** This notification is fired when everthing related to a volume or an independent issue or article is downloaded (issues, articles, assets)
+
+4. **allDownloadsComplete** This notification is fired when all articles/volumes added via the respective ArticleHandler/VolumeHandler methods are downloaded completely
 
 
 ## Usage
