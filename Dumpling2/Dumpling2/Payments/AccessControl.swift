@@ -13,6 +13,13 @@ import StoreKit
 public protocol AccessControl {
     
     /**
+    This method makes an in-app purchase and calls the Subscriber API to verify if the purchase receipt is valid or not. If valid, the content is unlocked and made available to the user
+    
+    :param: object Object which has to be purchased. Can be an Article, Volume or Issue object
+    */
+    func purchaseItem(object: AnyObject)
+    
+    /**
     This method restores all in-app purchases for the current logged in user. If any issues purchased are not available, they will be downloaded, saved to the database and made available. This method checks both in-app purchases as well as web purchases (if userId is not nil)
     
     :brief: Restore IAPs, save to database
