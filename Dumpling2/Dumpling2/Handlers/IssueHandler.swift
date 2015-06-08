@@ -624,6 +624,29 @@ public class IssueHandler: NSObject {
             }
             
             NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
+            
+            //Check for all volumes/articles
+            var allValues: NSArray = self.activeDownloads.allValues //Returns an array of dictionaries
+            var allDone = true
+            for statusDict: NSDictionary in allValues as! [NSDictionary] {
+                let statusValues: NSArray = statusDict.allValues
+                if statusValues.count > 0 && statusValues.containsObject(NSNumber(integer: 0)) {
+                    //Found a 0 - download not complete
+                    allDone = false
+                    break
+                }
+            }
+            if allDone {
+                //All downloads complete - send notification
+                var objects: [AnyObject] = self.activeDownloads.allKeys as [AnyObject]
+                var key = "articles"
+                if !Helper.isNilOrEmpty(volumeId) {
+                    key = "volumes"
+                }
+                
+                var userInfoDict = NSDictionary(object: objects, forKey: key)
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: userInfoDict as! Dictionary<String, [AnyObject]>)
+            }
         }
     }
     

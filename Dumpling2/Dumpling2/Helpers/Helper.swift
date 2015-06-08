@@ -15,6 +15,7 @@ var clientKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
 let DOWNLOAD_COMPLETE: String = "downloadComplete" //Volume + Issues + Article + Volume assets + Issue assets + Article assets downloaded
+let ALL_DOWNLOADS_COMPLETE: String = "allDownloadsComplete" //all volumes or articles through the VolumeHandler or ArticleHandler
 
 class Helper {
     
