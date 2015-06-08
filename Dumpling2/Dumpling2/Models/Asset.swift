@@ -526,7 +526,7 @@ public class Asset: RLMObject {
         }
         
         if issueId == "" {
-            let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
+            let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", articleId, "image")
             var assets = Asset.objectsWithPredicate(predicate)
             
             if assets.count > 0 {
