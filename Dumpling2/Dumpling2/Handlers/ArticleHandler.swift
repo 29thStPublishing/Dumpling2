@@ -108,6 +108,34 @@ public class ArticleHandler: NSObject {
         Article.createIndependentArticle(globalId, delegate: self.issueHandler)
     }
     
+    /**
+    The method uses an SKU/Apple id of an article, gets its content from the Magnet API and adds it to the database
+    
+    :param: appleId The Apple id for the article
+    */
+    public func addArticleWith(appleId: String) {
+        let requestURL = "\(baseURL)articles/sku/\(appleId)"
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleDetails: NSDictionary = allArticles.firstObject as! NSDictionary
+                //Update article
+                
+                self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleDetails.objectForKey("id") as! String)
+                
+                Article.addArticle(articleDetails, delegate: self.issueHandler)
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
     public func addAllArticles() {
         let requestURL = "\(baseURL)articles/"
 

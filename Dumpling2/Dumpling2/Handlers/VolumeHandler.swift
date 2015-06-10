@@ -172,6 +172,35 @@ public class VolumeHandler: NSObject {
         }
     }
     
+    /**
+    The method uses the SKU/Apple id of a volume, gets its content from the Magnet API and adds it to the database
+    
+    :param: appleId The Apple id for the volume
+    */
+    public func addVolumeFor(appleId: String) {
+        
+        let requestURL = "\(baseURL)volumes/sku/\(appleId)"
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                let volumeDetails: NSDictionary = allVolumes.firstObject as! NSDictionary
+                
+                //Update volume now
+                var volumeId = volumeDetails.objectForKey("id") as! String
+                self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volumeId)
+                self.updateVolumeFromAPI(volumeDetails, globalId: volumeId)
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
     // MARK: Add/Update Volumes, Issues, Assets and Articles
     
     //Add or create volume details (from API)
