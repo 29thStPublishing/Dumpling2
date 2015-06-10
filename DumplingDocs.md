@@ -43,11 +43,13 @@ This is the main class and the starting point of Dumpling
 
 5. **addVolumeFromAPI(globalId: NSString)** The method uses the global id of a volume, gets its content from the Magnet API and adds it to the database
 
-6. **getVolume(volumeId: String)** ```returns Volume or nil``` Get volume details from database for a specific global id
+6. **addVolumeFor(appleId: String)** The method uses the SKU/Apple id of a volume, gets its content from the Magnet API and adds it to the database
 
-7. **listVolumes()** The method is for testing only. It prints the available volumes for a client api key
+7. **getVolume(volumeId: String)** ```returns Volume or nil``` Get volume details from database for a specific global id
 
-8. **addAllVolumes()** This method gets all the volumes for a given client key and adds them to the database
+8. **listVolumes()** The method is for testing only. It prints the available volumes for a client api key
+
+9. **addAllVolumes()** This method gets all the volumes for a given client key and adds them to the database
 
 
 ## IssueHandler
@@ -101,7 +103,9 @@ This class created for managing independent articles
 
 4. **addArticleFromAPI(globalId: String)** The method uses the global id of an article, gets its content from the Magnet API and adds it to the database as an independent article
 
-5. **addAllArticles()** Gets all the articles for a client key from the API and adds it to the database
+5. **addArticleWith(appleId: String)** The method uses an SKU/Apple id of an article, gets its content from the Magnet API and adds it to the database
+
+6. **addAllArticles()** Gets all the articles for a client key from the API and adds it to the database
 
 7. **getAllArticles(page: Int, count: Int)** ```returns Array<Article> or nil``` The method returns a paginated list of independent articles from the database. If you need all articles, specify count as 0. The page index starts at 0
 

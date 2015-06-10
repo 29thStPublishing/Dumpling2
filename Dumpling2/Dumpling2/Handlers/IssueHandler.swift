@@ -466,7 +466,6 @@ public class IssueHandler: NSObject {
                 else if let err = error {
                     println("Error: " + err.description)
                 }
-                
             }
         }
         
