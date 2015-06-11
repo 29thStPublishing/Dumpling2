@@ -148,6 +148,26 @@ public class Volume: RLMObject {
         return nil
     }
     
+    /**
+    This method inputs the global id of a volume and returns the Volume object
+    
+    :param:  volumeId The global id for the volume
+    
+    :return: Volume object for the global id. Returns nil if the volume is not found
+    */
+    public class func getVolume(volumeId: String) -> Volume? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = %@", volumeId)
+        var vols = Volume.objectsWithPredicate(predicate)
+        
+        if vols.count > 0 {
+            return vols.firstObject() as? Volume
+        }
+        
+        return nil
+    }
+    
     //MARK: Instance methods
     
     /**

@@ -136,8 +136,17 @@ public class ArticleHandler: NSObject {
         }
     }
     
-    public func addAllArticles() {
-        let requestURL = "\(baseURL)articles/"
+    /**
+    The method lets you download and add all articles to the database
+    
+    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    */
+    public func addAllArticles(page: Int) {
+        var requestURL = "\(baseURL)articles/?limit=20"
+        
+        if page > 0 {
+            requestURL = requestURL + "&page=\(page+1)"
+        }
 
         var networkManager = LRNetworkManager.sharedInstance
         

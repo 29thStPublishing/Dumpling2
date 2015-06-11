@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		630953431B28501600DBDB46 /* PurchaseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 630953421B28501600DBDB46 /* PurchaseHandler.swift */; };
 		634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634BA6121B17230A007B2630 /* ArticleHandler.swift */; };
 		636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636FF7BD1B0097D7006FF05A /* AccessControl.swift */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
@@ -128,6 +129,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		630953421B28501600DBDB46 /* PurchaseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseHandler.swift; sourceTree = "<group>"; };
 		634BA6121B17230A007B2630 /* ArticleHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleHandler.swift; sourceTree = "<group>"; };
 		636FF7BD1B0097D7006FF05A /* AccessControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessControl.swift; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 			children = (
 				FFD0EDAD1AFC9C500055A102 /* Purchase.swift */,
 				636FF7BD1B0097D7006FF05A /* AccessControl.swift */,
+				630953421B28501600DBDB46 /* PurchaseHandler.swift */,
 			);
 			path = Payments;
 			sourceTree = "<group>";
@@ -707,6 +710,7 @@
 				63CED84F1B1300A100C4200C /* Volume.swift in Sources */,
 				FFCA0FD91A80DBF1000C9AFD /* AFHTTPSessionManager.m in Sources */,
 				FFDAD91B1AB6FA9600506EBF /* LRNetworkManager.swift in Sources */,
+				630953431B28501600DBDB46 /* PurchaseHandler.swift in Sources */,
 				FFCB3B431A78E5F600F52BC6 /* Magazine.swift in Sources */,
 				FFCA0FDC1A80DBF1000C9AFD /* AFNetworkReachabilityManager.m in Sources */,
 				FFD86B831AE7B352003E357B /* ReaderHelper.swift in Sources */,
