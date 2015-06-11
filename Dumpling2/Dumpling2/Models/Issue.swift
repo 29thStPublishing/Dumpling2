@@ -13,7 +13,7 @@ public class Issue: RLMObject {
     /// Global id of an issue - this is unique for each issue
     dynamic public var globalId = ""
     /// SKU or Apple Id for an issue
-    dynamic var appleId = ""
+    dynamic public var appleId = ""
     /// Title of the issue
     dynamic public var title = ""
     /// Description of the issue
@@ -33,7 +33,7 @@ public class Issue: RLMObject {
     /// Custom metadata of the issue
     dynamic public var metadata = ""
     ///Global id of the volume to which the issue belongs (can be blank if this is an independent issue)
-    dynamic var volumeId = ""
+    dynamic public var volumeId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"

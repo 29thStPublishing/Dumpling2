@@ -310,9 +310,15 @@ public class VolumeHandler: NSObject {
     
     /**
     This method gets all available volumes for a client key, downloads it and saves it to the database
+    
+    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     */
-    public func addAllVolumes() {
-        let requestURL = "\(baseURL)volumes/"
+    public func addAllVolumes(page: Int) {
+        var requestURL = "\(baseURL)volumes/?limit=20"
+
+        if page > 0 {
+            requestURL = requestURL + "&page=\(page+1)"
+        }
         
         var networkManager = LRNetworkManager.sharedInstance
         

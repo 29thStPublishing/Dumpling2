@@ -49,11 +49,11 @@ public protocol AccessControl {
     func isAvailable(appleId: String, userId: AnyObject?)
     
     /**
-    This method returns an array of issue ids for issues purchased by the current logged in user (or IAPs + web purchases if userId is not nil)
+    This method returns an array of skus for Purchases made by the current logged in user (or IAPs + web purchases if userId is not nil)
     
     :param: userId User id for which purchases should be retrieved
     
-    :return: Array of String containing issue ids which the user has access to
+    :return: Array of SKUs which the user has access to
     */
     func listPurchases(userId: AnyObject?) -> Array<String>?
     

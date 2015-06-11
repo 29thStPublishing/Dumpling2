@@ -57,9 +57,9 @@ public class Article: RLMObject {
     /// Whether the article is featured for the given issue or not
     dynamic public var isFeatured = false
     /// Global id for the issue the article belongs to. This can be blank for independent articles
-    dynamic var issueId = ""
+    dynamic public var issueId = ""
     ///SKU/Apple id for the article - will be used when articles are sold individually
-    dynamic var appleId = ""
+    dynamic public var appleId = ""
     
     override public class func primaryKey() -> String {
         return "globalId"
