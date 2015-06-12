@@ -309,6 +309,32 @@ public class VolumeHandler: NSObject {
     }
     
     /**
+    This method gets last 20 volumes for a client key, downloads it and saves it to the database
+    */
+    public func addAllVolumes() {
+        var requestURL = "\(baseURL)volumes/?limit=20"
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                if allVolumes.count > 0 {
+                    for (index, volumeDict) in enumerate(allVolumes) {
+                        let volumeId = volumeDict.valueForKey("id") as! String
+                        self.addVolumeFromAPI(volumeId)
+                    }
+                }
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
+    /**
     This method gets all available volumes for a client key, downloads it and saves it to the database
     
     :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
