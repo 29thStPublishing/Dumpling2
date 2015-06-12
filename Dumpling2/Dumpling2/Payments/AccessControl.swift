@@ -45,8 +45,10 @@ public protocol AccessControl {
     :param: appleId SKU for which access needs to be checked
     
     :param: userId User id for which web purchase should be checked
+    
+    :return: true if the user has access to the SKU, false otherwise
     */
-    func isAvailable(appleId: String, userId: AnyObject?)
+    func isAvailable(appleId: String, userId: AnyObject?) -> Bool
     
     /**
     This method returns an array of skus for Purchases made by the current logged in user (or IAPs + web purchases if userId is not nil)

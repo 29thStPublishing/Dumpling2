@@ -51,6 +51,8 @@ This is the main class and the starting point of Dumpling
 
 9. **addAllVolumes(page: Int)** This method gets all the volumes for a given client key and adds them to the database. Current limit is set to 20. Pagination starts at 0
 
+10. **addAllVolumes()** This method gets last 20 volumes for a given client key and adds them to the database
+
 
 ## IssueHandler
 
@@ -483,7 +485,7 @@ This is a protocol for managing access control to various purchases. The client 
 
 3. **restoreWebPurchases(userId: AnyObject)** This method retrieves all web purchases for the user whose id is passed. If any issues purchased are not available, they will be downloaded, saved to the database and made available
 
-4. **isAvailable(appleId: String, userId: AnyObject?)** This method checks if a user has access to a given issue (based on Apple id/SKU). If the userId is provided, the app will check for access permissions through both in-app purchase and web purchases. Otherwise it will only check against in-app purchases
+4. **isAvailable(appleId: String, userId: AnyObject?)** ```returns Bool``` This method checks if a user has access to a given issue (based on Apple id/SKU). If the userId is provided, the app will check for access permissions through both in-app purchase and web purchases. Otherwise it will only check against in-app purchases
 
 5. **listPurchases(userId: AnyObject?)** ```returns Array<String> or nil``` This method returns an array of skus for Purchases made by the current logged in user (or IAPs + web purchases if userId is not nil)
 
