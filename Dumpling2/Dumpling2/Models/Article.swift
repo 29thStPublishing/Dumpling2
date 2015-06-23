@@ -432,7 +432,7 @@ public class Article: RLMObject {
     
     :param: page Page number (will be used with count)
     
-    :return: an array of articles fulfiling the conditions
+    :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?, count: Int, page: Int) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -457,7 +457,7 @@ public class Article: RLMObject {
             let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
             var articles: RLMResults
             
-            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
+            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false) as RLMResults
             
             if articles.count > 0 {
                 var array = Array<Article>()
@@ -469,6 +469,9 @@ public class Article: RLMObject {
                 //If count > 0, return only values in that range
                 if count > 0 {
                     var startIndex = page * count
+                    if startIndex > array.count {
+                        return nil
+                    }
                     var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
                     var slicedArray = Array(array[startIndex...endIndex])
                     
@@ -490,13 +493,13 @@ public class Article: RLMObject {
     
     :param: key The key whose values need to be searched. Please ensure this has the same name as the properties available. The value can be any of the Article properties, keywords or customMeta keys
     
-    :param: value The value of the key for the articles to be retrieved
+    :param: value The value of the key for the articles to be retrieved. If sending multiple keywords, use a comma-separated string with no spaces e.g. keyword1,keyword2,keyword3
     
     :param: count Number of articles to be returned
     
     :param: page Page number (will be used with count)
     
-    :return: an array of articles fulfiling the conditions
+    :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, key: String, value: String, count: Int, page: Int) -> Array<Article>? {
         let realm = RLMRealm.defaultRealm()
@@ -522,8 +525,20 @@ public class Article: RLMObject {
         
         if foundProperty {
             //This is a property
-            var keyPredicate = NSPredicate(format: "%K = %@", key, value)
-            subPredicates.addObject(keyPredicate)
+            if key == "keywords" {
+                var keywords: [String] = value.componentsSeparatedByString(",")
+                var keywordPredicates = NSMutableArray()
+                for keyword in keywords {
+                    var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
+                    keywordPredicates.addObject(subPredicate)
+                }
+                var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(keywordPredicates as [AnyObject])
+                subPredicates.addObject(orPredicate)
+            }
+            else {
+                var keyPredicate = NSPredicate(format: "%K = %@", key, value)
+                subPredicates.addObject(keyPredicate)
+            }
         }
         else {
             //Is a customMeta key
@@ -536,7 +551,7 @@ public class Article: RLMObject {
             let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
             var articles: RLMResults
             
-            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("placement", ascending: true) as RLMResults
+            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false) as RLMResults
             
             if articles.count > 0 {
                 var array = Array<Article>()
@@ -548,6 +563,9 @@ public class Article: RLMObject {
                 //If count > 0, return only values in that range
                 if count > 0 {
                     var startIndex = page * count
+                    if startIndex > array.count {
+                        return nil
+                    }
                     var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
                     var slicedArray = Array(array[startIndex...endIndex])
                     
