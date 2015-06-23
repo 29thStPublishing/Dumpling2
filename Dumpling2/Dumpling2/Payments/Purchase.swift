@@ -25,4 +25,8 @@ public class Purchase: RLMObject {
     /// Identity used for syncing web purchases
     dynamic public var userIdentity = ""
     
+    override public class func primaryKey() -> String {
+        return "appleId"
+    }
+    
 }
