@@ -52,13 +52,17 @@ class ViewController: UIViewController {
             self.issueHandler!.addIssueFromAPI("555cbf28ae2eea2ae23783b3", volumeId: nil)
         }*/
         if let articleHandler = ArticleHandler(folder: docsDir) {
-            articleHandler.addAllArticles()
+            articleHandler.addAllArticles(0)
         }
     }
     
     func updateArticleStatus(notif: NSNotification) {
         println("#####DOWNLOADED######")
         //NSNotificationCenter.defaultCenter().removeObserver(self)
+        
+        if let arts = Article.getArticlesFor(nil, key: "keywords", value: "@full,@video", count: 0, page: 0) {
+            NSLog("ARTICLES: \(arts.count)")
+        }
     }
 }
 

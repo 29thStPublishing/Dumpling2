@@ -369,12 +369,11 @@ public class Article: RLMObject {
                     (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                 }
                 Asset.downloadAndCreateAsset(assetDict.valueForKey("id") as! NSString, issue: issue, articleId: currentArticle.globalId, placement: index+1, delegate: delegate)
+                
+                if index == 0 {
+                    currentArticle.thumbImageURL = assetDict.valueForKey("id") as! String
+                }
             }
-        }
-        
-        //Set thumbnail for article
-        if let firstAsset = Asset.getFirstAssetFor("", articleId: currentArticle.globalId, volumeId: nil) {
-            currentArticle.thumbImageURL = firstAsset.globalId as String
         }
         
         //Article downloaded (not necessarily assets)
@@ -469,7 +468,7 @@ public class Article: RLMObject {
                 //If count > 0, return only values in that range
                 if count > 0 {
                     var startIndex = page * count
-                    if startIndex > array.count {
+                    if startIndex >= array.count {
                         return nil
                     }
                     var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
@@ -563,7 +562,7 @@ public class Article: RLMObject {
                 //If count > 0, return only values in that range
                 if count > 0 {
                     var startIndex = page * count
-                    if startIndex > array.count {
+                    if startIndex >= array.count {
                         return nil
                     }
                     var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
