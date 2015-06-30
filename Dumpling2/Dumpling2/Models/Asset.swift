@@ -168,7 +168,7 @@ public class Asset: RLMObject {
                 
                 var currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as! String
-                currentAsset.caption = mediaFile.valueForKey("title") as! String
+                currentAsset.caption = mediaFile.valueForKey("caption") as! String
                 currentAsset.volumeId = volume.globalId
                 
                 var meta = mediaFile.objectForKey("meta") as! NSDictionary
@@ -258,12 +258,11 @@ public class Asset: RLMObject {
                 var allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
-                
                 realm.beginWriteTransaction()
                 
                 var currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as! String
-                currentAsset.caption = mediaFile.valueForKey("title") as! String
+                currentAsset.caption = mediaFile.valueForKey("caption") as! String
                 currentAsset.issue = issue
                 currentAsset.articleId = articleId
                 
