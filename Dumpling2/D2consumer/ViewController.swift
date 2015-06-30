@@ -52,7 +52,8 @@ class ViewController: UIViewController {
             self.issueHandler!.addIssueFromAPI("555cbf28ae2eea2ae23783b3", volumeId: nil)
         }*/
         if let articleHandler = ArticleHandler(folder: docsDir) {
-            articleHandler.addAllArticles(0)
+            //articleHandler.addAllArticles(0, limit: 30)
+            articleHandler.addAllPublishedArticles(0)
         }
     }
     

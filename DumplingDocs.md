@@ -107,7 +107,9 @@ This class created for managing independent articles
 
 5. **addArticleWith(appleId: String)** The method uses an SKU/Apple id of an article, gets its content from the Magnet API and adds it to the database
 
-6. **addAllArticles(page: Int)** Gets all the articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0
+6. **addAllArticles(page: Int, limit: Int?)** Gets all the articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0. ```limit``` is optional. If nil, a default value of 20 will be used
+
+7. **addAllPublishedArticles(page: Int, limit: Int?)** Gets all the published articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0. ```limit``` is optional. If nil, a default value of 20 will be used
 
 7. **getAllArticles(page: Int, count: Int)** ```returns Array<Article> or nil``` The method returns a paginated list of independent articles from the database. If you need all articles, specify count as 0. The page index starts at 0
 
