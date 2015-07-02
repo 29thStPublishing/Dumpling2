@@ -141,13 +141,13 @@ public class ArticleHandler: NSObject {
     
     :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Optional parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addAllArticles(page: Int, limit: Int?) {
+    public func addAllArticles(page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles/?limit="
         
-        if let newLimit = limit {
-            requestURL += "\(newLimit)"
+        if limit > 0 {
+            requestURL += "\(limit)"
         }
         else {
             requestURL += "20"
@@ -185,13 +185,13 @@ public class ArticleHandler: NSObject {
     
     :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Optional parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addAllPublishedArticles(page: Int, limit: Int?) {
+    public func addAllPublishedArticles(page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles/published?limit="
         
-        if let newLimit = limit {
-            requestURL += "\(newLimit)"
+        if limit > 0 {
+            requestURL += "\(limit)"
         }
         else {
             requestURL += "20"

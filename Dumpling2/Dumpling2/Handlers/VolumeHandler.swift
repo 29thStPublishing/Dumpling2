@@ -338,9 +338,18 @@ public class VolumeHandler: NSObject {
     This method gets all available volumes for a client key, downloads it and saves it to the database
     
     :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    
+    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0 or nil, we will fetch 20 records by default
     */
-    public func addAllVolumes(page: Int) {
-        var requestURL = "\(baseURL)volumes/?limit=20"
+    public func addAllVolumes(page: Int, limit: Int) {
+        var requestURL = "\(baseURL)volumes/?limit="
+        
+        if limit > 0 {
+            requestURL += "\(limit)"
+        }
+        else {
+            requestURL += "20"
+        }
 
         if page > 0 {
             requestURL = requestURL + "&page=\(page+1)"
