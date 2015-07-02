@@ -10,7 +10,7 @@ import UIKit
 import StoreKit
 
 /** A protocol for managing access control to various purchases*/
-public protocol AccessControl {
+@objc public protocol AccessControl {
     
     /**
     This method makes an in-app purchase and calls the Subscriber API to verify if the purchase receipt is valid or not. If valid, the content is unlocked and made available to the user
