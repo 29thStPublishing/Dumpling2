@@ -703,6 +703,8 @@ public class Article: RLMObject {
     /**
     This method returns all articles whose publish date is before the published date provided
     
+    :param: date The date to compare publish dates with
+    
     :return: an array of articles older than the given date
     */
     public class func getOlderArticles(date: NSDate) -> Array<Article>? {
@@ -726,6 +728,8 @@ public class Article: RLMObject {
     /**
     This method returns all articles whose publish date is after the published date provided
     
+    :param: date The date to compare publish dates with
+    
     :return: an array of articles newer than the given date
     */
     public class func getNewerArticles(date: NSDate) -> Array<Article>? {
@@ -747,6 +751,25 @@ public class Article: RLMObject {
     }
     
     //MARK: Instance methods
+    
+    /**
+    This method deletes a stand-alone article and all assets for the given article
+    */
+    
+    public func deleteArticle() {
+        let realm = RLMRealm.defaultRealm()
+        
+        //Delete all assets for the article
+        var articleIds = NSMutableArray()
+        articleIds.addObject(self.globalId)
+        Asset.deleteAssetsForArticles(articleIds)
+        
+        //Delete article
+        realm.beginWriteTransaction()
+        realm.deleteObject(self)
+        realm.commitWriteTransaction()
+    }
+    
     
     /**
     This method downloads assets for the article
