@@ -303,6 +303,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 6. **downloadArticleAssets()** This method downloads assets for the article
 
+7. **deleteArticle()** This method deletes all assets for the article and the article from the database
+
 
 ## Asset
 
