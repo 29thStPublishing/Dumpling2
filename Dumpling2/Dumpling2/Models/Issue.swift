@@ -190,6 +190,52 @@ public class Issue: RLMObject {
     //MARK: Instance methods
     
     /**
+    This method downloads assets for the issue (only issue assets, not article assets)
+    */
+    public func downloadIssueAssets() {
+        var assetFolder = self.assetFolder
+        if assetFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docsDir: NSString = docPaths[0] as! NSString
+            assetFolder = docsDir as String
+        }
+        else {
+            assetFolder = assetFolder.stringByReplacingOccurrencesOfString("/\(self.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+        }
+        let issueHandler = IssueHandler(folder: assetFolder)!
+        
+        let requestURL = "\(baseURL)issues/\(self.globalId)"
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
+                    //Download assets for the issue
+                    var issueMedia = issueDetails.objectForKey("media") as! NSArray
+                    if issueMedia.count > 0 {
+                        for (index, assetDict) in enumerate(issueMedia) {
+                            let assetid = assetDict.valueForKey("id") as! NSString
+                            issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
+                        }
+                    }
+                    
+                    issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)issues/\(self.globalId)", status: 1)
+                }
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)issues/\(self.globalId)", status: 2)
+            }
+        }
+    }
+    
+    /**
     This method saves an issue back to the database
     
     :brief: Save an Issue to the database

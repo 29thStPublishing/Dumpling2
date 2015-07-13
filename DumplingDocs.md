@@ -213,6 +213,8 @@ Realm object for Issues. Also has methods for directly dealing with issues
 
 4. **saveIssue()** This method saves an issue back to the database
 
+5. **downloadIssueAssets()** This method downloads assets for the issue (only issue assets, not article assets)
+
 
 ## Article
 
@@ -282,6 +284,10 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 7. **setAssetPattern(newPattern: String)** This method accepts a regular expression which should be used to identify placeholders for assets in an article body.
     The default asset pattern is ```<!-- \\[ASSET: .+\\] -->```
+    
+8. **getOlderArticles(date: NSDate)** ```returns Array<Article>``` This method accepts a date and returns all articles whose publish date is before this date
+
+9. **getNewerArticles(date: NSDate)** ```returns Array<Article>``` This method accepts a date and returns all articles whose publish date is after this date
 
 ###Instance methods (public)
 1. **getValue(key:)** ```returns AnyObject/id or nil``` This method returns the value for a specific key from the custom metadata of the article
@@ -294,6 +300,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 4. **getOlderArticles()** ```returns Array<Article>``` This method returns all articles for an issue whose publish date is before the published date of current article
 
 5. **saveArticle()** This method can be called on an Article object to save it back to the database
+
+6. **downloadArticleAssets()** This method downloads assets for the article
 
 
 ## Asset
