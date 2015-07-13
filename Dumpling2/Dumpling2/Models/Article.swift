@@ -217,6 +217,10 @@ public class Article: RLMObject {
                             (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)
+                        
+                        if index == 0 {
+                            currentArticle.thumbImageURL = assetDict.valueForKey("id") as! String
+                        }
                     }
                 }
                 
@@ -696,7 +700,110 @@ public class Article: RLMObject {
         assetPattern = newPattern
     }
     
+    /**
+    This method returns all articles whose publish date is before the published date provided
+    
+    :return: an array of articles older than the given date
+    */
+    public class func getOlderArticles(date: NSDate) -> Array<Article>? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "date < %@", date)
+        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        
+        if articles.count > 0 {
+            var array = Array<Article>()
+            for object in articles {
+                let obj: Article = object as! Article
+                array.append(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
+    /**
+    This method returns all articles whose publish date is after the published date provided
+    
+    :return: an array of articles newer than the given date
+    */
+    public class func getNewerArticles(date: NSDate) -> Array<Article>? {
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "date > %@", date)
+        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        
+        if articles.count > 0 {
+            var array = Array<Article>()
+            for object in articles {
+                let obj: Article = object as! Article
+                array.append(obj)
+            }
+            return array
+        }
+        
+        return nil
+    }
+    
     //MARK: Instance methods
+    
+    /**
+    This method downloads assets for the article
+    */
+    public func downloadArticleAssets() {
+        var issueId = self.issueId
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docsDir: NSString = docPaths[0] as! NSString
+        var assetFolder = docsDir as String
+        
+        var issue = Issue.getIssue(issueId)
+        if issue == nil {
+            issue = Issue()
+            issue?.assetFolder = assetFolder
+        }
+        else {
+            let folder = issue?.assetFolder
+            if folder!.hasPrefix("/Documents") {
+            }
+            else {
+                assetFolder = folder!.stringByReplacingOccurrencesOfString("/\(issue?.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            }
+        }
+        let issueHandler = IssueHandler(folder: assetFolder)!
+        let requestURL = "\(baseURL)articles/\(self.globalId)"
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
+                
+                //Add all assets of the article
+                var articleMedia = articleInfo.objectForKey("media") as! NSArray
+                if articleMedia.count > 0 {
+                    for (index, assetDict) in enumerate(articleMedia) {
+                        //Download images and create Asset object for issue
+                        let assetid = assetDict.valueForKey("id") as! NSString
+                        
+                        issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        Asset.downloadAndCreateAsset(assetid, issue: issue!, articleId: self.globalId as String, placement: index+1, delegate: issueHandler)
+                    }
+                }
+                
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 1)
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 2)
+            }
+            
+        }
+    }
     
     /**
     This method can be called on an Article object to save it back to the database
