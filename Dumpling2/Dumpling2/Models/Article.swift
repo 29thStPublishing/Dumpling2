@@ -380,14 +380,14 @@ public class Article: RLMObject {
             }
         }
         
+        realm.beginWriteTransaction()
+        realm.addOrUpdateObject(currentArticle)
+        realm.commitWriteTransaction()
+        
         //Article downloaded (not necessarily assets)
         if delegate != nil {
             (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
         }
-        
-        realm.beginWriteTransaction()
-        realm.addOrUpdateObject(currentArticle)
-        realm.commitWriteTransaction()
     }
     
     /**
