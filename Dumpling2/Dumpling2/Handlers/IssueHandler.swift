@@ -310,9 +310,6 @@ public class IssueHandler: NSObject {
         if results.count > 0 {
             //older issue
             currentIssue = results.firstObject() as! Issue
-            //Delete all articles and assets if the issue already exists. Then add again
-            Asset.deleteAssetsForIssue(currentIssue.globalId)
-            Article.deleteArticlesFor(currentIssue.globalId)
         }
         else {
             //Create a new issue
@@ -585,8 +582,10 @@ public class IssueHandler: NSObject {
         if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All articles not downloaded yet
         }
         else {
-            //All articles downloaded (with or without errors)
-            NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
+            //All articles downloaded (with or without errors) - send notif only if status of an article was updated
+            if url.rangeOfString("/articles/") != nil {
+                NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
+            }
         }
         
         predicate = NSPredicate(format: "SELF contains[c] %@", "/issues/")
@@ -635,7 +634,7 @@ public class IssueHandler: NSObject {
                     break
                 }
             }
-            if allDone {
+            if allDone && allValues.count > 1 {
                 //All downloads complete - send notification
                 var objects: [AnyObject] = self.activeDownloads.allKeys as [AnyObject]
                 var key = "articles"

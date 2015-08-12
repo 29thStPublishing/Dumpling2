@@ -109,9 +109,11 @@ This class created for managing independent articles
 
 6. **addAllArticles(page: Int, limit: Int?)** Gets all the articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0. ```limit``` is optional. If nil, a default value of 20 will be used
 
-7. **addAllPublishedArticles(page: Int, limit: Int?)** Gets all the published articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0. ```limit``` is optional. If nil, a default value of 20 will be used
+7. **addArticlesFor(property: String, value: String, page: Int, limit: Int)** This method accepts a property name, its corresponding values and retrieves a paginated list of articles from the API which match this. If either of property or value are blank, the normal addAllArticles method will be invoked
 
-7. **getAllArticles(page: Int, count: Int)** ```returns Array<Article> or nil``` The method returns a paginated list of independent articles from the database. If you need all articles, specify count as 0. The page index starts at 0
+8. **addAllPublishedArticles(page: Int, limit: Int?)** Gets all the published articles for a client key from the API and adds it to the database. Current limit is set to 20. Pagination starts at 0. ```limit``` is optional. If nil, a default value of 20 will be used
+
+9. **getAllArticles(page: Int, count: Int)** ```returns Array<Article> or nil``` The method returns a paginated list of independent articles from the database. If you need all articles, specify count as 0. The page index starts at 0
 
 
 ## Volume

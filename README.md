@@ -33,6 +33,8 @@ You need to provide a client key for the API calls to work
 
 **IssueHandler** is the class which deals with issues, their articles and assets. It also takes in the Apple id of an issue (also the name of the zip file - available in the app bundle), extracts the zip file and creates the Issue, Article and Asset objects necessary.
 
+**ArticleHandler** is the class which deals with articles and their assets. It lets you retrieve paginated list of articles from the API and save to the database
+
 **Helper** class stores the various functions used throughout the framework like finding the device type and resolution, getting string from date (and other way round), getting JSON object from string (and other way round). It also stores the constants in the project like the base URL for Magnet and notification names (for download completion)
 
 **LRNetworkManager** is a singleton subclass of AFHTTPRequestOperationManager. All network operations should be through this file. It sends requests to the Magnet API and downloads data as well as files
@@ -70,7 +72,7 @@ if volumeHandler != nil {
 
 3. In order to use iCloud for syncing reading status, add CloudKit.framework to your project, turn on iCloud in the target's Capabilities section for Key-value storage. The sample project uses the default container for storing and retrieving values. If you wish to use a custom container, the code will change accordingly
 
-4. If you turn on App Groups for multiple projects and instantiate **VolumeHandler** and **IssueHandler** with the appropriate folder, you can read the data across multiple apps. To do this, you will need an app id with App Groups enabled and set the app group in Capabilities for all projects sharing the data.
+4. If you turn on App Groups for multiple projects and instantiate **VolumeHandler**, **IssueHandler** and **ArticleHandler** with the appropriate folder, you can read the data across multiple apps. To do this, you will need an app id with App Groups enabled and set the app group in Capabilities for all projects sharing the data.
 
 
 *The Documents directory is here ~/Library/Developer/CoreSimulator/Devices/Your_simulator_UDID/data/Containers/Data/Application/Your_app_UDID/Documents

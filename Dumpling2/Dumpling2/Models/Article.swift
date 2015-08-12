@@ -188,10 +188,13 @@ public class Article: RLMObject {
                     currentArticle.isPublished = published.boolValue
                 }
                 
-                var updated = meta.valueForKey("updated") as! NSDictionary
+                if let publishedDate = meta.valueForKey("publishedDate") as? String {
+                    currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+                }//For Gothamist
+                /*var updated = meta.valueForKey("updated") as! NSDictionary
                 if let updateDate: String = updated.valueForKey("date") as? String {
                     currentArticle.date = Helper.publishedDateFromISO(updateDate)
-                }
+                }*/
                 
                 if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -338,10 +341,14 @@ public class Article: RLMObject {
             currentArticle.isPublished = published.boolValue
         }
         
-        var updated = meta.valueForKey("updated") as! NSDictionary
+        if let publishedDate = meta.valueForKey("publishedDate") as? String {
+            currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+        } //For Gothamist
+
+        /*var updated = meta.valueForKey("updated") as! NSDictionary
         if let updateDate: String = updated.valueForKey("date") as? String {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
-        }
+        }*/
         
         if let metadata: AnyObject = article.objectForKey("customMeta") {
             if metadata.isKindOfClass(NSDictionary) {
@@ -979,9 +986,28 @@ public class Article: RLMObject {
     */
     public func getValue(key: NSString) -> AnyObject? {
         
-        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
-        if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key as String)
+        var testArticle = Article()
+        var properties: NSArray = testArticle.objectSchema.properties
+        
+        var foundProperty = false
+        for property: RLMProperty in properties as! [RLMProperty] {
+            let propertyName = property.name
+            if propertyName == key {
+                //This is the property we are looking for
+                foundProperty = true
+                break
+            }
+        }
+        if (foundProperty) {
+            //Get value of this property and return
+            return self.valueForKey(key as String)
+        }
+        else {
+            //This is a metadata key
+            var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+            if let metadataDict = metadata as? NSDictionary {
+                return metadataDict.valueForKey(key as String)
+            }
         }
         
         return nil
