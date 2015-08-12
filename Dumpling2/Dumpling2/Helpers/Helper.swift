@@ -43,7 +43,7 @@ class Helper {
         return date!
     }
 
-    //Date from string of ISO format
+    //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00
     class func publishedDateFromISO(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
             var dateFormatter = NSDateFormatter()
@@ -51,6 +51,20 @@ class Helper {
             var posix = NSLocale(localeIdentifier: "en_US_POSIX")
             dateFormatter.locale = posix
         
+            var date = dateFormatter.dateFromString(string!)
+            return date!
+        }
+        return NSDate()
+    }
+    
+    //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00
+    class func publishedDateFromISO2(string: String?) -> NSDate {
+        if !isNilOrEmpty(string) {
+            var dateFormatter = NSDateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+            var posix = NSLocale(localeIdentifier: "en_US_POSIX")
+            dateFormatter.locale = posix
+            
             var date = dateFormatter.dateFromString(string!)
             return date!
         }

@@ -213,7 +213,7 @@ public class VolumeHandler: NSObject {
             //older issue
             currentVolume = results.firstObject() as! Volume
             //Delete all issues, articles and assets if the volume already exists. Then add again
-            Issue.deleteIssuesForVolume(currentVolume.globalId)
+            //Issue.deleteIssuesForVolume(currentVolume.globalId)
         }
         else {
             //Create a new issue
@@ -312,7 +312,7 @@ public class VolumeHandler: NSObject {
     This method gets last 20 volumes for a client key, downloads it and saves it to the database
     */
     public func addAllVolumes() {
-        var requestURL = "\(baseURL)volumes/?limit=20"
+        var requestURL = "\(baseURL)volumes?limit=20"
         
         var networkManager = LRNetworkManager.sharedInstance
         
@@ -342,7 +342,7 @@ public class VolumeHandler: NSObject {
     :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0 or nil, we will fetch 20 records by default
     */
     public func addAllVolumes(page: Int, limit: Int) {
-        var requestURL = "\(baseURL)volumes/?limit="
+        var requestURL = "\(baseURL)volumes?limit="
         
         if limit > 0 {
             requestURL += "\(limit)"

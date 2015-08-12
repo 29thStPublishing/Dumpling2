@@ -187,7 +187,7 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
-                let fileUrl = mediaFile.valueForKey("url") as! String
+                let fileUrl = mediaFile.valueForKey("cdnUrl") as! String
                 
                 var finalURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
@@ -220,6 +220,31 @@ public class Asset: RLMObject {
                 }
                 
                 currentAsset.originalURL = fileUrl.lastPathComponent
+                
+                let thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                
+                var finalThumbURL: String
+                if volume.assetFolder.hasPrefix("/Documents") {
+                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                    var docsDir: NSString = docPaths[0] as! NSString
+                    let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                    finalThumbURL = "\(finalFolder)/\(thumbUrl.lastPathComponent)"
+                }
+                else {
+                    finalThumbURL = "\(volume.assetFolder)/\(thumbUrl.lastPathComponent)"
+                }
+                
+                networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
+                    (status:AnyObject?, error:NSError?) -> () in
+                    if status != nil {
+                        let completed = status as! NSNumber
+                    }
+                    else if let err = error {
+                        println("Error: " + err.description)
+                    }
+                }
+                
+                currentAsset.squareURL = thumbUrl.lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -282,7 +307,7 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
-                let fileUrl = mediaFile.valueForKey("url") as! String
+                let fileUrl = mediaFile.valueForKey("cdnUrl") as! String
                 var finalURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -325,6 +350,32 @@ public class Asset: RLMObject {
                     }
                 }
                 currentAsset.originalURL = fileUrl.lastPathComponent
+                
+                let thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                var finalThumbURL: String
+                if issue.assetFolder.hasPrefix("/Documents") {
+                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                    var docsDir: NSString = docPaths[0] as! NSString
+                    let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                    finalThumbURL = "\(finalFolder)/\(thumbUrl.lastPathComponent)"
+                }
+                else {
+                    finalThumbURL = "\(issue.assetFolder)/\(thumbUrl.lastPathComponent)"
+                }
+                
+                networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
+                    (status:AnyObject?, error:NSError?) -> () in
+                    if status != nil {
+                        let completed = status as! NSNumber
+                        if completed.boolValue {
+                            //Mark asset download as done
+                        }
+                    }
+                    else if let err = error {
+                        println("Error: " + err.description)
+                    }
+                }
+                currentAsset.squareURL = fileUrl.lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {

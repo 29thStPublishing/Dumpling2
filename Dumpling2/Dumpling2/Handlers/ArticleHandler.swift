@@ -137,6 +137,59 @@ public class ArticleHandler: NSObject {
     }
     
     /**
+    This method accepts a property name, its corresponding values and retrieves a paginated list of articles from the API which match this. If either of property or value are blank, the normal addAllArticles method will be invoked
+    
+    :param:  property The property by matching which articles need to be retrieved
+    
+    :param:  value The value of the property
+    
+    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    
+    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    */
+    public func addArticlesFor(property: String, value: String, page: Int, limit: Int) {
+        if Helper.isNilOrEmpty(property) || Helper.isNilOrEmpty(value) {
+            self.addAllArticles(page, limit: limit)
+            return
+        }
+        
+        var requestURL = "\(baseURL)articles/\(property)/\(value)?limit="
+        
+        if limit > 0 {
+            requestURL += "\(limit)"
+        }
+        else {
+            requestURL += "20"
+        }
+        
+        if page > 0 {
+            requestURL = requestURL + "&page=\(page+1)"
+        }
+        
+        var networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                var response: NSDictionary = data as! NSDictionary
+                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                if allArticles.count > 0 {
+                    for (index, articleDict) in enumerate(allArticles) {
+                        let articleId = articleDict.valueForKey("id") as! NSString
+                        let requestURL = "\(baseURL)articles/\(articleId)"
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        
+                        Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
+                    }
+                }
+            }
+            else if let err = error {
+                println("Error: " + err.description)
+            }
+        }
+    }
+    
+    /**
     The method lets you download and add all articles to the database
     
     :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
@@ -144,7 +197,7 @@ public class ArticleHandler: NSObject {
     :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
     public func addAllArticles(page: Int, limit: Int) {
-        var requestURL = "\(baseURL)articles/?limit="
+        var requestURL = "\(baseURL)articles?limit="
         
         if limit > 0 {
             requestURL += "\(limit)"
