@@ -37,7 +37,7 @@ class ViewController: UIViewController {
     
     //Add issue details from API
     @IBAction func useAPI () {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateArticleStatus:", name: "allDownloadsComplete", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateArticleStatus:", name: "articlesDownloadComplete", object: nil)
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         var docsDir: NSString = docPaths[0] as! NSString
@@ -53,17 +53,14 @@ class ViewController: UIViewController {
         }*/
         if let articleHandler = ArticleHandler(folder: docsDir) {
             //articleHandler.addAllArticles(0, limit: 30)
-            articleHandler.addAllPublishedArticles(0)
+            //articleHandler.addAllPublishedArticles(0, limit: 10)
+            articleHandler.addArticlesFor("ist", value: "LAist", page: 0, limit: 1)
         }
     }
     
     func updateArticleStatus(notif: NSNotification) {
         println("#####DOWNLOADED######")
         //NSNotificationCenter.defaultCenter().removeObserver(self)
-        
-        if let arts = Article.getArticlesFor(nil, key: "keywords", value: "@full,@video", count: 0, page: 0) {
-            NSLog("ARTICLES: \(arts.count)")
-        }
     }
 }
 

@@ -221,7 +221,7 @@ public class Asset: RLMObject {
                 
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
-                let thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                let thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
                 
                 var finalThumbURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
@@ -351,7 +351,7 @@ public class Asset: RLMObject {
                 }
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
-                let thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                let thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
                 var finalThumbURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
