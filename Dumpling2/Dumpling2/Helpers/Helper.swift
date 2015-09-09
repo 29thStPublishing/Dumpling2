@@ -43,7 +43,7 @@ class Helper {
         return date!
     }
 
-    //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00
+    //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00 (length = 32 chars)
     class func publishedDateFromISO(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
             var dateFormatter = NSDateFormatter()
@@ -51,13 +51,18 @@ class Helper {
             var posix = NSLocale(localeIdentifier: "en_US_POSIX")
             dateFormatter.locale = posix
         
-            var date = dateFormatter.dateFromString(string!)
-            return date!
+            if let date = dateFormatter.dateFromString(string!) {
+                return date
+            }
+            
+            if let date = Helper.publishedDateFromISO2(string) as NSDate? {
+                return date
+            }
         }
         return NSDate()
     }
     
-    //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00
+    //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00 (length = 25 chars)
     class func publishedDateFromISO2(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
             var dateFormatter = NSDateFormatter()
@@ -65,8 +70,13 @@ class Helper {
             var posix = NSLocale(localeIdentifier: "en_US_POSIX")
             dateFormatter.locale = posix
             
-            var date = dateFormatter.dateFromString(string!)
-            return date!
+            if let date = dateFormatter.dateFromString(string!) {
+                return date
+            }
+            
+            if let date = Helper.publishedDateFromISO(string) as NSDate? {
+                return date
+            }
         }
         return NSDate()
     }

@@ -293,7 +293,6 @@ public class Article: RLMObject {
                 var response: NSDictionary = data as! NSDictionary
                 var allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
-                
                 self.addArticle(articleInfo, delegate: delegate)
                 
             }
