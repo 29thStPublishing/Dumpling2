@@ -163,7 +163,7 @@ public class Asset: RLMObject {
                 var allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
-                
+
                 realm.beginWriteTransaction()
                 
                 var currentAsset = Asset()
@@ -187,7 +187,10 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
-                let fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                if Helper.isNilOrEmpty(fileUrl) {
+                    fileUrl = mediaFile.valueForKey("url") as! String
+                }
                 
                 var finalURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
@@ -221,7 +224,10 @@ public class Asset: RLMObject {
                 
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
-                let thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                if Helper.isNilOrEmpty(thumbUrl) {
+                    thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                }
                 
                 var finalThumbURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
@@ -284,7 +290,7 @@ public class Asset: RLMObject {
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
                 realm.beginWriteTransaction()
-                
+
                 var currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as! String
                 currentAsset.caption = mediaFile.valueForKey("caption") as! String
@@ -307,7 +313,10 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
-                let fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                if Helper.isNilOrEmpty(fileUrl) {
+                    fileUrl = mediaFile.valueForKey("url") as! String
+                }
                 var finalURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -351,7 +360,11 @@ public class Asset: RLMObject {
                 }
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
-                let thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                if Helper.isNilOrEmpty(thumbUrl) {
+                    thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                }
+                
                 var finalThumbURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
