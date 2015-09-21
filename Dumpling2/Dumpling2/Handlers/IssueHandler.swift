@@ -362,6 +362,12 @@ public class IssueHandler: NSObject {
         if !assetId.isEmpty {
             currentIssue.coverImageId = assetId
         }
+        if let iPadId = issue.valueForKey("coverTablet") as? String {
+            currentIssue.coverImageiPadId = iPadId
+        }
+        if let iPadId = issue.valueForKey("coverTabletLandscape") as? String {
+            currentIssue.coverImageiPadLndId = iPadId
+        }
         
         if let metadata: AnyObject = issue.objectForKey("customMeta") {
             if metadata.isKindOfClass(NSDictionary) {

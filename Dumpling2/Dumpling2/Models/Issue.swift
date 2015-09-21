@@ -21,7 +21,11 @@ public class Issue: RLMObject {
     /// Folder saving all the assets for the issue
     dynamic public var assetFolder = ""
     /// Global id of the asset which is the cover image of the issue
-    dynamic public var coverImageId = "" //globalId of asset
+    dynamic public var coverImageId = "" //globalId of asset - for phone
+    /// Global id of the asset for cover image on iPad
+    dynamic public var coverImageiPadId = ""
+    /// Global id of the asset for cover image on iPad Landscape
+    dynamic public var coverImageiPadLndId = ""
     /// File URL for the icon image
     dynamic public var iconImageURL = ""
     /// Published date for the issue
