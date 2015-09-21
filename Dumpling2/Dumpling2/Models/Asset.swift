@@ -187,9 +187,11 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
+                var isCdn = true
                 var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
                 if Helper.isNilOrEmpty(fileUrl) {
                     fileUrl = mediaFile.valueForKey("url") as! String
+                    isCdn = false
                 }
                 
                 var finalURL: String
@@ -215,18 +217,39 @@ public class Asset: RLMObject {
                         }
                     }
                     else if let err = error {
-                        println("Error: " + err.description)
-                        if delegate != nil {
-                            (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                        println("Error cdn: " + err.description)
+                        //Try downloading with url if cdn url download failed
+                        if isCdn {
+                            fileUrl = mediaFile.valueForKey("url") as! String
+                            networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                                (status:AnyObject?, error:NSError?) -> () in
+                                if status != nil {
+                                    let completed = status as! NSNumber
+                                    if completed.boolValue {
+                                        //Mark asset download as done
+                                        if delegate != nil {
+                                            (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                                        }
+                                    }
+                                }
+                                else if let err = error {
+                                    println("Error non cdn: " + err.description)
+                                    if delegate != nil {
+                                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
+                var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
                 if Helper.isNilOrEmpty(thumbUrl) {
                     thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                    isCdnThumb = false
                 }
                 
                 var finalThumbURL: String
@@ -247,6 +270,19 @@ public class Asset: RLMObject {
                     }
                     else if let err = error {
                         println("Error: " + err.description)
+                        //Try downloading with url if cdn url download failed
+                        if isCdnThumb {
+                            thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                            networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
+                                (status:AnyObject?, error:NSError?) -> () in
+                                if status != nil {
+                                    let completed = status as! NSNumber
+                                }
+                                else if let err = error {
+                                    println("Error non cdn: " + err.description)
+                                }
+                            }
+                        }
                     }
                 }
                 
@@ -313,9 +349,11 @@ public class Asset: RLMObject {
                 }
                 currentAsset.placement = placement
                 
+                var isCdn = true
                 var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
                 if Helper.isNilOrEmpty(fileUrl) {
                     fileUrl = mediaFile.valueForKey("url") as! String
+                    isCdn = false
                 }
                 var finalURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
@@ -348,21 +386,47 @@ public class Asset: RLMObject {
                     }
                     else if let err = error {
                         println("Error: " + err.description)
-                        if delegate != nil {
-                            if !issue.globalId.isEmpty {
-                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
-                            }
-                            else {
-                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                        if isCdn {
+                            fileUrl = mediaFile.valueForKey("url") as! String
+                            networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                                (status:AnyObject?, error:NSError?) -> () in
+                                if status != nil {
+                                    let completed = status as! NSNumber
+                                    if completed.boolValue {
+                                        //Mark asset download as done
+                                        if delegate != nil {
+                                            if !issue.globalId.isEmpty {
+                                                //This is an issue's asset or an article's (belonging to an issue) asset
+                                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                                            }
+                                            else {
+                                                //This is an independent article's asset
+                                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                                            }
+                                        }
+                                    }
+                                }
+                                else if let err = error {
+                                    if delegate != nil {
+                                        if !issue.globalId.isEmpty {
+                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                                        }
+                                        else {
+                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
                 currentAsset.originalURL = fileUrl.lastPathComponent
                 
+                var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
                 if Helper.isNilOrEmpty(thumbUrl) {
                     thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                    isCdnThumb = false
                 }
                 
                 var finalThumbURL: String
@@ -386,6 +450,20 @@ public class Asset: RLMObject {
                     }
                     else if let err = error {
                         println("Error: " + err.description)
+                        if isCdnThumb {
+                            thumbUrl = mediaFile.valueForKey("urlThumb") as! String
+                            networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
+                                (status:AnyObject?, error:NSError?) -> () in
+                                if status != nil {
+                                    let completed = status as! NSNumber
+                                    if completed.boolValue {
+                                    }
+                                }
+                                else if let err = error {
+                                    println("Error: " + err.description)
+                                }
+                            }
+                        }
                     }
                 }
                 currentAsset.squareURL = fileUrl.lastPathComponent
