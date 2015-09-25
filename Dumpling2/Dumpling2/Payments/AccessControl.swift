@@ -15,7 +15,7 @@ import StoreKit
     /**
     This method makes an in-app purchase and calls the Subscriber API to verify if the purchase receipt is valid or not. If valid, the content is unlocked and made available to the user
     
-    :param: object Object which has to be purchased. Can be an Article, Volume or Issue object
+    - parameter object: Object which has to be purchased. Can be an Article, Volume or Issue object
     */
     func purchaseItem(object: AnyObject)
     
@@ -24,7 +24,7 @@ import StoreKit
     
     :brief: Restore IAPs, save to database
     
-    :param: userId User id for which web purchases should be checked. This param is optional. If nil, web purchases will not be checked for
+    - parameter userId: User id for which web purchases should be checked. This param is optional. If nil, web purchases will not be checked for
     */
     func restorePurchases(userId: AnyObject?)
     
@@ -33,7 +33,7 @@ import StoreKit
     
     :brief: Retrieve web purchases, save to database
     
-    :param: userId User id for which web purchases should be checked
+    - parameter userId: User id for which web purchases should be checked
     */
     func restoreWebPurchases(userId: AnyObject)
     
@@ -42,9 +42,9 @@ import StoreKit
     
     :brief: Check if user has access to a specific issue/article
     
-    :param: appleId SKU for which access needs to be checked
+    - parameter appleId: SKU for which access needs to be checked
     
-    :param: userId User id for which web purchase should be checked
+    - parameter userId: User id for which web purchase should be checked
     
     :return: true if the user has access to the SKU, false otherwise
     */
@@ -53,7 +53,7 @@ import StoreKit
     /**
     This method returns an array of skus for Purchases made by the current logged in user (or IAPs + web purchases if userId is not nil)
     
-    :param: userId User id for which purchases should be retrieved
+    - parameter userId: User id for which purchases should be retrieved
     
     :return: Array of SKUs which the user has access to
     */
@@ -62,7 +62,7 @@ import StoreKit
     /**
     This method syncs all purchases saved in the database to the server for given user identity. All purchases which do not have a user id (i.e. have been purchased on the device through IAPs) will also be marked as purchased by this user on the server
     
-    :param: userId User id for which purchases should be synced with the server
+    - parameter userId: User id for which purchases should be synced with the server
     */
     func syncPurchases(userId: AnyObject)
     

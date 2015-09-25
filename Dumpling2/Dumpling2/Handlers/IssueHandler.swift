@@ -49,17 +49,17 @@ public class IssueHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     */
     public init?(folder: NSString){
         super.init()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -68,9 +68,12 @@ public class IssueHandler: NSObject {
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        var mainBundle = NSBundle.mainBundle()
+        let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
         }
@@ -84,18 +87,21 @@ public class IssueHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents" //docsDir
         clientKey = clientKey as String
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
     }
     
     /**
@@ -103,17 +109,17 @@ public class IssueHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -123,30 +129,33 @@ public class IssueHandler: NSObject {
         self.activeDownloads = NSMutableDictionary()
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
         
     // MARK: Use zip
     
+    //Issue 46 
     /**
     The method uses an Apple id, gets a zip file from the project Bundle with the name appleId.zip, extracts its contents and adds the issue, articles and assets to the database
     
     :brief: Add issue details from an extracted zip file to the database
     
-    :param: appleId The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
+    - parameter appleId: The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
     */
-    public func addIssueZip(appleId: NSString) {
-        /* Step 1 - import zip file */
+    /*public func addIssueZip(appleId: NSString) {
         
-        var appPath = NSBundle.mainBundle().bundlePath
-        var defaultZipPath = "\(appPath)/\(appleId).zip"
-        var newZipDir = "\(self.defaultFolder)/\(appleId)"
+        let appPath = NSBundle.mainBundle().bundlePath
+        let defaultZipPath = "\(appPath)/\(appleId).zip"
+        let newZipDir = "\(self.defaultFolder)/\(appleId)"
         
         var folderPath: String
         if self.defaultFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-            var docsDir: NSString = docPaths[0] as! NSString
+            let docsDir: NSString = docPaths[0] as NSString
             folderPath = newZipDir.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
         }
         else {
@@ -171,11 +180,18 @@ public class IssueHandler: NSObject {
         var jsonPath = "\(self.defaultFolder)/\(appleId)/latest.json"
         if self.defaultFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-            var docsDir: NSString = docPaths[0] as! NSString
+            let docsDir: NSString = docPaths[0] as NSString
             jsonPath = jsonPath.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
         }
         
-        var fullJSON = NSString(contentsOfFile: jsonPath, encoding: NSUTF8StringEncoding, error: &error)
+        var fullJSON: NSString?
+        do {
+            fullJSON = try NSString(contentsOfFile: jsonPath, encoding: NSUTF8StringEncoding)
+        } catch let error1 as NSError {
+            error = error1
+            NSLog("Error: \(error?.localizedDescription)")
+            fullJSON = nil
+        }
         
         if fullJSON == nil {
             return
@@ -187,7 +203,7 @@ public class IssueHandler: NSObject {
             //now write the issue content into the database
             self.updateIssueMetadata(issueDict, globalId: issueDict.valueForKey("global_id") as! String)
         }
-    }
+    }*/
 
     // MARK: Use API
     
@@ -196,7 +212,7 @@ public class IssueHandler: NSObject {
     
     :brief: Get Issue details from API and add to database
     
-    :param: appleId The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
+    - parameter appleId: The SKU/Apple id for the issue. The method looks for a zip with the same name in the Bundle
     */
     public func addIssueFromAPI(issueId: String, volumeId: String?) {
         
@@ -212,22 +228,49 @@ public class IssueHandler: NSObject {
             //self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volId)
         }
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Update issue now
                     self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 //Mark issue download as failed
                 self.updateStatusDictionary(volumeId, issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 2)
+            }
+        }
+    }
+    
+    /**
+    The method gets all issues from the Magnet API for the client key and adds them to the database
+    */
+    public func addAllIssues() {
+        
+        let requestURL = "\(baseURL)issues/"
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                if allIssues.count > 0 {
+                    for (_, issueDict) in allIssues.enumerate() {
+                        let issueId = issueDict.valueForKey("id") as! String
+                        self.addIssueFromAPI(issueId, volumeId: nil)
+                    }
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
             }
         }
     }
@@ -238,7 +281,7 @@ public class IssueHandler: NSObject {
     func updateIssueMetadata(issue: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
         
-        var results = Issue.objectsWhere("globalId = '\(globalId)'")
+        let results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
         
         realm.beginWriteTransaction()
@@ -275,9 +318,9 @@ public class IssueHandler: NSObject {
         realm.commitWriteTransaction()
 
         //Add all assets of the issue (which do not have an associated article)
-        var orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as! NSArray
+        let orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as! NSArray
         if orderedArray.count > 0 {
-            for (index, assetDict) in enumerate(orderedArray) {
+            for (index, assetDict) in orderedArray.enumerate() {
                 //create asset
                 Asset.createAsset(assetDict as! NSDictionary, issue: currentIssue, articleId: "", placement: index+1)
             }
@@ -292,8 +335,8 @@ public class IssueHandler: NSObject {
         }
         
         //Now add all articles into the database
-        var articles = issue.objectForKey("articles") as! NSArray
-        for (index, articleDict) in enumerate(articles) {
+        let articles = issue.objectForKey("articles") as! NSArray
+        for (index, articleDict) in articles.enumerate() {
             //Insert article for issueId x with placement y
             Article.createArticle(articleDict as! NSDictionary, issue: currentIssue, placement: index+1)
         }
@@ -304,7 +347,7 @@ public class IssueHandler: NSObject {
     //Add or create issue details (from API)
     func updateIssueFromAPI(issue: NSDictionary, globalId: String, volumeId: String?) -> Int {
         let realm = RLMRealm.defaultRealm()
-        var results = Issue.objectsWhere("globalId = '\(globalId)'")
+        let results = Issue.objectsWhere("globalId = '\(globalId)'")
         var currentIssue: Issue!
         
         if results.count > 0 {
@@ -325,8 +368,8 @@ public class IssueHandler: NSObject {
             currentIssue.volumeId = volId
         }
         
-        var meta = issue.valueForKey("meta") as! NSDictionary
-        var updatedInfo = meta.valueForKey("updated") as! NSDictionary
+        let meta = issue.valueForKey("meta") as! NSDictionary
+        let updatedInfo = meta.valueForKey("updated") as! NSDictionary
         
         if updatedInfo.count > 0 {
             currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as! String
@@ -340,7 +383,7 @@ public class IssueHandler: NSObject {
         var folderPath: String
         if self.defaultFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-            var docsDir: NSString = docPaths[0] as! NSString
+            let docsDir: NSString = docPaths[0] as NSString
             folderPath = currentIssue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
         }
         else {
@@ -354,11 +397,14 @@ public class IssueHandler: NSObject {
             }
         }
         else {
-            //Folder doesn't exist, create folder where assets will be downloaded
-            NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil, error: nil)
+            do {
+                //Folder doesn't exist, create folder where assets will be downloaded
+                try NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil)
+            } catch _ {
+            }
         }
         
-        var assetId = issue.valueForKey("coverPhone") as! String
+        let assetId = issue.valueForKey("coverPhone") as! String
         if !assetId.isEmpty {
             currentIssue.coverImageId = assetId
         }
@@ -382,20 +428,20 @@ public class IssueHandler: NSObject {
         realm.commitWriteTransaction()
         
         //Add all assets of the issue (which do not have an associated article)
-        var issueMedia = issue.objectForKey("media") as! NSArray
+        let issueMedia = issue.objectForKey("media") as! NSArray
         if issueMedia.count > 0 {
-            for (index, assetDict) in enumerate(issueMedia) {
+            for (index, assetDict) in issueMedia.enumerate() {
                 //Download images and create Asset object for issue
                 //Add asset to Issue dictionary
-                let assetid = assetDict.valueForKey("id") as! NSString
+                let assetId = assetDict.valueForKey("id") as! NSString
                 self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)media/\(assetId)", status: 0)
                 Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)
             }
         }
         
         //add all articles into the database
-        var articles = issue.objectForKey("articles") as! NSArray
-        for (index, articleDict) in enumerate(articles) {
+        let articles = issue.objectForKey("articles") as! NSArray
+        for (index, articleDict) in articles.enumerate() {
             //Insert article
             //Add article and its assets to Issue dictionary
             let articleId = articleDict.valueForKey("id") as! NSString
@@ -416,17 +462,17 @@ public class IssueHandler: NSObject {
         
         let requestURL = "\(baseURL)issues"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
-                println("ISSUES: \(allIssues)")
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                print("ISSUES: \(allIssues)")
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
             
         }
@@ -437,37 +483,37 @@ public class IssueHandler: NSObject {
     
     :brief: Search for an issue with an apple id
     
-    :param: appleId The SKU/Apple id for the issue
+    - parameter appleId: The SKU/Apple id for the issue
     
     :return: Issue object or nil if the issue is not in the database or on the server
     */
     public func searchIssueFor(appleId: String) -> Issue? {
         
-        var issue = Issue.getIssueFor(appleId)
+        let issue = Issue.getIssueFor(appleId)
         
         if issue == nil {
             
             let requestURL = "\(baseURL)issues/sku/\(appleId)"
             
-            var networkManager = LRNetworkManager.sharedInstance
+            let networkManager = LRNetworkManager.sharedInstance
             
             networkManager.requestData("GET", urlString: requestURL) {
                 (data:AnyObject?, error:NSError?) -> () in
                 if data != nil {
-                    var response: NSDictionary = data as! NSDictionary
-                    var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                    let response: NSDictionary = data as! NSDictionary
+                    let allIssues: NSArray = response.valueForKey("issues") as! NSArray
                     let issueDetails: NSDictionary = allIssues.firstObject as! NSDictionary
                     //Update issue now
-                    var issueVolumes = issueDetails.objectForKey("volumes") as! NSArray
+                    let issueVolumes = issueDetails.objectForKey("volumes") as! NSArray
                     var volumeId: String?
                     if issueVolumes.count > 0 {
-                        var volumeDict: NSDictionary = issueVolumes.firstObject as! NSDictionary
+                        let volumeDict: NSDictionary = issueVolumes.firstObject as! NSDictionary
                         volumeId = volumeDict.valueForKey("id") as? String
                     }
                     self.updateIssueFromAPI(issueDetails, globalId: issueDetails.objectForKey("id") as! String, volumeId: volumeId)
                 }
                 else if let err = error {
-                    println("Error: " + err.description)
+                    print("Error: " + err.description)
                 }
             }
         }
@@ -478,16 +524,16 @@ public class IssueHandler: NSObject {
     /**
     Get issue details from database for a specific global id
     
-    :param: issueId global id of the issue
+    - parameter issueId: global id of the issue
     
     :return: Issue object or nil if the issue is not in the database
     */
     public func getIssue(issueId: NSString) -> Issue? {
         
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", issueId)
-        var issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
@@ -501,18 +547,18 @@ public class IssueHandler: NSObject {
     /**
     Add an issue on Newsstand
     
-    :param: issueId global id of the issue
+    - parameter issueId: global id of the issue
     */
     public func addIssueOnNewsstand(issueId: String) {
         
         if let issue = self.getIssue(issueId) {
-            var library = NKLibrary.sharedLibrary()
+            let library = NKLibrary.sharedLibrary()
             
             if let issueAppleId = issue.appleId as String? {
-                let existingIssue = library.issueWithName(issueAppleId) as NKIssue?
+                let existingIssue = library!.issueWithName(issueAppleId) as NKIssue?
                 if existingIssue == nil {
                     //Insert issue to Newsstand
-                    library.addIssueWithName(issueAppleId, date: issue.publishedDate)
+                    library!.addIssueWithName(issueAppleId, date: issue.publishedDate)
                 }
             }
             
@@ -523,29 +569,33 @@ public class IssueHandler: NSObject {
     
     //Update Newsstand icon
     func updateIssueCoverIcon() {
-        var issues = NKLibrary.sharedLibrary().issues
+        let issues = NKLibrary.sharedLibrary()!.issues
         
         //Find newest issue
         var newestIssue: NKIssue? = nil
         for issue in issues {
-            let issueDate = issue.date!
+            let issueDate = issue.date
             if newestIssue == nil {
-                newestIssue = issue as? NKIssue
+                newestIssue = issue 
             }
-            else if newestIssue?.date.compare(issueDate!) == NSComparisonResult.OrderedAscending {
-                newestIssue = issue as? NKIssue
+            else if newestIssue?.date.compare(issueDate) == NSComparisonResult.OrderedAscending {
+                newestIssue = issue 
             }
         }
         
         //Get cover image of isse
         if let issue = newestIssue {
-            var savedIssue = Issue.getIssueFor(issue.name)
+            let savedIssue = Issue.getIssueFor(issue.name)
             if savedIssue != nil {
                 if let coverImageId = savedIssue?.coverImageId {
-                    var asset = Asset.getAsset(coverImageId)
+                    let asset = Asset.getAsset(coverImageId)
                     if let coverImgURL = asset?.getAssetPath() {
-                        var coverImg = UIImage(contentsOfFile: coverImgURL)
-                        UIApplication.sharedApplication().setNewsstandIconImage(coverImg)
+                        let coverImg = UIImage(contentsOfFile: coverImgURL)
+                        if #available(iOS 9.0, *) {
+                            UIApplication.sharedApplication().setNewsstandIconImage(coverImg)
+                        } else {
+                            // Fallback on earlier versions
+                        }
                         UIApplication.sharedApplication().applicationIconBadgeNumber = 0
                     }
                 }
@@ -558,7 +608,7 @@ public class IssueHandler: NSObject {
     
     //status = 0 for not started, 1 for complete, 2 for error
     func updateStatusDictionary(volumeId: String?, issueId: String, url: String, status: Int) {
-        var dictionaryLock = NSLock()
+        let dictionaryLock = NSLock()
         dictionaryLock.lock()
 
         var issueStatus: NSMutableDictionary = NSMutableDictionary()
@@ -579,10 +629,10 @@ public class IssueHandler: NSObject {
         dictionaryLock.unlock()
         
         //Check if all values 1 or 2 for the dictionary, send out a notification
-        var stats = issueStatus.allValues
-        var keys: [String] = issueStatus.allKeys as! [String]
+        let stats = issueStatus.allValues
+        let keys: [String] = issueStatus.allKeys as! [String]
         var predicate = NSPredicate(format: "SELF contains[c] %@", "/articles/")
-        var articleKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
+        let articleKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
         
         var values: NSArray = issueStatus.objectsForKeys(articleKeys, notFoundMarker: NSNumber(integer: 0))
         if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All articles not downloaded yet
@@ -595,7 +645,7 @@ public class IssueHandler: NSObject {
         }
         
         predicate = NSPredicate(format: "SELF contains[c] %@", "/issues/")
-        var issueKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
+        let issueKeys = (keys as NSArray).filteredArrayUsingPredicate(predicate)
         
         values = issueStatus.objectsForKeys(issueKeys, notFoundMarker: NSNumber(integer: 0))
         if values.count > 0 && values.containsObject(NSNumber(integer: 0)) { //All issues not downloaded yet
@@ -611,7 +661,10 @@ public class IssueHandler: NSObject {
                 userInfoDict = NSDictionary(object: issueId, forKey: "issue")
             }
             
-            NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
+            //Send notification just once - not everytime there's a download
+            if url.rangeOfString("/issues/") != nil {
+                NSNotificationCenter.defaultCenter().postNotificationName(ISSUE_DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
+            }
         }
         
         if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
@@ -630,7 +683,7 @@ public class IssueHandler: NSObject {
             NSNotificationCenter.defaultCenter().postNotificationName(DOWNLOAD_COMPLETE, object: nil, userInfo: userInfoDict as! [String : String])
             
             //Check for all volumes/articles
-            var allValues: NSArray = self.activeDownloads.allValues //Returns an array of dictionaries
+            let allValues: NSArray = self.activeDownloads.allValues //Returns an array of dictionaries
             var allDone = true
             for statusDict: NSDictionary in allValues as! [NSDictionary] {
                 let statusValues: NSArray = statusDict.allValues
@@ -642,13 +695,13 @@ public class IssueHandler: NSObject {
             }
             if allDone && allValues.count > 1 {
                 //All downloads complete - send notification
-                var objects: [AnyObject] = self.activeDownloads.allKeys as [AnyObject]
+                let objects: [AnyObject] = self.activeDownloads.allKeys as [AnyObject]
                 var key = "articles"
                 if !Helper.isNilOrEmpty(volumeId) {
                     key = "volumes"
                 }
                 
-                var userInfoDict = NSDictionary(object: objects, forKey: key)
+                let userInfoDict = NSDictionary(object: objects, forKey: key)
                 NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: userInfoDict as! Dictionary<String, [AnyObject]>)
             }
         }
@@ -657,16 +710,16 @@ public class IssueHandler: NSObject {
     /**
     Find download % progress for an issue or volume. The method requires either a volume's global id or an issue's global id. The issue's global id should be used only if it is an independent issue (i.e. not belonging to any volume)
     
-    :param: issueId Global id of an issue
+    - parameter issueId: Global id of an issue
     
-    :param: volumeId Global id of a volume
+    - parameter volumeId: Global id of a volume
     
     :return: Download progress (in percentage) for the issue or volume
     */
     public func findDownloadProgress(volumeId: String?, issueId: String?) -> Int {
         if let volId = volumeId {
-            var volumeStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(volId) as! NSDictionary)
-            var values = volumeStatus.allValues
+            let volumeStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(volId) as! NSDictionary)
+            let values = volumeStatus.allValues
             var occurrences = 0
             for value in values {
                 occurrences += (value.integerValue != 0) ? 1 : 0
@@ -676,8 +729,8 @@ public class IssueHandler: NSObject {
             return percent
         }
         if let issueGlobalId = issueId {
-            var issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueGlobalId) as! NSDictionary)
-            var values = issueStatus.allValues
+            let issueStatus: NSMutableDictionary = NSMutableDictionary(dictionary: self.activeDownloads.valueForKey(issueGlobalId) as! NSDictionary)
+            let values = issueStatus.allValues
             var occurrences = 0
             for value in values {
                 occurrences += (value.integerValue != 0) ? 1 : 0
@@ -697,9 +750,9 @@ public class IssueHandler: NSObject {
     */
     public func getActiveDownloads() -> NSArray? {
         //Return issueId whose download is not complete yet
-        var globalIds = NSMutableArray(array: self.activeDownloads.allKeys)
+        let globalIds = NSMutableArray(array: self.activeDownloads.allKeys)
         for (globalid, urls) in self.activeDownloads {
-            var stats = urls.allValues //get all URLs status for the issueId
+            let stats = urls.allValues //get all URLs status for the issueId
         
             if stats.count > 1 && (stats as NSArray).containsObject(NSNumber(integer: 0)) { //Found a 0 - download of issue not complete
             }

@@ -18,17 +18,17 @@ public class PurchaseHandler: NSObject {
     /**
     Initializes the PurchaseHandler with the given folder. This is where the database and assets will be saved. The method expects to find a key `ClientKey` in the project's Info.plist with your client key. If none is found, the method returns a nil
     
-    :param: folder The folder where the database is
+    - parameter folder: The folder where the database is
     */
     public init?(folder: NSString){
         super.init()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -36,9 +36,12 @@ public class PurchaseHandler: NSObject {
         }
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        var mainBundle = NSBundle.mainBundle()
+        let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
         }
@@ -50,33 +53,36 @@ public class PurchaseHandler: NSObject {
     /**
     Initializes the PurchaseHandler with the Documents directory. This is where the database should be
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents" //docsDir
         clientKey = clientKey as String
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
     }
     
     /**
     Initializes the PurchaseHandler with a custom directory. This is where the database is. The API key is used for making calls to the Magnet API
     
-    :param: folder The folder where the database is
+    - parameter folder: The folder where the database is
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -85,14 +91,17 @@ public class PurchaseHandler: NSObject {
         clientKey = clientkey as String
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
     
     /**
     This method adds a purchase to the database
     
-    :param: purchase The Purchase object
+    - parameter purchase: The Purchase object
     */
     public func addPurchase(purchase: Purchase) {
         
@@ -105,15 +114,15 @@ public class PurchaseHandler: NSObject {
     /**
     The method returns an array of purchases made on this device - for a specific user or all purchases
     
-    :param: userId The user identity for which purchases are to be retrieved. Pass nil for returning all purchases
+    - parameter userId: The user identity for which purchases are to be retrieved. Pass nil for returning all purchases
     */
     public func getPurchases(userId: String?) -> Array<Purchase>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         var purchases: RLMResults
         
         if let identity = userId {
-            var predicate = NSPredicate(format: "userIdentity = %@", identity)
+            let predicate = NSPredicate(format: "userIdentity = %@", identity)
             purchases = Purchase.objectsWithPredicate(predicate) as RLMResults
         }
         else {
@@ -139,21 +148,21 @@ public class PurchaseHandler: NSObject {
     
     The key and value are needed. userId is optional
     
-    :param: key The key whose values need to be searched. Please ensure this has the same name as the properties available
+    - parameter key: The key whose values need to be searched. Please ensure this has the same name as the properties available
     
-    :param: value The value of the key for the purchases to be retrieved
+    - parameter value: The value of the key for the purchases to be retrieved
     
-    :param: userId The user identity for which purchases are to be retrieved. Pass nil for ignoring this
+    - parameter userId: The user identity for which purchases are to be retrieved. Pass nil for ignoring this
     
     :return: an array of purchases fulfiling the conditions
     */
     public class func getPurchasesFor(key: String, value: String, userId: String?) -> Array<Purchase>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
+        var subPredicates = Array<NSPredicate>()
         
-        var testPurchase = Purchase()
-        var properties: NSArray = testPurchase.objectSchema.properties
+        let testPurchase = Purchase()
+        let properties: NSArray = testPurchase.objectSchema.properties
         
         var foundProperty = false
         for property: RLMProperty in properties as! [RLMProperty] {
@@ -167,8 +176,8 @@ public class PurchaseHandler: NSObject {
         
         if foundProperty {
             //This is a property
-            var keyPredicate = NSPredicate(format: "%K = %@", key, value)
-            subPredicates.addObject(keyPredicate)
+            let keyPredicate = NSPredicate(format: "%K = %@", key, value)
+            subPredicates.append(keyPredicate)
         }
         else {
             //Could not find the key. Return nil
@@ -176,12 +185,12 @@ public class PurchaseHandler: NSObject {
         }
         
         if !Helper.isNilOrEmpty(userId) {
-            var userPredicate = NSPredicate(format: "userIdentity = %@", userId!)
-            subPredicates.addObject(userPredicate)
+            let userPredicate = NSPredicate(format: "userIdentity = %@", userId!)
+            subPredicates.append(userPredicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
+            let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
             var purchases: RLMResults
             
             purchases = Purchase.objectsWithPredicate(searchPredicate) as RLMResults
@@ -202,27 +211,27 @@ public class PurchaseHandler: NSObject {
     /**
     This method accepts a purchase object and returns the associated article, issue or volume object
     
-    :param: purchase The Purchase object
+    - parameter purchase: The Purchase object
     
     :return: corresponding volume, issue or article object or nil if none found
     */
     public class func getPurchase(purchase: Purchase) -> AnyObject? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let globalId = purchase.globalId
         let type = purchase.type
         
         switch type {
         case "volume":
-            var vol = Volume.getVolume(globalId)
+            let vol = Volume.getVolume(globalId)
             return vol
             
         case "issue":
-            var issue = Issue.getIssue(globalId)
+            let issue = Issue.getIssue(globalId)
             return issue
             
         case "article":
-            var article = Article.getArticle(globalId, appleId: nil)
+            let article = Article.getArticle(globalId, appleId: nil)
             return article
             
         default:

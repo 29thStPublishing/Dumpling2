@@ -27,7 +27,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
 
     required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        super.init(coder: aDecoder)!
     }
 
     func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
@@ -37,7 +37,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         
         if methodType == "GET" {
         
-            var operation = self.GET(urlString,
+            _ = self.GET(urlString,
                 parameters: nil,
                 success: { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
                     completion(data: responseObject, error: nil)
@@ -48,7 +48,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         }
         else if methodType == "POST" {
             
-            var operation = self.POST(urlString,
+            _ = self.POST(urlString,
                 parameters: nil,
                 success: { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
                     completion(data: responseObject, error: nil)
@@ -60,10 +60,10 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
     
     func downloadFile(fromPath: String, toPath: String, completion:(status:AnyObject?, error:NSError?) -> ()) {
-        var url = NSURL(string: fromPath)
-        var urlRequest = NSURLRequest(URL: url!)
+        let url = NSURL(string: fromPath)
+        let urlRequest = NSURLRequest(URL: url!)
         
-        var operation = AFHTTPRequestOperation(request: urlRequest)
+        let operation = AFHTTPRequestOperation(request: urlRequest)
         operation.outputStream = NSOutputStream(toFileAtPath: toPath, append: false)
         operation.setCompletionBlockWithSuccess( { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
             
@@ -78,7 +78,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
     
     func findAllActiveOperations() -> NSArray {
-        var operations = self.operationQueue.operations
+        let operations = self.operationQueue.operations
         return operations
     }
     

@@ -2,22 +2,30 @@
 
 Hello there! Dumpling 2 is intended to be compiled into a framework as a client to [Magnet API](https://github.com/29thStPublishing/Magnet-API)
 
-The project has 2 targets - the **Dumpling2** target (the framework) and a **DumplingDemo** target (which will use the framework)
-
 The framework lets you get an issue's details in 2 ways
 1. Parse through a zip file for an issue (in the application bundle)
 2. Get an issue id (or an individual article's id) and retrieve the information from Magnet
 
 The information from both is added into a Realm database.
 
-### Dependencies
+## Building Dumpling2
+
+There are two targets which will be used with Dumpling2 - **Dumpling2** and **Dumpling-Universal**
+
+1. If you wish to get a framework which can run on both phone and simulator, build the **Dumpling-Universal** target. In the build folder, under **Products** you will find 3 folders - one which has the framework for devices (*Debug-iphoneos*), one for simulators (*Debug-iphonesimulator*) and one which has the universal framework (*Debug-iphoneuniversal*).
+
+2. To get a framework which works with just phones or just simulators, you can use the framework from the folders above
+
+3. When submitting the app to the App Store or uploading to iTunes Connect for testing or submitting, use the framework from the Phone OS folder (*Debug-iphoneos*)
+
+## Dependencies
 
 1. The Dumpling2 framework looks for **AFNetworking** libraries for making calls to the Magnet API. We had initially intended to use Cocoapods, but they don't work with frameworks. So have included AFNetworking source files into the framework
 2. Dumpling2 uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately
 3. Dumpling2 uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 
-### Classes
+## Classes
 
 **Volume** has the properties associated with a volume object. This is a subclass of RLMObject.
 
@@ -42,7 +50,7 @@ You need to provide a client key for the API calls to work
 **ReaderHelper** has methods to save reading status of articles (issue, current article or asset, reading position) and retrieve them
 
 
-### Usage
+## Usage
 
 ```
 //For zipped files
@@ -64,7 +72,7 @@ if volumeHandler != nil {
 }
 ```
 
-### Additional notes
+## Additional notes
 
 1. To check whether data was inserted into Realm properly or not, you can use Realm browser. The browser can be found in their [release zip](http://static.realm.io/downloads/cocoa/latest) under browser/. Open the Documents directory for your app on Simulator. You will find the Realm database here (if you have not specified a different folder path when initializing IssueHandler). Open the database with Realm browser and you can browse throguh all the data
 

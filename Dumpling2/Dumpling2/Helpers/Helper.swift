@@ -21,10 +21,10 @@ class Helper {
     
     //Date from string of format MM/dd/yyyy
     class func publishedDateFrom(string: String) -> NSDate {
-        var dummyDate = NSDate()
+        let dummyDate = NSDate()
         
-        var calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
-        var unitFlags : NSCalendarUnit = NSCalendarUnit.CalendarUnitYear | NSCalendarUnit.CalendarUnitMonth | NSCalendarUnit.CalendarUnitDay
+        let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
+        let unitFlags : NSCalendarUnit = [NSCalendarUnit.Year, NSCalendarUnit.Month, NSCalendarUnit.Day]
         
         let comps = calendar?.components(unitFlags, fromDate: dummyDate)
         comps?.hour = 0
@@ -34,21 +34,21 @@ class Helper {
         var parts = string.componentsSeparatedByString("/")
         
         if parts.count == 3 {
-            comps?.month = parts[0].toInt()!
-            comps?.day = parts[1].toInt()!
-            comps?.year = parts[2].toInt()!
+            comps?.month = Int(parts[0])!
+            comps?.day = Int(parts[1])!
+            comps?.year = Int(parts[2])!
         }
         
-        var date = calendar?.dateFromComponents(comps!)
+        let date = calendar?.dateFromComponents(comps!)
         return date!
     }
 
     //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00 (length = 32 chars)
     class func publishedDateFromISO(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
-            var dateFormatter = NSDateFormatter()
+            let dateFormatter = NSDateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            var posix = NSLocale(localeIdentifier: "en_US_POSIX")
+            let posix = NSLocale(localeIdentifier: "en_US_POSIX")
             dateFormatter.locale = posix
         
             if let date = dateFormatter.dateFromString(string!) {
@@ -65,9 +65,9 @@ class Helper {
     //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00 (length = 25 chars)
     class func publishedDateFromISO2(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
-            var dateFormatter = NSDateFormatter()
+            let dateFormatter = NSDateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-            var posix = NSLocale(localeIdentifier: "en_US_POSIX")
+            let posix = NSLocale(localeIdentifier: "en_US_POSIX")
             dateFormatter.locale = posix
             
             if let date = dateFormatter.dateFromString(string!) {
@@ -101,7 +101,7 @@ class Helper {
     class func stringFromJSON(object: AnyObject) -> String? {
         
         if NSJSONSerialization.isValidJSONObject(object) {
-            if let data = NSJSONSerialization.dataWithJSONObject(object, options: nil, error: nil) {
+            if let data = try? NSJSONSerialization.dataWithJSONObject(object, options: []) {
                 if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
                     return string as String
                 }
@@ -114,7 +114,7 @@ class Helper {
     //String to JSON
     class func jsonFromString(string: String) -> AnyObject? {
         if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
-            if let jsonData: AnyObject = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(0), error: nil) {
+            if let jsonData: AnyObject = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0)) {
                 return jsonData
             }
         }
@@ -137,14 +137,15 @@ class Helper {
     }
     
     //Unpack a zip file
-    class func unpackZipFile(filePath: NSString) {
-        var zipArchive = ZipArchive()
+    //Issue 46
+    /*class func unpackZipFile(filePath: NSString) {
+        let zipArchive = ZipArchive()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var cacheDir: NSString = docPaths[0] as! NSString
+        let cacheDir: NSString = docPaths[0] as NSString
         
         if zipArchive.UnzipOpenFile(filePath as String) {
-            var result = zipArchive.UnzipFileTo(cacheDir as String, overWrite: true)
+            let result = zipArchive.UnzipFileTo(cacheDir as String, overWrite: true)
             if !result {
                 //problem
                 return
@@ -154,9 +155,12 @@ class Helper {
         }
         
         if filePath.hasPrefix(cacheDir as String) {
-            //remove zip file if it was in cache dir
-            //planning ahead - this won't be called right now
-            NSFileManager.defaultManager().removeItemAtPath(filePath as String, error: nil)
+            do {
+                //remove zip file if it was in cache dir
+                //planning ahead - this won't be called right now
+                try NSFileManager.defaultManager().removeItemAtPath(filePath as String)
+            } catch _ {
+            }
         }
-    }
+    }*/
 }
