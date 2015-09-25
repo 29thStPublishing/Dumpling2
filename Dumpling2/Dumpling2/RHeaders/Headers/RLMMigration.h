@@ -17,12 +17,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMDefines.h"
+
+RLM_ASSUME_NONNULL_BEGIN
 
 @class RLMSchema;
 @class RLMArray;
 @class RLMObject;
 
-typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObject);
+typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObject * __nullable newObject);
 
 /**---------------------------------------------------------------------------------------
  *  @name Realm Migrations
@@ -57,7 +60,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
  Enumerates objects of a given type in this Realm, providing both the old and new versions of each object.
  Objects properties can be accessed using keyed subscripting.
  
- :param: className   The name of the RLMObject class to enumerate.
+ @param className   The name of the RLMObject class to enumerate.
  
  @warning   All objects returned are of a type specific to the current migration and should not be casted
             to className. Instead you should access them as RLMObjects and use keyed subscripting to access
@@ -68,23 +71,36 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject *oldObject, RLMObject *newObje
 /**
  Create an RLMObject of type `className` in the Realm being migrated.
 
- :param: className   The name of the RLMObject class to create.
- :param: object      The value used to populate the created object. This can be any key/value coding compliant
+ @param className   The name of the RLMObject class to create.
+ @param value       The value used to populate the created object. This can be any key/value coding compliant
                     object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                     an NSArray with one object for each persisted property. An exception will be
                     thrown if any required properties are not present and no default is set.
 
                     When passing in an NSArray, all properties must be present, valid and in the same order as the properties defined in the model.
  */
--(RLMObject *)createObject:(NSString *)className withObject:(id)object;
+-(RLMObject *)createObject:(NSString *)className withValue:(id)value;
+
+-(RLMObject *)createObject:(NSString *)className withObject:(id)object DEPRECATED_MSG_ATTRIBUTE("use createObject:withValue:");
 
 /**
  Delete an object from a Realm during a migration. This can be called within `enumerateObjects:block:`.
 
- :param: object  Object to be deleted from the Realm being migrated.
+ @param object  Object to be deleted from the Realm being migrated.
  */
 - (void)deleteObject:(RLMObject *)object;
 
+/**
+ Deletes the data for the class with the given name.
+ This deletes all objects of the given class, and if the RLMObject subclass no longer exists in your program,
+ cleans up any remaining metadata for the class in the Realm file.
+ 
+ @param  name The name of the RLMObject class to delete.
+ 
+ @return whether there was any data to delete.
+ */
+- (BOOL)deleteDataForClassName:(NSString *)name;
+
 @end
 
-
+RLM_ASSUME_NONNULL_END

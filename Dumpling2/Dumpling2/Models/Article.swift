@@ -69,7 +69,7 @@ public class Article: RLMObject {
     class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
         let realm = RLMRealm.defaultRealm()
         
-        var currentArticle = Article()
+        let currentArticle = Article()
         currentArticle.globalId = article.objectForKey("global_id") as! String
         currentArticle.title = article.objectForKey("title") as! String
         currentArticle.body = article.objectForKey("body") as! String
@@ -84,7 +84,7 @@ public class Article: RLMObject {
         currentArticle.commentary = article.objectForKey("commentary") as! String
         currentArticle.articleType = article.objectForKey("type") as! String
         
-        var updateDate = article.objectForKey("date_last_updated") as! String
+        let updateDate = article.objectForKey("date_last_updated") as! String
         if updateDate != "" {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
         }
@@ -93,12 +93,12 @@ public class Article: RLMObject {
             currentArticle.appleId = sku
         }
         
-        var meta = article.valueForKey("meta") as! NSDictionary
+        let meta = article.valueForKey("meta") as! NSDictionary
         if let published = meta.valueForKey("published") as? NSNumber {
             currentArticle.isPublished = published.boolValue
         }
         
-        var metadata: AnyObject! = article.objectForKey("customMeta")
+        let metadata: AnyObject! = article.objectForKey("customMeta")
         if metadata.isKindOfClass(NSDictionary) {
             currentArticle.metadata = Helper.stringFromJSON(metadata)! //metadata.JSONString()!
         }
@@ -108,7 +108,7 @@ public class Article: RLMObject {
         
         currentArticle.issueId = issue.globalId
         currentArticle.placement = placement
-        var bundleVersion: AnyObject? = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey as String)
+        let bundleVersion: AnyObject? = NSBundle.mainBundle().objectForInfoDictionaryKey(kCFBundleVersionKey as String)
         currentArticle.versionStashed = bundleVersion as! String
         
         //Featured or not
@@ -122,7 +122,7 @@ public class Article: RLMObject {
         //Insert article images
         if let orderedArray = article.objectForKey("images")?.objectForKey("ordered") as? NSArray {
             if orderedArray.count > 0 {
-                for (index, imageDict) in enumerate(orderedArray) {
+                for (index, imageDict) in orderedArray.enumerate() {
                     Asset.createAsset(imageDict as! NSDictionary, issue: issue, articleId: currentArticle.globalId, placement: index+1)
                 }
             }
@@ -136,7 +136,7 @@ public class Article: RLMObject {
         //Insert article sound files
         if let orderedArray = article.objectForKey("sound_files")?.objectForKey("ordered") as? NSArray {
             if orderedArray.count > 0 {
-                for (index, soundDict) in enumerate(orderedArray) {
+                for (index, soundDict) in orderedArray.enumerate() {
                     Asset.createAsset(soundDict as! NSDictionary, issue: issue, articleId: currentArticle.globalId, sound: true, placement: index+1)
                 }
             }
@@ -153,16 +153,16 @@ public class Article: RLMObject {
         
         let requestURL = "\(baseURL)articles/\(articleId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 
-                var currentArticle = Article()
+                let currentArticle = Article()
                 currentArticle.globalId = articleId as String
                 currentArticle.placement = placement
                 currentArticle.issueId = issue.globalId
@@ -181,8 +181,8 @@ public class Article: RLMObject {
                     currentArticle.appleId = sku
                 }
                 
-                var meta = articleInfo.objectForKey("meta") as! NSDictionary
-                var featured = meta.valueForKey("featured") as! NSNumber
+                let meta = articleInfo.objectForKey("meta") as! NSDictionary
+                let featured = meta.valueForKey("featured") as! NSNumber
                 currentArticle.isFeatured = featured.boolValue
                 if let published = meta.valueForKey("published") as? NSNumber {
                     currentArticle.isPublished = published.boolValue
@@ -205,15 +205,15 @@ public class Article: RLMObject {
                     }
                 }
                 
-                var keywords = articleInfo.objectForKey("keywords") as! NSArray
+                let keywords = articleInfo.objectForKey("keywords") as! NSArray
                 if keywords.count > 0 {
                     currentArticle.keywords = Helper.stringFromJSON(keywords)!
                 }
                 
                 //Add all assets of the article (will add images and sound)
-                var articleMedia = articleInfo.objectForKey("media") as! NSArray
+                let articleMedia = articleInfo.objectForKey("media") as! NSArray
                 if articleMedia.count > 0 {
-                    for (index, assetDict) in enumerate(articleMedia) {
+                    for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
                         if delegate != nil {
@@ -242,7 +242,7 @@ public class Article: RLMObject {
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 if delegate != nil {
                     //Mark article as done - even if with errors
                     (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
@@ -256,9 +256,9 @@ public class Article: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issueId IN %@", issues)
-        var articles = Article.objectsInRealm(realm, withPredicate: predicate)
+        let articles = Article.objectsInRealm(realm, withPredicate: predicate)
         
-        var articleIds = NSMutableArray()
+        let articleIds = NSMutableArray()
         //go through each article and delete all assets associated with it
         for article in articles {
             let article = article as! Article
@@ -278,20 +278,20 @@ public class Article: RLMObject {
     
     :brief: Get Article from API and add to the database
     
-    :param:  articleId The global id for the article
+    - parameter  articleId: The global id for the article
     
-    :param: delegate Used to update the status of article download
+    - parameter delegate: Used to update the status of article download
     */
     class func createIndependentArticle(articleId: String, delegate: AnyObject?) {
         let requestURL = "\(baseURL)articles/\(articleId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 self.addArticle(articleInfo, delegate: delegate)
                 
@@ -301,7 +301,7 @@ public class Article: RLMObject {
                 if delegate != nil {
                     (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
                 }
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -316,7 +316,7 @@ public class Article: RLMObject {
     class func addArticle(article: NSDictionary, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
         
-        var currentArticle = Article()
+        let currentArticle = Article()
         currentArticle.globalId = article.valueForKey("id") as! String
         currentArticle.title = article.valueForKey("title") as! String
         currentArticle.body = article.valueForKey("body") as! String
@@ -333,8 +333,8 @@ public class Article: RLMObject {
             currentArticle.appleId = sku
         }
         
-        var meta = article.objectForKey("meta") as! NSDictionary
-        var featured = meta.valueForKey("featured") as! NSNumber
+        let meta = article.objectForKey("meta") as! NSDictionary
+        let featured = meta.valueForKey("featured") as! NSNumber
         currentArticle.isFeatured = featured.boolValue
         if let published = meta.valueForKey("published") as? NSNumber {
             currentArticle.isPublished = published.boolValue
@@ -358,21 +358,18 @@ public class Article: RLMObject {
             }
         }
         
-        var keywords = article.objectForKey("keywords") as! NSArray
+        let keywords = article.objectForKey("keywords") as! NSArray
         if keywords.count > 0 {
             currentArticle.keywords = Helper.stringFromJSON(keywords)!
         }
         
-        var issue = Issue()
-        
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let issue = Issue()
         issue.assetFolder = "/Documents"
         
         //Add all assets of the article (will add images and sound)
-        var articleMedia = article.objectForKey("media") as! NSArray
+        let articleMedia = article.objectForKey("media") as! NSArray
         if articleMedia.count > 0 {
-            for (index, assetDict) in enumerate(articleMedia) {
+            for (index, assetDict) in articleMedia.enumerate() {
                 //Download images and create Asset object for issue
                 let assetid = assetDict.valueForKey("id") as! NSString
                 if delegate != nil {
@@ -401,15 +398,15 @@ public class Article: RLMObject {
     
     :brief: Delete articles and assets for a specific issue
     
-    :param:  issueId The global id of the issue whose articles have to be deleted
+    - parameter  issueId: The global id of the issue whose articles have to be deleted
     */
     public class func deleteArticlesFor(issueId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issueId = %@", issueId)
-        var articles = Article.objectsWithPredicate(predicate)
+        let articles = Article.objectsWithPredicate(predicate)
         
-        var articleIds = NSMutableArray()
+        let articleIds = NSMutableArray()
         //go through each article and delete all assets associated with it
         for article in articles {
             let article = article as! Article
@@ -431,39 +428,39 @@ public class Article: RLMObject {
     
     :brief: Get all articles fulfiling certain conditions
     
-    :param:  issueId The global id of the issue whose articles have to be searched
+    - parameter  issueId: The global id of the issue whose articles have to be searched
     
-    :param: type The article type which should be searched and returned
+    - parameter type: The article type which should be searched and returned
     
-    :param: excludeType The article type which should not be included in the search
+    - parameter excludeType: The article type which should not be included in the search
     
-    :param: count Number of articles to be returned
+    - parameter count: Number of articles to be returned
     
-    :param: page Page number (will be used with count)
+    - parameter page: Page number (will be used with count)
     
     :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?, count: Int, page: Int) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
+        var subPredicates = Array<NSPredicate>()
         
         if issueId != nil {
-            var predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.addObject(predicate)
+            let predicate = NSPredicate(format: "issueId = %@", issueId!)
+            subPredicates.append(predicate)
         }
         
         if type != nil {
-            var typePredicate = NSPredicate(format: "articleType = %@", type!)
-            subPredicates.addObject(typePredicate)
+            let typePredicate = NSPredicate(format: "articleType = %@", type!)
+            subPredicates.append(typePredicate)
         }
         if excludeType != nil {
-            var excludePredicate = NSPredicate(format: "articleType != %@", excludeType!)
-            subPredicates.addObject(excludePredicate)
+            let excludePredicate = NSPredicate(format: "articleType != %@", excludeType!)
+            subPredicates.append(excludePredicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
+            let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
             var articles: RLMResults
             
             articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false) as RLMResults
@@ -477,12 +474,12 @@ public class Article: RLMObject {
                 
                 //If count > 0, return only values in that range
                 if count > 0 {
-                    var startIndex = page * count
+                    let startIndex = page * count
                     if startIndex >= array.count {
                         return nil
                     }
-                    var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
-                    var slicedArray = Array(array[startIndex...endIndex])
+                    let endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
+                    let slicedArray = Array(array[startIndex...endIndex])
                     
                     return slicedArray
                 }
@@ -498,29 +495,29 @@ public class Article: RLMObject {
     
     The key and value are needed. Other articles are optional. To ignore pagination, pass the count as 0
     
-    :param:  issueId The global id of the issue whose articles have to be searched
+    - parameter  issueId: The global id of the issue whose articles have to be searched
     
-    :param: key The key whose values need to be searched. Please ensure this has the same name as the properties available. The value can be any of the Article properties, keywords or customMeta keys
+    - parameter key: The key whose values need to be searched. Please ensure this has the same name as the properties available. The value can be any of the Article properties, keywords or customMeta keys
     
-    :param: value The value of the key for the articles to be retrieved. If sending multiple keywords, use a comma-separated string with no spaces e.g. keyword1,keyword2,keyword3
+    - parameter value: The value of the key for the articles to be retrieved. If sending multiple keywords, use a comma-separated string with no spaces e.g. keyword1,keyword2,keyword3
     
-    :param: count Number of articles to be returned
+    - parameter count: Number of articles to be returned
     
-    :param: page Page number (will be used with count)
+    - parameter page: Page number (will be used with count)
     
     :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, key: String, value: String, count: Int, page: Int) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
+        var subPredicates = Array<NSPredicate>()
         
         if issueId != nil {
-            var predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.addObject(predicate)
+            let predicate = NSPredicate(format: "issueId = %@", issueId!)
+            subPredicates.append(predicate)
         }
-        var testArticle = Article()
-        var properties: NSArray = testArticle.objectSchema.properties
+        let testArticle = Article()
+        let properties: NSArray = testArticle.objectSchema.properties
         
         var foundProperty = false
         for property: RLMProperty in properties as! [RLMProperty] {
@@ -535,29 +532,29 @@ public class Article: RLMObject {
         if foundProperty {
             //This is a property
             if key == "keywords" {
-                var keywords: [String] = value.componentsSeparatedByString(",")
-                var keywordPredicates = NSMutableArray()
+                let keywords: [String] = value.componentsSeparatedByString(",")
+                var keywordPredicates = Array<NSPredicate>()
                 for keyword in keywords {
-                    var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
-                    keywordPredicates.addObject(subPredicate)
+                    let subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
+                    keywordPredicates.append(subPredicate)
                 }
-                var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(keywordPredicates as [AnyObject])
-                subPredicates.addObject(orPredicate)
+                let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: keywordPredicates)
+                subPredicates.append(orPredicate)
             }
             else {
-                var keyPredicate = NSPredicate(format: "%K = %@", key, value)
-                subPredicates.addObject(keyPredicate)
+                let keyPredicate = NSPredicate(format: "%K = %@", key, value)
+                subPredicates.append(keyPredicate)
             }
         }
         else {
             //Is a customMeta key
-            var checkString = "\"\(key)\":\"\(value)\""
-            var subPredicate = NSPredicate(format: "metadata CONTAINS %@", checkString)
-            subPredicates.addObject(subPredicate)
+            let checkString = "\"\(key)\":\"\(value)\""
+            let subPredicate = NSPredicate(format: "metadata CONTAINS %@", checkString)
+            subPredicates.append(subPredicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
+            let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
             var articles: RLMResults
             
             articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false) as RLMResults
@@ -571,12 +568,12 @@ public class Article: RLMObject {
                 
                 //If count > 0, return only values in that range
                 if count > 0 {
-                    var startIndex = page * count
+                    let startIndex = page * count
                     if startIndex >= array.count {
                         return nil
                     }
-                    var endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
-                    var slicedArray = Array(array[startIndex...endIndex])
+                    let endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
+                    let slicedArray = Array(array[startIndex...endIndex])
                     
                     return slicedArray
                 }
@@ -590,14 +587,14 @@ public class Article: RLMObject {
     /**
     This method inputs the global id or Apple id of an article and returns the Article object
     
-    :param:  articleId The global id for the article
+    - parameter  articleId: The global id for the article
     
-    :param: appleId The apple id/SKU for the article
+    - parameter appleId: The apple id/SKU for the article
     
     :return: article object for the global/Apple id. Returns nil if the article is not found
     */
     public class func getArticle(articleId: String?, appleId: String?) -> Article? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         var predicate: NSPredicate
         if !Helper.isNilOrEmpty(articleId) {
@@ -610,7 +607,7 @@ public class Article: RLMObject {
             return nil
         }
 
-        var articles = Article.objectsWithPredicate(predicate)
+        let articles = Article.objectsWithPredicate(predicate)
         
         if articles.count > 0 {
             return articles.firstObject() as? Article
@@ -624,35 +621,35 @@ public class Article: RLMObject {
     
     :brief: Get all articles for an issue with specific keywords
     
-    :param:  keywords An array of String values with keywords that the article should have. If any of the keywords match, the article will be selected
+    - parameter  keywords: An array of String values with keywords that the article should have. If any of the keywords match, the article will be selected
     
-    :param: issueId Global id for the issue which the articles must belong to. This parameter is optional
+    - parameter issueId: Global id for the issue which the articles must belong to. This parameter is optional
     
     :return: an array of articles fulfiling the conditions
     */
     public class func searchArticlesWith(keywords: [String], issueId: String?) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
+        var subPredicates = Array<NSPredicate>()
         
         for keyword in keywords {
-            var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
-            subPredicates.addObject(subPredicate)
+            let subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
+            subPredicates.append(subPredicate)
         }
         
-        var orPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates as [AnyObject])
+        let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
         
-        subPredicates.removeAllObjects()
-        subPredicates.addObject(orPredicate)
+        subPredicates.removeAll()
+        subPredicates.append(orPredicate)
         
         if issueId != nil {
-            var predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.addObject(predicate)
+            let predicate = NSPredicate(format: "issueId = %@", issueId!)
+            subPredicates.append(predicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
-            var articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
+            let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+            let articles: RLMResults = Article.objectsWithPredicate(searchPredicate) as RLMResults
             
             if articles.count > 0 {
                 var array = Array<Article>()
@@ -672,15 +669,15 @@ public class Article: RLMObject {
     
     :brief: Get all  featured articles for a specific issue
     
-    :param: issueId Global id for the issue whose featured articles are needed
+    - parameter issueId: Global id for the issue whose featured articles are needed
     
     :return: an array of featured articles for the issue
     */
     public class func getFeaturedArticlesFor(issueId: NSString) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issueId = %@ AND isFeatured == true", issueId)
-        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
             var array = Array<Article>()
@@ -700,7 +697,7 @@ public class Article: RLMObject {
     
     :brief: Change the asset pattern
     
-    :param: newPattern The regex to identify pattern for asset placeholders
+    - parameter newPattern: The regex to identify pattern for asset placeholders
     */
     public class func setAssetPattern(newPattern: String) {
         assetPattern = newPattern
@@ -709,15 +706,15 @@ public class Article: RLMObject {
     /**
     This method returns all articles whose publish date is before the published date provided
     
-    :param: date The date to compare publish dates with
+    - parameter date: The date to compare publish dates with
     
     :return: an array of articles older than the given date
     */
     public class func getOlderArticles(date: NSDate) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "date < %@", date)
-        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
             var array = Array<Article>()
@@ -734,15 +731,15 @@ public class Article: RLMObject {
     /**
     This method returns all articles whose publish date is after the published date provided
     
-    :param: date The date to compare publish dates with
+    - parameter date: The date to compare publish dates with
     
     :return: an array of articles newer than the given date
     */
     public class func getNewerArticles(date: NSDate) -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "date > %@", date)
-        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
             var array = Array<Article>()
@@ -766,7 +763,7 @@ public class Article: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         //Delete all assets for the article
-        var articleIds = NSMutableArray()
+        let articleIds = NSMutableArray()
         articleIds.addObject(self.globalId)
         Asset.deleteAssetsForArticles(articleIds)
         
@@ -781,9 +778,9 @@ public class Article: RLMObject {
     This method downloads assets for the article
     */
     public func downloadArticleAssets() {
-        var issueId = self.issueId
+        let issueId = self.issueId
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         var assetFolder = docsDir as String
         
         var issue = Issue.getIssue(issueId)
@@ -803,19 +800,19 @@ public class Article: RLMObject {
         let requestURL = "\(baseURL)articles/\(self.globalId)"
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
                 
                 //Add all assets of the article
-                var articleMedia = articleInfo.objectForKey("media") as! NSArray
+                let articleMedia = articleInfo.objectForKey("media") as! NSArray
                 if articleMedia.count > 0 {
-                    for (index, assetDict) in enumerate(articleMedia) {
+                    for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
                         
@@ -827,7 +824,7 @@ public class Article: RLMObject {
                 issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 1)
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 2)
             }
             
@@ -857,68 +854,69 @@ public class Article: RLMObject {
     */
     public func replacePatternsWithAssets() -> NSString {
         //Should work for images, audio, video or any other types of assets
-        var regex = NSRegularExpression(pattern: assetPattern, options: NSRegularExpressionOptions.CaseInsensitive, error: nil)
+        let regex = try? NSRegularExpression(pattern: assetPattern, options: NSRegularExpressionOptions.CaseInsensitive)
         
-        var articleBody = self.body
-        var matches = regex?.matchesInString(articleBody, options: nil, range: NSMakeRange(0, count(articleBody))) as! Array<NSTextCheckingResult>
+        let articleBody = self.body
         
         var updatedBody: NSString = articleBody
         
-        if matches.count > 0 {
-            for match: NSTextCheckingResult in matches {
-                let matchRange = match.range
-                var range = NSRange(location: matchRange.location, length: matchRange.length)
-                var matchedString: NSString = (articleBody as NSString).substringWithRange(range) as NSString
-                var originallyMatched = matchedString
-                
-                //Get global id for the asset
-                for patternPart in assetPatternParts {
-                    matchedString = matchedString.stringByReplacingOccurrencesOfString(patternPart, withString: "", options: nil, range: NSMakeRange(0, matchedString.length))
-                }
-                
-                //Find asset with the global id
-                if let asset = Asset.getAsset(matchedString as String) {
-                    //Use the asset - generate an HTML with the asset file URL (image, audio, video)
-                    var originalAssetPath = asset.getAssetPath()
-                    let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath!)
+        if let matches: [NSTextCheckingResult] = regex?.matchesInString(articleBody, options: [], range: NSMakeRange(0, articleBody.characters.count)) {
+            if matches.count > 0 {
+                for match: NSTextCheckingResult in matches {
+                    let matchRange = match.range
+                    let range = NSRange(location: matchRange.location, length: matchRange.length)
+                    var matchedString: NSString = (articleBody as NSString).substringWithRange(range) as NSString
+                    let originallyMatched = matchedString
                     
-                    //Replace with HTML tags
-                    var finalHTML = "<div class='article_image'>"
-                    if asset.type == "image" {
-                        finalHTML += "<img src='\(fileURL)' alt='Tap to enlarge image' />"
-                    }
-                    else if asset.type == "sound" {
-                        finalHTML += "<audio src='\(fileURL)' controls='controls' />"
-                    }
-                    else if asset.type == "video" {
-                        finalHTML += "<video src='\(fileURL)' controls />"
+                    //Get global id for the asset
+                    for patternPart in assetPatternParts {
+                        matchedString = matchedString.stringByReplacingOccurrencesOfString(patternPart, withString: "", options: [], range: NSMakeRange(0, matchedString.length))
                     }
                     
-                    //Add caption and source
-                    var captionSource = ""
-                    if asset.source != "" {
-                        captionSource += "<span class='source'>\(asset.source)</span>"
-                    }
-                    if asset.caption != "" {
-                        captionSource += "<span class='caption'>\(asset.caption)</span>"
-                    }
-                    if captionSource != "" {
-                        finalHTML += "<div class='article_caption'>\(captionSource)</div>"
-                    }
-                    finalHTML += "</div>" //closing div
-                    
-                    //Special case - the asset was enclosed in paragraph tags
-                    //Move opening paragraph tag after the asset html in that case
-                    if matchRange.location >= 3 && count(articleBody) > 3 {
-                        var possibleMatchRange = NSMakeRange(matchRange.location - 3, 3)
+                    //Find asset with the global id
+                    if let asset = Asset.getAsset(matchedString as String) {
+                        //Use the asset - generate an HTML with the asset file URL (image, audio, video)
+                        let originalAssetPath = asset.getAssetPath()
+                        let fileURL: NSURL! = NSURL(fileURLWithPath: originalAssetPath!)
                         
-                        if updatedBody.substringWithRange(possibleMatchRange) == "<p>" {
-                            updatedBody = updatedBody.stringByReplacingCharactersInRange(possibleMatchRange, withString: "")
-                            finalHTML += "<p>"
+                        //Replace with HTML tags
+                        var finalHTML = "<div class='article_image'>"
+                        if asset.type == "image" {
+                            finalHTML += "<img src='\(fileURL)' alt='Tap to enlarge image' />"
                         }
+                        else if asset.type == "sound" {
+                            finalHTML += "<audio src='\(fileURL)' controls='controls' />"
+                        }
+                        else if asset.type == "video" {
+                            finalHTML += "<video src='\(fileURL)' controls />"
+                        }
+                        
+                        //Add caption and source
+                        var captionSource = ""
+                        if asset.source != "" {
+                            captionSource += "<span class='source'>\(asset.source)</span>"
+                        }
+                        if asset.caption != "" {
+                            captionSource += "<span class='caption'>\(asset.caption)</span>"
+                        }
+                        if captionSource != "" {
+                            finalHTML += "<div class='article_caption'>\(captionSource)</div>"
+                        }
+                        finalHTML += "</div>" //closing div
+                        
+                        //Special case - the asset was enclosed in paragraph tags
+                        //Move opening paragraph tag after the asset html in that case
+                        if matchRange.location >= 3 && articleBody.characters.count > 3 {
+                            let possibleMatchRange = NSMakeRange(matchRange.location - 3, 3)
+                            
+                            if updatedBody.substringWithRange(possibleMatchRange) == "<p>" {
+                                updatedBody = updatedBody.stringByReplacingCharactersInRange(possibleMatchRange, withString: "")
+                                finalHTML += "<p>"
+                            }
+                        }
+                        
+                        updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched as String, withString: finalHTML)
                     }
-                    
-                    updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched as String, withString: finalHTML)
                 }
             }
         }
@@ -934,10 +932,10 @@ public class Article: RLMObject {
     :return: an array of articles newer than the current article (in the same issue)
     */
     public func getNewerArticles() -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issueId = %@ AND date > %@", self.issueId, self.date)
-        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
             var array = Array<Article>()
@@ -959,10 +957,10 @@ public class Article: RLMObject {
     :return: an array of articles older than the current article (in the same issue)
     */
     public func getOlderArticles() -> Array<Article>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issueId = %@ AND date < %@", self.issueId, self.date)
-        var articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
             var array = Array<Article>()
@@ -985,8 +983,8 @@ public class Article: RLMObject {
     */
     public func getValue(key: NSString) -> AnyObject? {
         
-        var testArticle = Article()
-        var properties: NSArray = testArticle.objectSchema.properties
+        let testArticle = Article()
+        let properties: NSArray = testArticle.objectSchema.properties
         
         var foundProperty = false
         for property: RLMProperty in properties as! [RLMProperty] {
@@ -1003,7 +1001,7 @@ public class Article: RLMObject {
         }
         else {
             //This is a metadata key
-            var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+            let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
             if let metadataDict = metadata as? NSDictionary {
                 return metadataDict.valueForKey(key as String)
             }

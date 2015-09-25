@@ -19,17 +19,17 @@ public class ArticleHandler: NSObject {
     /**
     Initializes the ArticleHandler with the given folder. This is where the database and assets will be saved. The method expects to find a key `ClientKey` in the project's Info.plist with your client key. If none is found, the method returns a nil
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     */
     public init?(folder: NSString){
         super.init()
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -37,9 +37,12 @@ public class ArticleHandler: NSObject {
         }
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        var mainBundle = NSBundle.mainBundle()
+        let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
             issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
@@ -52,35 +55,38 @@ public class ArticleHandler: NSObject {
     /**
     Initializes the ArticleHandler with the Documents directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents"
         clientKey = clientKey as String
         issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
     
     /**
     Initializes the ArticleHandler with a custom directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -90,7 +96,10 @@ public class ArticleHandler: NSObject {
         issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
     
@@ -99,7 +108,7 @@ public class ArticleHandler: NSObject {
     
     :brief: Get Article details from API and add to database
     
-    :param: globalId The global id for the article
+    - parameter globalId: The global id for the article
     */
     public func addArticleFromAPI(globalId: String) {
         let requestURL = "\(baseURL)articles/\(globalId)"
@@ -111,18 +120,18 @@ public class ArticleHandler: NSObject {
     /**
     The method uses an SKU/Apple id of an article, gets its content from the Magnet API and adds it to the database
     
-    :param: appleId The Apple id for the article
+    - parameter appleId: The Apple id for the article
     */
     public func addArticleWith(appleId: String) {
         let requestURL = "\(baseURL)articles/sku/\(appleId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 let articleDetails: NSDictionary = allArticles.firstObject as! NSDictionary
                 //Update article
                 
@@ -131,7 +140,7 @@ public class ArticleHandler: NSObject {
                 Article.addArticle(articleDetails, delegate: self.issueHandler)
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -139,13 +148,13 @@ public class ArticleHandler: NSObject {
     /**
     This method accepts a property name, its corresponding values and retrieves a paginated list of articles from the API which match this. If either of property or value are blank, the normal addAllArticles method will be invoked
     
-    :param:  property The property by matching which articles need to be retrieved
+    - parameter  property: The property by matching which articles need to be retrieved
     
-    :param:  value The value of the property
+    - parameter  value: The value of the property
     
-    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
     public func addArticlesFor(property: String, value: String, page: Int, limit: Int) {
         if Helper.isNilOrEmpty(property) || Helper.isNilOrEmpty(value) {
@@ -166,15 +175,15 @@ public class ArticleHandler: NSObject {
             requestURL = requestURL + "&page=\(page+1)"
         }
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (index, articleDict) in enumerate(allArticles) {
+                    for (_, articleDict) in allArticles.enumerate() {
                         let articleId = articleDict.valueForKey("id") as! NSString
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
@@ -184,7 +193,7 @@ public class ArticleHandler: NSObject {
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -192,9 +201,9 @@ public class ArticleHandler: NSObject {
     /**
     The method lets you download and add all articles to the database
     
-    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
     public func addAllArticles(page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles?limit="
@@ -210,15 +219,15 @@ public class ArticleHandler: NSObject {
             requestURL = requestURL + "&page=\(page+1)"
         }
 
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (index, articleDict) in enumerate(allArticles) {
+                    for (_, articleDict) in allArticles.enumerate() {
                         let articleId = articleDict.valueForKey("id") as! NSString
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
@@ -228,7 +237,7 @@ public class ArticleHandler: NSObject {
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -236,9 +245,9 @@ public class ArticleHandler: NSObject {
     /**
     The method lets you download and add all published articles to the database
     
-    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+    - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
     public func addAllPublishedArticles(page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles/published?limit="
@@ -254,15 +263,15 @@ public class ArticleHandler: NSObject {
             requestURL = requestURL + "&page=\(page+1)"
         }
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (index, articleDict) in enumerate(allArticles) {
+                    for (_, articleDict) in allArticles.enumerate() {
                         let articleId = articleDict.valueForKey("id") as! NSString
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
@@ -272,7 +281,7 @@ public class ArticleHandler: NSObject {
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -280,17 +289,17 @@ public class ArticleHandler: NSObject {
     /**
     Get paginated articles (array) from the database
     
-    :param: page Page number for results (starts at 0)
+    - parameter page: Page number for results (starts at 0)
     
-    :param: count Number of items to be returned (specify as 0 if you need all articles)
+    - parameter count: Number of items to be returned (specify as 0 if you need all articles)
     
     :return: Array of independent articles (without any issueIds)
     */
     public func getAllArticles(page: Int, count: Int) -> Array<Article>? {
         
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var array: Array<Article>? = Article.getArticlesFor("", type: nil, excludeType: nil, count: count, page: page)
+        let array: Array<Article>? = Article.getArticlesFor("", type: nil, excludeType: nil, count: count, page: page)
         return array
     }
     

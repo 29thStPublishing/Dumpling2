@@ -70,8 +70,8 @@ public class Asset: RLMObject {
     class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, type: String, placement: Int) {
         let realm = RLMRealm.defaultRealm()
         
-        var globalId = asset.objectForKey("id") as! String
-        var results = Asset.objectsWhere("globalId = '\(globalId)'")
+        let globalId = asset.objectForKey("id") as! String
+        let results = Asset.objectsWhere("globalId = '\(globalId)'")
         var currentAsset: Asset!
         
         realm.beginWriteTransaction()
@@ -154,25 +154,25 @@ public class Asset: RLMObject {
         
         let requestURL = "\(baseURL)media/\(assetId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allMedia: NSArray = response.valueForKey("media") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
 
                 realm.beginWriteTransaction()
                 
-                var currentAsset = Asset()
+                let currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as! String
                 currentAsset.caption = mediaFile.valueForKey("caption") as! String
                 currentAsset.volumeId = volume.globalId
                 
-                var meta = mediaFile.objectForKey("meta") as! NSDictionary
-                var dataType = meta.objectForKey("type") as! NSString
+                let meta = mediaFile.objectForKey("meta") as! NSDictionary
+                let dataType = meta.objectForKey("type") as! NSString
                 if dataType.isEqualToString("image") {
                     currentAsset.type = AssetType.Image.rawValue
                 }
@@ -197,12 +197,12 @@ public class Asset: RLMObject {
                 var finalURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    var docsDir: NSString = docPaths[0] as! NSString
+                    let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/\(fileUrl.lastPathComponent)"
+                    finalURL = "\(finalFolder)/\((fileUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalURL = "\(volume.assetFolder)/\(fileUrl.lastPathComponent)"
+                    finalURL = "\(volume.assetFolder)/\((fileUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
@@ -217,7 +217,7 @@ public class Asset: RLMObject {
                         }
                     }
                     else if let err = error {
-                        println("Error cdn: " + err.description)
+                        print("Error cdn: " + err.description)
                         //Try downloading with url if cdn url download failed
                         if isCdn {
                             fileUrl = mediaFile.valueForKey("url") as! String
@@ -233,7 +233,7 @@ public class Asset: RLMObject {
                                     }
                                 }
                                 else if let err = error {
-                                    println("Error non cdn: " + err.description)
+                                    print("Error non cdn: " + err.description)
                                     if delegate != nil {
                                         (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
                                     }
@@ -243,7 +243,7 @@ public class Asset: RLMObject {
                     }
                 }
                 
-                currentAsset.originalURL = fileUrl.lastPathComponent
+                currentAsset.originalURL = (fileUrl as NSString).lastPathComponent
                 
                 var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
@@ -255,38 +255,38 @@ public class Asset: RLMObject {
                 var finalThumbURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    var docsDir: NSString = docPaths[0] as! NSString
+                    let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalThumbURL = "\(finalFolder)/\(thumbUrl.lastPathComponent)"
+                    finalThumbURL = "\(finalFolder)/\((thumbUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalThumbURL = "\(volume.assetFolder)/\(thumbUrl.lastPathComponent)"
+                    finalThumbURL = "\(volume.assetFolder)/\((thumbUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
                     (status:AnyObject?, error:NSError?) -> () in
                     if status != nil {
-                        let completed = status as! NSNumber
+                        _ = status as! NSNumber
                     }
                     else if let err = error {
-                        println("Error: " + err.description)
+                        print("Error: " + err.description)
                         //Try downloading with url if cdn url download failed
                         if isCdnThumb {
                             thumbUrl = mediaFile.valueForKey("urlThumb") as! String
                             networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
                                 (status:AnyObject?, error:NSError?) -> () in
                                 if status != nil {
-                                    let completed = status as! NSNumber
+                                    _ = status as! NSNumber
                                 }
                                 else if let err = error {
-                                    println("Error non cdn: " + err.description)
+                                    print("Error non cdn: " + err.description)
                                 }
                             }
                         }
                     }
                 }
                 
-                currentAsset.squareURL = thumbUrl.lastPathComponent
+                currentAsset.squareURL = (thumbUrl as NSString).lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -301,7 +301,7 @@ public class Asset: RLMObject {
                 realm.commitWriteTransaction()
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 if delegate != nil {
                     (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
                 }
@@ -316,25 +316,25 @@ public class Asset: RLMObject {
         
         let requestURL = "\(baseURL)media/\(assetId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allMedia: NSArray = response.valueForKey("media") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
                 realm.beginWriteTransaction()
 
-                var currentAsset = Asset()
+                let currentAsset = Asset()
                 currentAsset.globalId = mediaFile.valueForKey("id") as! String
                 currentAsset.caption = mediaFile.valueForKey("caption") as! String
                 currentAsset.issue = issue
                 currentAsset.articleId = articleId
                 
-                var meta = mediaFile.objectForKey("meta") as! NSDictionary
-                var dataType = meta.objectForKey("type") as! NSString
+                let meta = mediaFile.objectForKey("meta") as! NSDictionary
+                let dataType = meta.objectForKey("type") as! NSString
                 if dataType.isEqualToString("image") {
                     currentAsset.type = AssetType.Image.rawValue
                 }
@@ -358,12 +358,12 @@ public class Asset: RLMObject {
                 var finalURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    var docsDir: NSString = docPaths[0] as! NSString
+                    let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/\(fileUrl.lastPathComponent)"
+                    finalURL = "\(finalFolder)/\((fileUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalURL = "\(issue.assetFolder)/\(fileUrl.lastPathComponent)"
+                    finalURL = "\(issue.assetFolder)/\((fileUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
@@ -385,7 +385,7 @@ public class Asset: RLMObject {
                         }
                     }
                     else if let err = error {
-                        println("Error: " + err.description)
+                        print("Error: " + err.description)
                         if isCdn {
                             fileUrl = mediaFile.valueForKey("url") as! String
                             networkManager.downloadFile(fileUrl, toPath: finalURL) {
@@ -406,7 +406,7 @@ public class Asset: RLMObject {
                                         }
                                     }
                                 }
-                                else if let err = error {
+                                else if let _ = error {
                                     if delegate != nil {
                                         if !issue.globalId.isEmpty {
                                             (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
@@ -420,7 +420,7 @@ public class Asset: RLMObject {
                         }
                     }
                 }
-                currentAsset.originalURL = fileUrl.lastPathComponent
+                currentAsset.originalURL = (fileUrl as NSString).lastPathComponent
                 
                 var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
@@ -432,12 +432,12 @@ public class Asset: RLMObject {
                 var finalThumbURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    var docsDir: NSString = docPaths[0] as! NSString
+                    let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalThumbURL = "\(finalFolder)/\(thumbUrl.lastPathComponent)"
+                    finalThumbURL = "\(finalFolder)/\((thumbUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalThumbURL = "\(issue.assetFolder)/\(thumbUrl.lastPathComponent)"
+                    finalThumbURL = "\(issue.assetFolder)/\((thumbUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
@@ -449,7 +449,7 @@ public class Asset: RLMObject {
                         }
                     }
                     else if let err = error {
-                        println("Error: " + err.description)
+                        print("Error: " + err.description)
                         if isCdnThumb {
                             thumbUrl = mediaFile.valueForKey("urlThumb") as! String
                             networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
@@ -460,13 +460,13 @@ public class Asset: RLMObject {
                                     }
                                 }
                                 else if let err = error {
-                                    println("Error: " + err.description)
+                                    print("Error: " + err.description)
                                 }
                             }
                         }
                     }
                 }
-                currentAsset.squareURL = fileUrl.lastPathComponent
+                currentAsset.squareURL = (thumbUrl as NSString).lastPathComponent
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
@@ -481,7 +481,7 @@ public class Asset: RLMObject {
                 realm.commitWriteTransaction()
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 if delegate != nil {
                     if !issue.globalId.isEmpty {
                         (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
@@ -522,14 +522,17 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "articleId = %@", articleId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
-        var fileManager = NSFileManager.defaultManager()
+        let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
             let originalURL = assetDetails.getAssetPath()
-            fileManager.removeItemAtPath(originalURL!, error: nil)
+            do {
+                try fileManager.removeItemAtPath(originalURL!)
+            } catch _ {
+            }
         }
         
         realm.beginWriteTransaction()
@@ -543,14 +546,17 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "articleId IN %@", articles)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
-        var fileManager = NSFileManager.defaultManager()
+        let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
             let originalURL = assetDetails.getAssetPath()
-            fileManager.removeItemAtPath(originalURL!, error: nil)
+            do {
+                try fileManager.removeItemAtPath(originalURL!)
+            } catch _ {
+            }
         }
         
         realm.beginWriteTransaction()
@@ -563,14 +569,17 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issue.globalId IN %@", issues)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
-        var fileManager = NSFileManager.defaultManager()
+        let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
             let originalURL = assetDetails.getAssetPath()
-            fileManager.removeItemAtPath(originalURL!, error: nil)
+            do {
+                try fileManager.removeItemAtPath(originalURL!)
+            } catch _ {
+            }
         }
         
         realm.beginWriteTransaction()
@@ -583,14 +592,17 @@ public class Asset: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issue.globalId = %@", globalId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
-        var fileManager = NSFileManager.defaultManager()
+        let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
             let originalURL = assetDetails.getAssetPath()
-            fileManager.removeItemAtPath(originalURL!, error: nil)
+            do {
+                try fileManager.removeItemAtPath(originalURL!)
+            } catch _ {
+            }
         }
         
         realm.beginWriteTransaction()
@@ -618,20 +630,23 @@ public class Asset: RLMObject {
     
     :brief: Delete a specific asset
     
-    :param:  assetId The global id for the asset
+    - parameter  assetId: The global id for the asset
     */
     public class func deleteAsset(assetId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", assetId)
-        var results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
         
         //Iterate through the results and delete the files saved
-        var fileManager = NSFileManager.defaultManager()
+        let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
             let originalURL = assetDetails.getAssetPath()
-            fileManager.removeItemAtPath(originalURL!, error: nil)
+            do {
+                try fileManager.removeItemAtPath(originalURL!)
+            } catch _ {
+            }
         }
         
         realm.beginWriteTransaction()
@@ -644,21 +659,21 @@ public class Asset: RLMObject {
     
     :brief: Retrieve first asset for an issue/article
 
-    :param:  issueId The global id for the issue
+    - parameter  issueId: The global id for the issue
     
-    :param: articleId The global id for the article
+    - parameter articleId: The global id for the article
     
-    :param: volumeId The global id for the volume
+    - parameter volumeId: The global id for the volume
     
     :return: Asset object
     */
     public class func getFirstAssetFor(issueId: String, articleId: String, volumeId: String?) -> Asset? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         if Helper.isNilOrEmpty(issueId) {
             if let vol = volumeId {
                 let predicate = NSPredicate(format: "volumeId = %@ AND placement = 1 AND type = %@", vol, "image")
-                var assets = Asset.objectsWithPredicate(predicate)
+                let assets = Asset.objectsWithPredicate(predicate)
                 
                 if assets.count > 0 {
                     return assets.firstObject() as? Asset
@@ -668,7 +683,7 @@ public class Asset: RLMObject {
         
         if issueId == "" {
             let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", articleId, "image")
-            var assets = Asset.objectsWithPredicate(predicate)
+            let assets = Asset.objectsWithPredicate(predicate)
             
             if assets.count > 0 {
                 return assets.firstObject() as? Asset
@@ -676,7 +691,7 @@ public class Asset: RLMObject {
         }
         else {
             let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
-            var assets = Asset.objectsWithPredicate(predicate)
+            let assets = Asset.objectsWithPredicate(predicate)
         
             if assets.count > 0 {
                 return assets.firstObject() as? Asset
@@ -691,21 +706,21 @@ public class Asset: RLMObject {
     
     :brief: Retrieve number of assets for an issue/article
     
-    :param:  issueId The global id for the issue
+    - parameter  issueId: The global id for the issue
     
-    :param: articleId The global id for the article
+    - parameter articleId: The global id for the article
     
-    :param: volumeId The global id of the volume
+    - parameter volumeId: The global id of the volume
     
     :return: asset count for the issue and/or article
     */
     public class func getNumberOfAssetsFor(issueId: String, articleId: String, volumeId: String?) -> UInt {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         if Helper.isNilOrEmpty(issueId) {
             if let vol = volumeId {
                 let predicate = NSPredicate(format: "volumeId = %@", vol)
-                var assets = Asset.objectsWithPredicate(predicate)
+                let assets = Asset.objectsWithPredicate(predicate)
                 
                 if assets.count > 0 {
                     return assets.count
@@ -714,7 +729,7 @@ public class Asset: RLMObject {
         }
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
-        var assets = Asset.objectsWithPredicate(predicate)
+        let assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
             return assets.count
@@ -728,38 +743,39 @@ public class Asset: RLMObject {
     
     :brief: Retrieve all assets for an issue/article of a specific type
     
-    :param:  issueId The global id for the issue
+    - parameter  issueId: The global id for the issue
     
-    :param: articleId The global id for the article
+    - parameter articleId: The global id for the article
     
-    :param: volumeId The global id for the volume
+    - parameter volumeId: The global id for the volume
     
-    :param: type The type of asset. If nil, all assets will be returned
+    - parameter type: The type of asset. If nil, all assets will be returned
     
     :return: array of assets following the conditions
     */
     public class func getAssetsFor(issueId: String, articleId: String, volumeId: String?, type: String?) -> Array<Asset>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
-        
+        var subPredicates = Array<NSPredicate>()
+
         if !Helper.isNilOrEmpty(volumeId) {
             if let vol = volumeId {
                 let predicate = NSPredicate(format: "volumeId = %@", vol)
-                subPredicates.addObject(predicate)
+                subPredicates.append(predicate)
             }
         }
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
-        subPredicates.addObject(predicate)
+        subPredicates.append(predicate)
 
         if type != nil {
-            var assetPredicate = NSPredicate(format: "type = %@", type!)
-            subPredicates.addObject(assetPredicate)
+            let assetPredicate = NSPredicate(format: "type = %@", type!)
+            subPredicates.append(assetPredicate)
         }
         
-        let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [AnyObject])
-        var assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
+        let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+        //let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [NSPredicate])
+        let assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
         
         if assets.count > 0 {
             var array = Array<Asset>()
@@ -778,15 +794,15 @@ public class Asset: RLMObject {
     
     :brief: Retrieve a specific asset
     
-    :param:  assetId The global id for the asset
+    - parameter  assetId: The global id for the asset
     
     :return: asset object for the global id. Returns nil if the asset is not found
     */
     public class func getAsset(assetId: String) -> Asset? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", assetId)
-        var assets = Asset.objectsWithPredicate(predicate)
+        let assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
             return assets.firstObject() as? Asset
@@ -800,17 +816,17 @@ public class Asset: RLMObject {
     
     :brief: Retrieve all sound files for an article/issue as a playlist/array
     
-    :param:  issueId The global id for the issue
+    - parameter  issueId: The global id for the issue
     
-    :param:  articleId The global id for the article
+    - parameter  articleId: The global id for the article
     
     :return: Array of sound asset objects for the given issue and/or article
     */
     public class func getPlaylistFor(issueId: String, articleId: String) -> Array<Asset>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND type = %@", issueId, articleId, "sound")
-        var assets = Asset.objectsWithPredicate(predicate)
+        let assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
             var array = Array<Asset>()
@@ -834,10 +850,10 @@ public class Asset: RLMObject {
         if !Helper.isNilOrEmpty(fileURL) {
             var assetFolder = self.issue.assetFolder
             if Helper.isNilOrEmpty(assetFolder) {
-                let realm = RLMRealm.defaultRealm()
+                _ = RLMRealm.defaultRealm()
                 
                 let predicate = NSPredicate(format: "globalId = %@", volumeId)
-                var volumes = Volume.objectsWithPredicate(predicate)
+                let volumes = Volume.objectsWithPredicate(predicate)
                 
                 if volumes.count > 0 {
                     let volume: Volume = volumes.firstObject() as! Volume
@@ -850,11 +866,11 @@ public class Asset: RLMObject {
                 var folderPath = assetFolder
                 if assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    var docsDir: NSString = docPaths[0] as! NSString
+                    let docsDir: NSString = docPaths[0] as NSString
                     folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
                 }
                 
-                var filePath = "\(folderPath)/\(fileURL)"
+                let filePath = "\(folderPath)/\(fileURL)"
                 return filePath
             }
         }

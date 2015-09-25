@@ -14,7 +14,7 @@ public class ReaderHelper: NSObject {
     /**
     Save current active volume
     
-    :param: volumeId Global id of the volume which is currently being viewed. If nil, will remove saved volume
+    - parameter volumeId: Global id of the volume which is currently being viewed. If nil, will remove saved volume
     */
     public class func saveVolume(volumeId: String?) {
         if volumeId == nil {
@@ -27,7 +27,7 @@ public class ReaderHelper: NSObject {
     /**
     Save current active issue
     
-    :param: issueId Global id of the issue which is currently being viewed. If nil, will remove saved issue
+    - parameter issueId: Global id of the issue which is currently being viewed. If nil, will remove saved issue
     */
     public class func saveIssue(issueId: String?) {
         if issueId == nil {
@@ -40,7 +40,7 @@ public class ReaderHelper: NSObject {
     /**
     Save current active article
     
-    :param: articleId Global id of the article which is currently being viewed. If nil, will remove saved article
+    - parameter articleId: Global id of the article which is currently being viewed. If nil, will remove saved article
     */
     public class func saveArticle(articleId: String?) {
         if articleId == nil {
@@ -53,7 +53,7 @@ public class ReaderHelper: NSObject {
     /**
     Save asset being viewed
     
-    :param: assetId Global id of the asset which is currently being viewed. If nil, will remove saved asset
+    - parameter assetId: Global id of the asset which is currently being viewed. If nil, will remove saved asset
     */
     public class func saveAsset(assetId: String?) {
         if assetId == nil {
@@ -66,9 +66,9 @@ public class ReaderHelper: NSObject {
     /**
     Save reading status for current article
     
-    :param: articleId Global id of the article currently being read
+    - parameter articleId: Global id of the article currently being read
     
-    :param: readingPercentage Current position of user in the article in percentage
+    - parameter readingPercentage: Current position of user in the article in percentage
     */
     public class func saveReadingPercentageFor(articleId: String, readingPercentage: Float) {
         let articleKey = "ArticlePercent-" + articleId
@@ -130,14 +130,14 @@ public class ReaderHelper: NSObject {
     /**
     Get last saved reading percentage for given article
     
-    :param: articleId Global id of article for which reading percentage is to be retrieved
+    - parameter articleId: Global id of article for which reading percentage is to be retrieved
     
     :return: progress of given article's reading in percentage
     */
     public class func getReadingPercentageFor(articleId: String) -> Float {
         let articleKey = "ArticlePercent-" + articleId
         if let percentValue: String = NSUserDefaults.standardUserDefaults().valueForKey(articleKey) as? String {
-            var percentage = NSString(string: percentValue).floatValue
+            let percentage = NSString(string: percentValue).floatValue
             return percentage
         }
         return 0.0
@@ -168,7 +168,7 @@ public class ReaderHelper: NSObject {
         
         if let articleId = retrieveCurrentArticle() {
             values["CurrentArticle"] = articleId
-            var key = "ArticlePercent-" + articleId
+            let key = "ArticlePercent-" + articleId
             values[key] = NSString(format: "%.2f", getReadingPercentageFor(articleId))
         }
         
@@ -185,7 +185,7 @@ public class ReaderHelper: NSObject {
     
     :brief: Saves current reading status to User defaults
     
-    :param: savedValues a dictionary containing saved values for current issue, article, asset and reading percentage for an article
+    - parameter savedValues: a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
     public class func saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>) {
         //If CurrentVolume, CurrentIssue, CurrentArticle, CurrentAsset, Reading% are on iCloud, retrieve and save to user defaults
@@ -197,7 +197,7 @@ public class ReaderHelper: NSObject {
         }
         if let articleId: String = savedValues["CurrentArticle"] as? String {
             saveArticle(articleId)
-            var key = "ArticlePercent-" + articleId
+            let key = "ArticlePercent-" + articleId
             if let percent: String = savedValues[key] as? String {
                 saveReadingPercentageFor(articleId, readingPercentage: NSString(string: percent).floatValue)
             }

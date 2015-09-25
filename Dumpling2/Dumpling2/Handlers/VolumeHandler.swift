@@ -22,16 +22,16 @@ public class VolumeHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     */
     public init?(folder: NSString){
         super.init()
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -39,9 +39,12 @@ public class VolumeHandler: NSObject {
         }
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        var mainBundle = NSBundle.mainBundle()
+        let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
             self.issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
@@ -56,18 +59,21 @@ public class VolumeHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents"
         clientKey = clientKey as String
         self.issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
     
@@ -76,17 +82,17 @@ public class VolumeHandler: NSObject {
     
     :brief: Initializer object
     
-    :param: folder The folder where the database and downloaded assets should be saved
+    - parameter folder: The folder where the database and downloaded assets should be saved
     
-    :param: clientkey Client API key to be used for making calls to the Magnet API
+    - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
+        let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            var folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
             self.defaultFolder = folderPath
         }
         else {
@@ -98,7 +104,10 @@ public class VolumeHandler: NSObject {
         self.issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
         let defaultRealmPath = "\(folder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
         //Call this if the schema version has changed - pass new schema version as integer
         //VolumeHandler.checkAndMigrateData(2)
@@ -109,8 +118,8 @@ public class VolumeHandler: NSObject {
     
     :return: the current schema version for the database
     */
-    public class func getCurrentSchemaVersion() -> UInt {
-        var currentSchemaVersion: UInt = RLMRealm.schemaVersionAtPath(RLMRealm.defaultRealmPath(), error: nil)
+    public class func getCurrentSchemaVersion() -> UInt64 {
+        let currentSchemaVersion: UInt64 = RLMRealm.schemaVersionAtPath(RLMRealmConfiguration.defaultConfiguration().path!, error: nil)
         
         if currentSchemaVersion < 0 {
             return 0
@@ -120,24 +129,27 @@ public class VolumeHandler: NSObject {
     }
     
     //Check and migrate Realm data if needed
-    class func checkAndMigrateData(schemaVersion: UInt) {
+    class func checkAndMigrateData(schemaVersion: UInt64) {
         
-        var currentSchemaVersion: UInt = getCurrentSchemaVersion()
-        
+        let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
         if currentSchemaVersion < schemaVersion {
-            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealm.defaultRealmPath(),
+            let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+            realmConfiguration.schemaVersion = schemaVersion
+            realmConfiguration.migrationBlock = { migration, oldSchemaVersion in
+                
+                //Enumerate through the models and migrate data as needed
+            }
+            RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        }
+        
+        /*if currentSchemaVersion < schemaVersion {
+            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealmConfiguration.defaultConfiguration().path!,
                 withMigrationBlock: { migration, oldSchemaVersion in
                     
                     //Enumerate through the models and migrate data as needed
-                    /*migration.enumerateObjects(MyClass.className()) { oldObject, newObject in
-                    // Make the necessary changes for migration
-                    if oldSchemaVersion < 1 {
-                    //Use old object and new object
-                    }
-                    }*/
                 }
             )
-        }
+        }*/
     }
     
     // MARK: Use API
@@ -147,26 +159,26 @@ public class VolumeHandler: NSObject {
     
     :brief: Get Volume details from API and add to database
     
-    :param: globalId The global id for the volume
+    - parameter globalId: The global id for the volume
     */
     public func addVolumeFromAPI(globalId: String) {
         
         let requestURL = "\(baseURL)volumes/\(globalId)"
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
                 let volumeDetails: NSDictionary = allVolumes.firstObject as! NSDictionary
                 //Update volume now
                 self.updateVolumeFromAPI(volumeDetails, globalId: volumeDetails.objectForKey("id") as! String)
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 self.issueHandler.updateStatusDictionary(globalId, issueId: "", url: requestURL, status: 2)
             }
         }
@@ -175,28 +187,28 @@ public class VolumeHandler: NSObject {
     /**
     The method uses the SKU/Apple id of a volume, gets its content from the Magnet API and adds it to the database
     
-    :param: appleId The Apple id for the volume
+    - parameter appleId: The Apple id for the volume
     */
     public func addVolumeFor(appleId: String) {
         
         let requestURL = "\(baseURL)volumes/sku/\(appleId)"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
                 let volumeDetails: NSDictionary = allVolumes.firstObject as! NSDictionary
                 
                 //Update volume now
-                var volumeId = volumeDetails.objectForKey("id") as! String
+                let volumeId = volumeDetails.objectForKey("id") as! String
                 self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volumeId)
                 self.updateVolumeFromAPI(volumeDetails, globalId: volumeId)
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -206,7 +218,7 @@ public class VolumeHandler: NSObject {
     //Add or create volume details (from API)
     func updateVolumeFromAPI(volume: NSDictionary, globalId: String) -> Int {
         let realm = RLMRealm.defaultRealm()
-        var results = Volume.objectsWhere("globalId = '\(globalId)'")
+        let results = Volume.objectsWhere("globalId = '\(globalId)'")
         var currentVolume: Volume!
         
         if results.count > 0 {
@@ -226,7 +238,7 @@ public class VolumeHandler: NSObject {
         currentVolume.subtitle = volume.valueForKey("subtitle") as! String
         currentVolume.volumeDesc = volume.valueForKey("description") as! String
         
-        var meta = volume.valueForKey("meta") as! NSDictionary
+        let meta = volume.valueForKey("meta") as! NSDictionary
         currentVolume.releaseDate = meta.valueForKey("releaseDate") as! String
         if let pubDate = meta.valueForKey("publishedDate") as? String {
             currentVolume.publishedDate = Helper.publishedDateFromISO(pubDate)
@@ -236,7 +248,7 @@ public class VolumeHandler: NSObject {
         }
         currentVolume.publisher = meta.valueForKey("publishedBy") as! String
         
-        var keywords = volume.objectForKey("keywords") as! NSArray
+        let keywords = volume.objectForKey("keywords") as! NSArray
         if keywords.count > 0 {
             currentVolume.keywords = Helper.stringFromJSON(keywords)!
         }
@@ -246,7 +258,7 @@ public class VolumeHandler: NSObject {
         var folderPath: String
         if self.defaultFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-            var docsDir: NSString = docPaths[0] as! NSString
+            let docsDir: NSString = docPaths[0] as NSString
             folderPath = currentVolume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
         }
         else {
@@ -260,11 +272,14 @@ public class VolumeHandler: NSObject {
             }
         }
         else {
-            //Folder doesn't exist, create folder where assets will be downloaded
-            NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil, error: nil)
+            do {
+                //Folder doesn't exist, create folder where assets will be downloaded
+                try NSFileManager.defaultManager().createDirectoryAtPath(folderPath, withIntermediateDirectories: true, attributes: nil)
+            } catch _ {
+            }
         }
         
-        var assetId = volume.valueForKey("featuredImage") as! String
+        let assetId = volume.valueForKey("featuredImage") as! String
         if !assetId.isEmpty {
             currentVolume.coverImageId = assetId
         }
@@ -282,9 +297,9 @@ public class VolumeHandler: NSObject {
         realm.commitWriteTransaction()
         
         //Add all assets of the volume (which do not have an associated issue/article)
-        var volumeMedia = volume.objectForKey("media") as! NSArray
+        let volumeMedia = volume.objectForKey("media") as! NSArray
         if volumeMedia.count > 0 {
-            for (index, assetDict) in enumerate(volumeMedia) {
+            for (index, assetDict) in volumeMedia.enumerate() {
                 //Download images and create Asset object for volume
                 //Add asset to Volume dictionary
                 let assetid = assetDict.valueForKey("id") as! NSString
@@ -294,8 +309,8 @@ public class VolumeHandler: NSObject {
         }
         
         //add all issues into the database
-        var issues = volume.objectForKey("issues") as! NSArray
-        for (index, issueDict) in enumerate(issues) {
+        let issues = volume.objectForKey("issues") as! NSArray
+        for (_, issueDict) in issues.enumerate() {
             //Insert issue
             //Add issue to dictionary
             let issueId: String = issueDict.valueForKey("id") as! String
@@ -312,24 +327,24 @@ public class VolumeHandler: NSObject {
     This method gets last 20 volumes for a client key, downloads it and saves it to the database
     */
     public func addAllVolumes() {
-        var requestURL = "\(baseURL)volumes?limit=20"
+        let requestURL = "\(baseURL)volumes?limit=20"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
                 if allVolumes.count > 0 {
-                    for (index, volumeDict) in enumerate(allVolumes) {
+                    for (_, volumeDict) in allVolumes.enumerate() {
                         let volumeId = volumeDict.valueForKey("id") as! String
                         self.addVolumeFromAPI(volumeId)
                     }
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -337,9 +352,9 @@ public class VolumeHandler: NSObject {
     /**
     This method gets all available volumes for a client key, downloads it and saves it to the database
     
-    :param: page Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+    - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
-    :param: limit Parameter accepting the number of records to fetch at a time. If this is set to 0 or nil, we will fetch 20 records by default
+    - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0 or nil, we will fetch 20 records by default
     */
     public func addAllVolumes(page: Int, limit: Int) {
         var requestURL = "\(baseURL)volumes?limit="
@@ -355,22 +370,22 @@ public class VolumeHandler: NSObject {
             requestURL = requestURL + "&page=\(page+1)"
         }
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allVolumes: NSArray = response.valueForKey("volumes") as! NSArray
                 if allVolumes.count > 0 {
-                    for (index, volumeDict) in enumerate(allVolumes) {
+                    for (_, volumeDict) in allVolumes.enumerate() {
                         let volumeId = volumeDict.valueForKey("id") as! String
                         self.addVolumeFromAPI(volumeId)
                     }
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
         }
     }
@@ -378,16 +393,16 @@ public class VolumeHandler: NSObject {
     /**
     Get volume details from database for a specific global id
     
-    :param: volumeId global id of the volume
+    - parameter volumeId: global id of the volume
     
     :return: Volume object or nil if the volume is not in the database
     */
     public func getVolume(volumeId: NSString) -> Volume? {
         
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", volumeId)
-        var volumes = Volume.objectsWithPredicate(predicate)
+        let volumes = Volume.objectsWithPredicate(predicate)
         
         if volumes.count > 0 {
             return volumes.firstObject() as? Volume
@@ -400,17 +415,17 @@ public class VolumeHandler: NSObject {
         
         let requestURL = "\(baseURL)volumes"
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allIssues: NSArray = response.valueForKey("volumes") as! NSArray
-                println("VOLUMES: \(allIssues)")
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("volumes") as! NSArray
+                print("VOLUMES: \(allIssues)")
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
             }
             
         }

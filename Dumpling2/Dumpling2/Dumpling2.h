@@ -16,9 +16,9 @@ FOUNDATION_EXPORT const unsigned char Dumpling2VersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <Dumpling2/PublicHeader.h>
 
-#import "ZipArchive.h"
-#import "Realm.h"
+//Issue 46 #import "ZipArchive.h"
 #import "AFNetworking.h"
+#import "Realm.h"
 
 //#import <AFNetworking/AFNetworking.h>
 

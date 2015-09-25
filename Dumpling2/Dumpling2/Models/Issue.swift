@@ -50,9 +50,9 @@ public class Issue: RLMObject {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "volumeId = %@", volumeId)
-        var results = Issue.objectsWithPredicate(predicate)
+        let results = Issue.objectsWithPredicate(predicate)
         
-        var issueIds = NSMutableArray()
+        let issueIds = NSMutableArray()
         for issue in results {
             let singleIssue = issue as! Issue
             issueIds.addObject(singleIssue.globalId)
@@ -75,18 +75,18 @@ public class Issue: RLMObject {
     
     :brief: Delete an issue
     
-    :param:  appleId The SKU/Apple id for the issue
+    - parameter  appleId: The SKU/Apple id for the issue
     */
     public class func deleteIssue(appleId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "appleId = %@", appleId)
-        var issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objectsWithPredicate(predicate)
         
         //Delete all assets and articles for the issue
         if issues.count == 1 {
             //older issue
-            var currentIssue = issues.firstObject() as! Issue
+            let currentIssue = issues.firstObject() as! Issue
             //Delete all articles and assets if the issue already exists
             Asset.deleteAssetsForIssue(currentIssue.globalId)
             Article.deleteArticlesFor(currentIssue.globalId)
@@ -106,12 +106,12 @@ public class Issue: RLMObject {
     :return:  Object for most recent issue
     */
     public class func getNewestIssue() -> Issue? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var results = Issue.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
+        let results = Issue.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
         
         if results.count > 0 {
-            var newestIssue = results.firstObject() as! Issue
+            let newestIssue = results.firstObject() as! Issue
             return newestIssue
         }
         
@@ -123,15 +123,15 @@ public class Issue: RLMObject {
     
     :brief: Get the issue for a specific Apple id
     
-    :param: appleId The SKU/Apple id to search for
+    - parameter appleId: The SKU/Apple id to search for
     
     :return:  Issue object for the given SKU/Apple id
     */
     public class func getIssueFor(appleId: String) -> Issue? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "appleId = %@", appleId)
-        var issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
@@ -143,12 +143,12 @@ public class Issue: RLMObject {
     /**
     This method returns all issues for a given volume or if volumeId is nil, all issues
     
-    :param: volumeId Global id of the volume whose issues have to be retrieved
+    - parameter volumeId: Global id of the volume whose issues have to be retrieved
     
     :return: an array of issues for given volume or all issues if volumeId is nil
     */
     public class func getIssues(volumeId: String?) -> Array<Issue>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
 
         var issues: RLMResults
         if let volId = volumeId {
@@ -174,15 +174,15 @@ public class Issue: RLMObject {
     /**
     This method inputs the global id of an issue and returns the Issue object
     
-    :param:  issueId The global id for the issue
+    - parameter  issueId: The global id for the issue
     
     :return: issue object for the global id. Returns nil if the issue is not found
     */
     public class func getIssue(issueId: String) -> Issue? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", issueId)
-        var issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objectsWithPredicate(predicate)
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
@@ -200,7 +200,7 @@ public class Issue: RLMObject {
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-            var docsDir: NSString = docPaths[0] as! NSString
+            let docsDir: NSString = docPaths[0] as NSString
             assetFolder = docsDir as String
         }
         else {
@@ -211,18 +211,18 @@ public class Issue: RLMObject {
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
-        var networkManager = LRNetworkManager.sharedInstance
+        let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
-                var response: NSDictionary = data as! NSDictionary
-                var allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Download assets for the issue
-                    var issueMedia = issueDetails.objectForKey("media") as! NSArray
+                    let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
-                        for (index, assetDict) in enumerate(issueMedia) {
+                        for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! NSString
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
@@ -233,7 +233,7 @@ public class Issue: RLMObject {
                 }
             }
             else if let err = error {
-                println("Error: " + err.description)
+                print("Error: " + err.description)
                 issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)issues/\(self.globalId)", status: 2)
             }
         }
@@ -261,7 +261,7 @@ public class Issue: RLMObject {
     */
     public func getValue(key: NSString) -> AnyObject? {
         
-        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+        let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
             return metadataDict.valueForKey(key as String)
         }
@@ -277,10 +277,10 @@ public class Issue: RLMObject {
     :return: an array of issues older than the current issue
     */
     public func getOlderIssues() -> Array<Issue>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate)
-        var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        let issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
         
         if issues.count > 0 {
             var array = Array<Issue>()
@@ -302,10 +302,10 @@ public class Issue: RLMObject {
     :return: an array of issues newer than the current issue
     */
     public func getNewerIssues() -> Array<Issue>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate)
-        var issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        let issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
         
         if issues.count > 0 {
             var array = Array<Issue>()

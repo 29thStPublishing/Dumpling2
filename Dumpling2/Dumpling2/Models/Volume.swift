@@ -48,18 +48,18 @@ public class Volume: RLMObject {
     
     :brief: Delete a volume
     
-    :param:  globalId The global id for the volume
+    - parameter  globalId: The global id for the volume
     */
     public class func deleteVolume(globalId: NSString) {
         let realm = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", globalId)
-        var volume = Volume.objectsWithPredicate(predicate)
+        let volume = Volume.objectsWithPredicate(predicate)
         
         //Delete all issues, assets and articles for the volume
         if volume.count == 1 {
             //older issue
-            var currentVolume = volume.firstObject() as! Volume
+            let currentVolume = volume.firstObject() as! Volume
             //Delete all articles and assets if the issue already exists
             Issue.deleteIssuesForVolume(currentVolume.globalId)
             
@@ -78,12 +78,12 @@ public class Volume: RLMObject {
     :return:  Object for most recent volume
     */
     public class func getNewestVolume() -> Volume? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var results = Volume.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
+        let results = Volume.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
         
         if results.count > 0 {
-            var newestVolume = results.firstObject() as! Volume
+            let newestVolume = results.firstObject() as! Volume
             return newestVolume
         }
         
@@ -93,23 +93,23 @@ public class Volume: RLMObject {
     /**
     This method returns all volumes with specific keywords
     
-    :param:  keywords An array of String values with keywords that the volume should have. If any of the keywords match, the volume will be selected
+    - parameter  keywords: An array of String values with keywords that the volume should have. If any of the keywords match, the volume will be selected
     
     :return: an array of volumes fulfiling the conditions
     */
     public class func searchVolumesWith(keywords: [String]) -> Array<Volume>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var subPredicates = NSMutableArray()
+        var subPredicates = Array<NSPredicate>()
         
         for keyword in keywords {
-            var subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
-            subPredicates.addObject(subPredicate)
+            let subPredicate = NSPredicate(format: "keywords CONTAINS %@", keyword)
+            subPredicates.append(subPredicate)
         }
         
         if subPredicates.count > 0 {
-            let searchPredicate = NSCompoundPredicate.orPredicateWithSubpredicates(subPredicates as [AnyObject])
-            var volumes: RLMResults = Volume.objectsWithPredicate(searchPredicate) as RLMResults
+            let searchPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
+            let volumes: RLMResults = Volume.objectsWithPredicate(searchPredicate) as RLMResults
             
             if volumes.count > 0 {
                 var array = Array<Volume>()
@@ -130,11 +130,11 @@ public class Volume: RLMObject {
     :return: an array of volumes
     */
     public class func getVolumes() -> Array<Volume>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
-        var predicate = NSPredicate(format: "published = %@", NSNumber(bool: true))
+        let predicate = NSPredicate(format: "published = %@", NSNumber(bool: true))
         
-        var volumes: RLMResults = Volume.objectsWithPredicate(predicate)
+        let volumes: RLMResults = Volume.objectsWithPredicate(predicate)
         
         if volumes.count > 0 {
             var array = Array<Volume>()
@@ -151,15 +151,15 @@ public class Volume: RLMObject {
     /**
     This method inputs the global id of a volume and returns the Volume object
     
-    :param:  volumeId The global id for the volume
+    - parameter  volumeId: The global id for the volume
     
     :return: Volume object for the global id. Returns nil if the volume is not found
     */
     public class func getVolume(volumeId: String) -> Volume? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "globalId = %@", volumeId)
-        var vols = Volume.objectsWithPredicate(predicate)
+        let vols = Volume.objectsWithPredicate(predicate)
         
         if vols.count > 0 {
             return vols.firstObject() as? Volume
@@ -192,7 +192,7 @@ public class Volume: RLMObject {
     */
     public func getValue(key: NSString) -> AnyObject? {
         
-        var metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+        let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
             return metadataDict.valueForKey(key as String)
         }
@@ -208,10 +208,10 @@ public class Volume: RLMObject {
     :return: an array of volumes older than the current volume
     */
     public func getOlderVolumes() -> Array<Volume>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate < %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
-        var volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
+        let volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
         
         if volumes.count > 0 {
             var array = Array<Volume>()
@@ -233,10 +233,10 @@ public class Volume: RLMObject {
     :return: an array of volumes newer than the current volume
     */
     public func getNewerVolumes() -> Array<Volume>? {
-        let realm = RLMRealm.defaultRealm()
+        _ = RLMRealm.defaultRealm()
         
         let predicate = NSPredicate(format: "publishedDate > %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
-        var volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
+        let volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
         
         if volumes.count > 0 {
             var array = Array<Volume>()
