@@ -1,6 +1,5 @@
 // AFHTTPRequestOperationManager.h
-//
-// Copyright (c) 2013-2015 AFNetworking (http://afnetworking.com)
+// Copyright (c) 2011–2015 Alamofire Software Foundation (http://alamofire.org/)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +42,8 @@
 #define NS_DESIGNATED_INITIALIZER
 #endif
 #endif
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  `AFHTTPRequestOperationManager` encapsulates the common patterns of communicating with a web application over HTTP, including request creation, response serialization, network reachability monitoring, and security, as well as request operation management.
@@ -95,7 +96,7 @@
 /**
  The URL used to monitor reachability, and construct requests from relative paths in methods like `requestWithMethod:URLString:parameters:`, and the `GET` / `POST` / et al. convenience methods.
  */
-@property (readonly, nonatomic, strong) NSURL *baseURL;
+@property (readonly, nonatomic, strong, nullable) NSURL *baseURL;
 
 /**
  Requests created with `requestWithMethod:URLString:parameters:` & `multipartFormRequestWithMethod:URLString:parameters:constructingBodyWithBlock:` are constructed with a set of default headers using a parameter serialization specified by this property. By default, this is set to an instance of `AFHTTPRequestSerializer`, which serializes query string parameters for `GET`, `HEAD`, and `DELETE` requests, or otherwise URL-form-encodes HTTP message bodies.
@@ -132,7 +133,7 @@
 
  @see AFURLConnectionOperation -credential
  */
-@property (nonatomic, strong) NSURLCredential *credential;
+@property (nonatomic, strong, nullable) NSURLCredential *credential;
 
 ///-------------------------------
 /// @name Managing Security Policy
@@ -160,18 +161,18 @@
  The dispatch queue for the `completionBlock` of request operations. If `NULL` (default), the main queue is used.
  */
 #if OS_OBJECT_HAVE_OBJC_SUPPORT
-@property (nonatomic, strong) dispatch_queue_t completionQueue;
+@property (nonatomic, strong, nullable) dispatch_queue_t completionQueue;
 #else
-@property (nonatomic, assign) dispatch_queue_t completionQueue;
+@property (nonatomic, assign, nullable) dispatch_queue_t completionQueue;
 #endif
 
 /**
  The dispatch group for the `completionBlock` of request operations. If `NULL` (default), a private dispatch group is used.
  */
 #if OS_OBJECT_HAVE_OBJC_SUPPORT
-@property (nonatomic, strong) dispatch_group_t completionGroup;
+@property (nonatomic, strong, nullable) dispatch_group_t completionGroup;
 #else
-@property (nonatomic, assign) dispatch_group_t completionGroup;
+@property (nonatomic, assign, nullable) dispatch_group_t completionGroup;
 #endif
 
 ///---------------------------------------------
@@ -188,11 +189,11 @@
 
  This is the designated initializer.
 
- :param: url The base URL for the HTTP client.
+ @param url The base URL for the HTTP client.
 
- :return: The newly-initialized HTTP client
+ @return The newly-initialized HTTP client
  */
-- (instancetype)initWithBaseURL:(NSURL *)url NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithBaseURL:(nullable NSURL *)url NS_DESIGNATED_INITIALIZER;
 
 ///---------------------------------------
 /// @name Managing HTTP Request Operations
@@ -201,13 +202,13 @@
 /**
  Creates an `AFHTTPRequestOperation`, and sets the response serializers to that of the HTTP client.
 
- :param: request The request object to be loaded asynchronously during execution of the operation.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
+ @param request The request object to be loaded asynchronously during execution of the operation.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the created request operation and the object created from the response data of request.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes two arguments:, the created request operation and the `NSError` object describing the network or parsing error that occurred.
  */
 - (AFHTTPRequestOperation *)HTTPRequestOperationWithRequest:(NSURLRequest *)request
-                                                    success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                                                    failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+                                                    success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                                                    failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 ///---------------------------
 /// @name Making HTTP Requests
@@ -216,109 +217,110 @@
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `GET` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)GET:(NSString *)URLString
-                     parameters:(id)parameters
-                        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)GET:(NSString *)URLString
+                     parameters:(nullable id)parameters
+                        success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                        failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `HEAD` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes a single arguments: the request operation.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes a single arguments: the request operation.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)HEAD:(NSString *)URLString
-                      parameters:(id)parameters
-                         success:(void (^)(AFHTTPRequestOperation *operation))success
-                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)HEAD:(NSString *)URLString
+                      parameters:(nullable id)parameters
+                         success:(nullable void (^)(AFHTTPRequestOperation *operation))success
+                         failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `POST` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)POST:(NSString *)URLString
-                      parameters:(id)parameters
-                         success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)POST:(NSString *)URLString
+                      parameters:(nullable id)parameters
+                         success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                         failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a multipart `POST` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param block A block that takes a single argument and appends data to the HTTP body. The block argument is an object adopting the `AFMultipartFormData` protocol.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)POST:(NSString *)URLString
-                      parameters:(id)parameters
-       constructingBodyWithBlock:(void (^)(id <AFMultipartFormData> formData))block
-                         success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                         failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)POST:(NSString *)URLString
+                      parameters:(nullable id)parameters
+       constructingBodyWithBlock:(nullable void (^)(id <AFMultipartFormData> formData))block
+                         success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                         failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `PUT` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)PUT:(NSString *)URLString
-                     parameters:(id)parameters
-                        success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                        failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)PUT:(NSString *)URLString
+                     parameters:(nullable id)parameters
+                        success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                        failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `PATCH` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)PATCH:(NSString *)URLString
-                       parameters:(id)parameters
-                          success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                          failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)PATCH:(NSString *)URLString
+                       parameters:(nullable id)parameters
+                          success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                          failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 /**
  Creates and runs an `AFHTTPRequestOperation` with a `DELETE` request.
 
- :param: URLString The URL string used to create the request URL.
- :param: parameters The parameters to be encoded according to the client request serializer.
- :param: success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
- :param: failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
+ @param URLString The URL string used to create the request URL.
+ @param parameters The parameters to be encoded according to the client request serializer.
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes two arguments: the request operation, and the response object created by the client response serializer.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a two arguments: the request operation and the error describing the network or parsing error that occurred.
 
  @see -HTTPRequestOperationWithRequest:success:failure:
  */
-- (AFHTTPRequestOperation *)DELETE:(NSString *)URLString
-                        parameters:(id)parameters
-                           success:(void (^)(AFHTTPRequestOperation *operation, id responseObject))success
-                           failure:(void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
+- (nullable AFHTTPRequestOperation *)DELETE:(NSString *)URLString
+                        parameters:(nullable id)parameters
+                           success:(nullable void (^)(AFHTTPRequestOperation *operation, id responseObject))success
+                           failure:(nullable void (^)(AFHTTPRequestOperation *operation, NSError *error))failure;
 
 @end
 
+NS_ASSUME_NONNULL_END

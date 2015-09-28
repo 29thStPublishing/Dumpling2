@@ -18,10 +18,14 @@ There are two targets which will be used with Dumpling2 - **Dumpling2** and **Du
 
 3. When submitting the app to the App Store or uploading to iTunes Connect for testing or submitting, use the framework from the Phone OS folder (*Debug-iphoneos*)
 
+
 ## Dependencies
 
-1. The Dumpling2 framework looks for **AFNetworking** libraries for making calls to the Magnet API. We had initially intended to use Cocoapods, but they don't work with frameworks. So have included AFNetworking source files into the framework
-2. Dumpling2 uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately
+1. The Dumpling2 framework looks for **AFNetworking** libraries for making calls to the Magnet API. We had initially intended to use Cocoapods, but they don't work with frameworks. So have included AFNetworking source files into the framework. The current Dumpling2 version as of September 2015 uses [AFNetworking v2.6.0](https://github.com/AFNetworking/AFNetworking/releases/tag/2.6.0)
+
+2. Dumpling2 uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately.
+The current Dumpling2 version as of September 2015 uses [Realm v0.95.2](https://github.com/realm/realm-cocoa/releases/download/v0.95.2/realm-objc-0.95.2.zip)
+
 3. Dumpling2 uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 

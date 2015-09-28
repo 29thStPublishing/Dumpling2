@@ -1,6 +1,5 @@
 // AFNetworkReachabilityManager.h
-//
-// Copyright (c) 2013-2015 AFNetworking (http://afnetworking.com)
+// Copyright (c) 2011–2015 Alamofire Software Foundation (http://alamofire.org/)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +20,8 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+
+#if !TARGET_OS_WATCH
 #import <SystemConfiguration/SystemConfiguration.h>
 
 #ifndef NS_DESIGNATED_INITIALIZER
@@ -37,6 +38,8 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
     AFNetworkReachabilityStatusReachableViaWWAN = 1,
     AFNetworkReachabilityStatusReachableViaWiFi = 2,
 };
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  `AFNetworkReachabilityManager` monitors the reachability of domains, and addresses for both WWAN and WiFi network interfaces.
@@ -81,27 +84,27 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
 /**
  Creates and returns a network reachability manager for the specified domain.
 
- :param: domain The domain used to evaluate network reachability.
+ @param domain The domain used to evaluate network reachability.
 
- :return: An initialized network reachability manager, actively monitoring the specified domain.
+ @return An initialized network reachability manager, actively monitoring the specified domain.
  */
 + (instancetype)managerForDomain:(NSString *)domain;
 
 /**
  Creates and returns a network reachability manager for the socket address.
 
- :param: address The socket address (`sockaddr_in`) used to evaluate network reachability.
+ @param address The socket address (`sockaddr_in`) used to evaluate network reachability.
 
- :return: An initialized network reachability manager, actively monitoring the specified socket address.
+ @return An initialized network reachability manager, actively monitoring the specified socket address.
  */
 + (instancetype)managerForAddress:(const void *)address;
 
 /**
  Initializes an instance of a network reachability manager from the specified reachability object.
 
- :param: reachability The reachability object to monitor.
+ @param reachability The reachability object to monitor.
 
- :return: An initialized network reachability manager, actively monitoring the specified reachability.
+ @return An initialized network reachability manager, actively monitoring the specified reachability.
  */
 - (instancetype)initWithReachability:(SCNetworkReachabilityRef)reachability NS_DESIGNATED_INITIALIZER;
 
@@ -135,9 +138,9 @@ typedef NS_ENUM(NSInteger, AFNetworkReachabilityStatus) {
 /**
  Sets a callback to be executed when the network availability of the `baseURL` host changes.
 
- :param: block A block object to be executed when the network availability of the `baseURL` host changes.. This block has no return value and takes a single argument which represents the various reachability states from the device to the `baseURL`.
+ @param block A block object to be executed when the network availability of the `baseURL` host changes.. This block has no return value and takes a single argument which represents the various reachability states from the device to the `baseURL`.
  */
-- (void)setReachabilityStatusChangeBlock:(void (^)(AFNetworkReachabilityStatus status))block;
+- (void)setReachabilityStatusChangeBlock:(nullable void (^)(AFNetworkReachabilityStatus status))block;
 
 @end
 
@@ -199,3 +202,6 @@ extern NSString * const AFNetworkingReachabilityNotificationStatusItem;
  Returns a localized string representation of an `AFNetworkReachabilityStatus` value.
  */
 extern NSString * AFStringFromNetworkReachabilityStatus(AFNetworkReachabilityStatus status);
+
+NS_ASSUME_NONNULL_END
+#endif
