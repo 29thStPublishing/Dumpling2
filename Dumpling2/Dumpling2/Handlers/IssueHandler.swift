@@ -275,6 +275,33 @@ public class IssueHandler: NSObject {
         }
     }
     
+    /**
+    The method gets preview issues from the Magnet API for the client key and adds them to the database
+    */
+    public func addPreviewIssues() {
+        
+        let requestURL = "\(baseURL)issues/preview"
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                if allIssues.count > 0 {
+                    for (_, issueDict) in allIssues.enumerate() {
+                        let issueId = issueDict.valueForKey("id") as! String
+                        self.addIssueFromAPI(issueId, volumeId: nil)
+                    }
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+            }
+        }
+    }
+    
     // MARK: Add/Update Issues, Assets and Articles
     
     //Add or create issue details (zip structure)
