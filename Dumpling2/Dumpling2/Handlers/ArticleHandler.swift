@@ -108,20 +108,25 @@ public class ArticleHandler: NSObject {
     }
     
     class func getCurrentSchemaVersion() -> UInt64 {
-        let currentSchemaVersion: UInt64 = RLMRealm.schemaVersionAtPath(RLMRealmConfiguration.defaultConfiguration().path!, error: nil)
-        
-        if currentSchemaVersion < 0 {
-            return 0
+        if NSFileManager.defaultManager().fileExistsAtPath(RLMRealmConfiguration.defaultConfiguration().path!) {
+            
+            let currentSchemaVersion: UInt64 = RLMRealm.schemaVersionAtPath(RLMRealmConfiguration.defaultConfiguration().path!, error: nil)
+            
+            if currentSchemaVersion < 0 {
+                return 0
+            }
+            
+            return currentSchemaVersion
         }
         
-        return currentSchemaVersion
+        return 0
     }
     
     //Check and migrate Realm data if needed
     class func checkAndMigrateData(schemaVersion: UInt64) {
         
         let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
-        if currentSchemaVersion < schemaVersion {
+        if currentSchemaVersion <= schemaVersion {
             let config = RLMRealmConfiguration.defaultConfiguration()
             config.schemaVersion = schemaVersion
             
@@ -198,7 +203,9 @@ public class ArticleHandler: NSObject {
             return
         }
         
-        var requestURL = "\(baseURL)articles/\(property)/\(value)?limit="
+        //let encodedVal = value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
+        let encodedVal = value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
+        var requestURL = "\(baseURL)articles/\(property)/" + encodedVal! + "?limit="
         
         if limit > 0 {
             requestURL += "\(limit)"

@@ -870,7 +870,11 @@ public class Asset: RLMObject {
                     folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
                 }
                 
-                let filePath = "\(folderPath)/\(fileURL)"
+                if !folderPath.hasSuffix("/") {
+                    //Add the trailing slash
+                    folderPath = "\(folderPath)/"
+                }
+                let filePath = "\(folderPath)\(fileURL)"
                 return filePath
             }
         }
