@@ -90,15 +90,19 @@ This class handles adding issues to the database. If using a VolumeHandler, you 
 
 5. **addIssueFromAPI(issueId: String, volumeId: String)** The method uses the global id of an issue, gets its content from the Magnet API and adds it to the database. The volume id is optional and if provided, saves the global id of the volume this issue is associated with
 
-6. **listIssues()** The method is for testing only. It prints the available issues for a client api key
+6. **addAllIssues()** The method gets all issues from the Magnet API for given client and adds it to the database
 
-7. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
+7. **addPreviewIssues()** The method gets all preview issues from the Magnet API for given client and adds it to the database
 
-8. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
+8. **listIssues()** The method is for testing only. It prints the available issues for a client api key
 
-9. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
+9. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
 
-10. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
+10. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
+
+11. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
+
+12. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
 
 
 ## ArticleHandler
