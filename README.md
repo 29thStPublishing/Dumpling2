@@ -28,6 +28,16 @@ The current Dumpling2 version as of September 2015 uses [Realm v0.95.2](https://
 
 3. Dumpling2 uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
+###Updating Realm in Dumpling2
+1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases)
+
+2. From the Realm.framework **ios** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/RHeaders*
+
+3. Make sure *Realm* is added to *Linked Frameworks & Libraries* for Dumpling2 target
+
+4. All the `.h` files added **should** have public access (can be checked in the File Inspector
+
+5. Change all references to `#import <Realm/file_name.h>` to `#import file_name.h`
 
 ## Classes
 
