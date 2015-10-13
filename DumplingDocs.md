@@ -18,6 +18,21 @@ Dumpling has been written with Swift 1.2 and is very easy to use and integrate. 
 3. Dumpling uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 
+## Building for iTunes Connect / Testflight
+To build your app (using Dumpling2) for submission to iTunes Connect or for distribution via Testflight, we need to strip the fat framework to support just arm64 and armv7 (and remove i386 and x86_64 needed for running the app on simulators).
+
+To do this, follow these steps
+
+1. Add `Dumpling2.framework` in your project
+
+2. In `Build Phases` for your project's target, add a new `Run Script` phase after `Embed Frameworks`
+
+3. Add the following command to the `Run Script`
+```
+/bin/sh ${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Dumpling2.framework/strip-frameworks.sh
+```
+
+
 ## VolumeHandler
 
 This is the main class and the starting point of Dumpling

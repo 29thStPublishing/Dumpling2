@@ -57,6 +57,7 @@
 		639B4EBB1BB564E3001DC8CE /* RLMResults_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B4D341BB416B4001DC8CE /* libc++.tbd */; };
+		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; settings = {ASSET_TAGS = (); }; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
 		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
 		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -169,6 +170,7 @@
 		639B4E9B1BB564E3001DC8CE /* RLMRealmUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmUtil.h; sourceTree = "<group>"; };
 		639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
 		639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
+		63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "Helpers/strip-frameworks.sh"; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
 		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
 		FF1A70051AEA5F85001B350F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
@@ -382,6 +384,7 @@
 		FFCB3B321A78E58600F52BC6 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */,
 				FFCB3B361A78E5E400F52BC6 /* Helper.swift */,
 				FFDAD91A1AB6FA9600506EBF /* LRNetworkManager.swift */,
 				FFD86B821AE7B352003E357B /* ReaderHelper.swift */,
@@ -593,6 +596,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -818,7 +822,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dumpling2/RHeaders",
@@ -857,7 +861,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dumpling2/RHeaders",
