@@ -20,5 +20,8 @@ FOUNDATION_EXPORT const unsigned char Dumpling2VersionString[];
 #import "AFNetworking.h"
 #import "Realm.h"
 
+#import "GTMNSString+HTML.h"
+#import "NSString+HTML.h"
+
 //#import <AFNetworking/AFNetworking.h>
 
