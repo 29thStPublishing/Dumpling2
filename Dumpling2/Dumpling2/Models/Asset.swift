@@ -199,10 +199,10 @@ public class Asset: RLMObject {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/\((fileUrl as NSString).lastPathComponent)"
+                    finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalURL = "\(volume.assetFolder)/\((fileUrl as NSString).lastPathComponent)"
+                    finalURL = "\(volume.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
@@ -243,7 +243,7 @@ public class Asset: RLMObject {
                     }
                 }
                 
-                currentAsset.originalURL = (fileUrl as NSString).lastPathComponent
+                currentAsset.originalURL = "original-\((fileUrl as NSString).lastPathComponent)"
                 
                 var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
@@ -257,10 +257,10 @@ public class Asset: RLMObject {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalThumbURL = "\(finalFolder)/\((thumbUrl as NSString).lastPathComponent)"
+                    finalThumbURL = "\(finalFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalThumbURL = "\(volume.assetFolder)/\((thumbUrl as NSString).lastPathComponent)"
+                    finalThumbURL = "\(volume.assetFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
@@ -286,11 +286,18 @@ public class Asset: RLMObject {
                     }
                 }
                 
-                currentAsset.squareURL = (thumbUrl as NSString).lastPathComponent
+                currentAsset.squareURL = "thumb-\((thumbUrl as NSString).lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
-                        currentAsset.metadata = Helper.stringFromJSON(metadata)!
+                        let metadataDict = NSMutableDictionary(dictionary: metadata as! NSDictionary)
+                        if let height = meta.objectForKey("height") {
+                            metadataDict.setObject(height, forKey: "height")
+                        }
+                        if let width = meta.objectForKey("width") {
+                            metadataDict.setObject(width, forKey: "width")
+                        }
+                        currentAsset.metadata = Helper.stringFromJSON(metadataDict)!
                     }
                     else {
                         currentAsset.metadata = metadata as! String
@@ -324,6 +331,7 @@ public class Asset: RLMObject {
                 let response: NSDictionary = data as! NSDictionary
                 let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
+                
                 //Update Asset now
                 realm.beginWriteTransaction()
 
@@ -360,10 +368,10 @@ public class Asset: RLMObject {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/\((fileUrl as NSString).lastPathComponent)"
+                    finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalURL = "\(issue.assetFolder)/\((fileUrl as NSString).lastPathComponent)"
+                    finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(fileUrl, toPath: finalURL) {
@@ -420,7 +428,7 @@ public class Asset: RLMObject {
                         }
                     }
                 }
-                currentAsset.originalURL = (fileUrl as NSString).lastPathComponent
+                currentAsset.originalURL = "original-\((fileUrl as NSString).lastPathComponent)"
                 
                 var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
@@ -434,10 +442,10 @@ public class Asset: RLMObject {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
                     let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalThumbURL = "\(finalFolder)/\((thumbUrl as NSString).lastPathComponent)"
+                    finalThumbURL = "\(finalFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                 }
                 else {
-                    finalThumbURL = "\(issue.assetFolder)/\((thumbUrl as NSString).lastPathComponent)"
+                    finalThumbURL = "\(issue.assetFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                 }
                 
                 networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
@@ -466,11 +474,18 @@ public class Asset: RLMObject {
                         }
                     }
                 }
-                currentAsset.squareURL = (thumbUrl as NSString).lastPathComponent
+                currentAsset.squareURL = "thumb-\((thumbUrl as NSString).lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
                     if metadata.isKindOfClass(NSDictionary) {
-                        currentAsset.metadata = Helper.stringFromJSON(metadata)!
+                        let metadataDict = NSMutableDictionary(dictionary: metadata as! NSDictionary)
+                        if let height = meta.objectForKey("height") {
+                            metadataDict.setObject(height, forKey: "height")
+                        }
+                        if let width = meta.objectForKey("width") {
+                            metadataDict.setObject(width, forKey: "width")
+                        }
+                        currentAsset.metadata = Helper.stringFromJSON(metadataDict)!
                     }
                     else {
                         currentAsset.metadata = metadata as! String
@@ -878,6 +893,40 @@ public class Asset: RLMObject {
                 return filePath
             }
         }
+        return nil
+    }
+    
+    /**
+    This method returns the value for a specific key from the custom metadata of the asset
+    
+    :return: an object for the key from the custom metadata (or nil)
+    */
+    public func getValue(key: NSString) -> AnyObject? {
+        
+        let testAsset = Asset()
+        let properties: NSArray = testAsset.objectSchema.properties
+        
+        var foundProperty = false
+        for property: RLMProperty in properties as! [RLMProperty] {
+            let propertyName = property.name
+            if propertyName == key {
+                //This is the property we are looking for
+                foundProperty = true
+                break
+            }
+        }
+        if (foundProperty) {
+            //Get value of this property and return
+            return self.valueForKey(key as String)
+        }
+        else {
+            //This is a metadata key
+            let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
+            if let metadataDict = metadata as? NSDictionary {
+                return metadataDict.valueForKey(key as String)
+            }
+        }
+        
         return nil
     }
 }
