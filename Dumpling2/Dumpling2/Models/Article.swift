@@ -306,7 +306,30 @@ public class Article: RLMObject {
         }
     }
     
-    // MARK: Public methods
+    //Add article with given issue global id
+    class func createArticle(articleId: String, issueId: String, delegate: AnyObject?) {
+        let requestURL = "\(baseURL)articles/\(articleId)"
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
+                self.addArticle(articleInfo, delegate: delegate)
+                
+            }
+            else if let err = error {
+                //Update article status - error
+                if delegate != nil {
+                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                }
+                print("Error: " + err.description)
+            }
+        }
+    }
     
     //MARK: Class methods
     
@@ -392,6 +415,8 @@ public class Article: RLMObject {
             (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
         }
     }
+    
+    // MARK: Public methods
     
     /**
     This method accepts an issue's global id and deletes all articles from the database which belong to that issue

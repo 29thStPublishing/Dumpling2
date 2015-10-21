@@ -22,6 +22,10 @@
 
 /* Begin PBXBuildFile section */
 		630953431B28501600DBDB46 /* PurchaseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 630953421B28501600DBDB46 /* PurchaseHandler.swift */; };
+		630F202F1BD76F5100A0B2DE /* GTMNSString+HTML.h in Headers */ = {isa = PBXBuildFile; fileRef = 630F202B1BD76F5100A0B2DE /* GTMNSString+HTML.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		630F20301BD76F5100A0B2DE /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */; settings = {ASSET_TAGS = (); }; };
+		630F20311BD76F5100A0B2DE /* NSString+HTML.h in Headers */ = {isa = PBXBuildFile; fileRef = 630F202D1BD76F5100A0B2DE /* NSString+HTML.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		630F20321BD76F5100A0B2DE /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202E1BD76F5100A0B2DE /* NSString+HTML.m */; settings = {ASSET_TAGS = (); }; };
 		634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634BA6121B17230A007B2630 /* ArticleHandler.swift */; };
 		636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636FF7BD1B0097D7006FF05A /* AccessControl.swift */; };
 		639B4E2E1BB47338001DC8CE /* Dumpling2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCB3AF71A78A12700F52BC6 /* Dumpling2.framework */; };
@@ -135,6 +139,11 @@
 
 /* Begin PBXFileReference section */
 		630953421B28501600DBDB46 /* PurchaseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PurchaseHandler.swift; sourceTree = "<group>"; };
+		630F20281BD75E9A00A0B2DE /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		630F202B1BD76F5100A0B2DE /* GTMNSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GTMNSString+HTML.h"; sourceTree = "<group>"; };
+		630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
+		630F202D1BD76F5100A0B2DE /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
+		630F202E1BD76F5100A0B2DE /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
 		634BA6121B17230A007B2630 /* ArticleHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleHandler.swift; sourceTree = "<group>"; };
 		636FF7BD1B0097D7006FF05A /* AccessControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessControl.swift; sourceTree = "<group>"; };
 		639B4D341BB416B4001DC8CE /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -240,6 +249,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		630F202A1BD76F5100A0B2DE /* Encoding */ = {
+			isa = PBXGroup;
+			children = (
+				630F202B1BD76F5100A0B2DE /* GTMNSString+HTML.h */,
+				630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */,
+				630F202D1BD76F5100A0B2DE /* NSString+HTML.h */,
+				630F202E1BD76F5100A0B2DE /* NSString+HTML.m */,
+			);
+			name = Encoding;
+			path = Helpers/Encoding;
+			sourceTree = "<group>";
+		};
 		639B4E7C1BB564E3001DC8CE /* Headers */ = {
 			isa = PBXGroup;
 			children = (
@@ -295,6 +316,7 @@
 		F1B16F3685C54536E0868F50 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				630F20281BD75E9A00A0B2DE /* CoreFoundation.framework */,
 				639B4D361BB416C0001DC8CE /* libz.tbd */,
 				639B4D341BB416B4001DC8CE /* libc++.tbd */,
 				FFD0EDAF1AFCA8F00055A102 /* StoreKit.framework */,
@@ -384,6 +406,7 @@
 		FFCB3B321A78E58600F52BC6 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				630F202A1BD76F5100A0B2DE /* Encoding */,
 				63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */,
 				FFCB3B361A78E5E400F52BC6 /* Helper.swift */,
 				FFDAD91A1AB6FA9600506EBF /* LRNetworkManager.swift */,
@@ -474,10 +497,12 @@
 				639B4EB11BB564E3001DC8CE /* RLMArray_Private.h in Headers */,
 				FFCA0FE51A80DBF1000C9AFD /* AFURLSessionManager.h in Headers */,
 				639B4EA11BB564E3001DC8CE /* RLMCollection.h in Headers */,
+				630F202F1BD76F5100A0B2DE /* GTMNSString+HTML.h in Headers */,
 				639B4EA51BB564E3001DC8CE /* RLMObject.h in Headers */,
 				639B4EA71BB564E3001DC8CE /* RLMObjectBase_Dynamic.h in Headers */,
 				639B4EA21BB564E3001DC8CE /* RLMConstants.h in Headers */,
 				639B4EB51BB564E3001DC8CE /* RLMObjectSchema_Private.h in Headers */,
+				630F20311BD76F5100A0B2DE /* NSString+HTML.h in Headers */,
 				FFCA0FD81A80DBF1000C9AFD /* AFHTTPSessionManager.h in Headers */,
 				639B4EA41BB564E3001DC8CE /* RLMMigration.h in Headers */,
 				FFCF6D0F1A7F42BF008DF718 /* Dumpling2.h in Headers */,
@@ -646,11 +671,13 @@
 				FFCA0FD51A80DBF1000C9AFD /* AFHTTPRequestOperation.m in Sources */,
 				FFCA0FE61A80DBF1000C9AFD /* AFURLSessionManager.m in Sources */,
 				FFCB3B241A78E42800F52BC6 /* RLMSupport.swift in Sources */,
+				630F20301BD76F5100A0B2DE /* GTMNSString+HTML.m in Sources */,
 				FFCB3B3A1A78E5ED00F52BC6 /* IssueHandler.swift in Sources */,
 				63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */,
 				63CED84F1B1300A100C4200C /* Volume.swift in Sources */,
 				FFCA0FD91A80DBF1000C9AFD /* AFHTTPSessionManager.m in Sources */,
 				FFDAD91B1AB6FA9600506EBF /* LRNetworkManager.swift in Sources */,
+				630F20321BD76F5100A0B2DE /* NSString+HTML.m in Sources */,
 				630953431B28501600DBDB46 /* PurchaseHandler.swift in Sources */,
 				FFCB3B431A78E5F600F52BC6 /* Magazine.swift in Sources */,
 				FFCA0FDC1A80DBF1000C9AFD /* AFNetworkReachabilityManager.m in Sources */,
@@ -835,7 +862,7 @@
 				INFOPLIST_FILE = Dumpling2/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @rpath/Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dumpling2/RHeaders/**",
@@ -874,7 +901,7 @@
 				INFOPLIST_FILE = Dumpling2/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @rpath/Frameworks @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Dumpling2/RHeaders/**",
