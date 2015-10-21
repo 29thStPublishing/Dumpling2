@@ -378,6 +378,8 @@ Realm object for Assets. Also has methods for directly dealing with assets
 
 2. **getAssetPath()** ```returns String``` This method returns the path of the asset file (using the ```originalURL``` property) for the current object. Use this method to access the file path instead of directly using ```originalURL```
 
+3. **getValue(key:)** ```returns AnyObject/id or nil``` This method returns the value for a specific key (from the custom metadata or any of the properties)
+
 
 ## ReaderHelper
 
@@ -407,6 +409,14 @@ Class which helps store and retrieve user reading status
 11. **getDictionaryForCloud()** ```returns Dictionary<String, AnyObject>``` This method returns a dictionary containing saved values for current issue, article, asset and reading percentage for an article. The keys used are *CurrentVolume*, *CurrentIssue*, *CurrentArticle*, *CurrentAsset* and *ArticlePercent-<article_id_here>*
 
 12. **saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>)** saves specific values from a key for current issue, current article, current asset and article reading percentage back to user defaults (for using while app is active). The keys used should be the same as above
+
+
+## Helper
+
+Helper class
+
+###Class methods (public)
+1. **decodeHTMLEntitiesIn(string: String)** ```returns String``` This method accepts a string and replaces HTML entities with their respective characters
 
 
 ## Notifications
@@ -523,6 +533,3 @@ This is a protocol for managing access control to various purchases. The client 
 5. **listPurchases(userId: AnyObject?)** ```returns Array<String> or nil``` This method returns an array of skus for Purchases made by the current logged in user (or IAPs + web purchases if userId is not nil)
 
 6. **syncPurchases(userId: AnyObject)** This method syncs all purchases saved in the database to the server for given user identity. All purchases which do not have a user id (i.e. have been purchased on the device through IAPs) will also be marked as purchased by this user on the server
-
-
-**Sample implementation of AccessControl coming soon**
