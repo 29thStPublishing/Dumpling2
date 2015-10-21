@@ -17,7 +17,7 @@ let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
 let DOWNLOAD_COMPLETE: String = "downloadComplete" //Volume + Issues + Article + Volume assets + Issue assets + Article assets downloaded
 let ALL_DOWNLOADS_COMPLETE: String = "allDownloadsComplete" //all volumes or articles through the VolumeHandler or ArticleHandler
 
-class Helper {
+public class Helper {
     
     //Date from string of format MM/dd/yyyy
     class func publishedDateFrom(string: String) -> NSDate {
@@ -134,6 +134,15 @@ class Helper {
         }
         //Not nil and not empty
         return false
+    }
+    
+    public class func decodeHTMLEntitiesIn(string: String) -> String {
+        if string.rangeOfString("&") == nil {
+            return string
+        }
+        let str: NSString = NSString(string: string)
+        let decodedStr = str.stringByDecodingHTMLEntities()
+        return decodedStr
     }
     
     //Unpack a zip file
