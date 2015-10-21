@@ -159,6 +159,24 @@ public class ArticleHandler: NSObject {
     }
     
     /**
+    The method uses the global id of an article and its issue's global id, gets its content from the Magnet API and adds it to the database
+    
+    - parameter globalId: The global id for the article
+    
+    - parameter issueId: The global id for the issue
+    */
+    public func addArticleFromAPI(globalId: String, issueId: String) {
+        let requestURL = "\(baseURL)articles/\(globalId)"
+        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: "\(baseURL)issues/\(issueId)"), forKey: issueId)
+
+        self.issueHandler.updateStatusDictionary("", issueId: issueId, url: requestURL, status: 0)
+        if let issue = Issue.getIssue(issueId) {
+            Article.createArticleForId(globalId, issue: issue, placement: 0, delegate: self.issueHandler)
+        }
+        self.issueHandler.updateStatusDictionary("", issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 1)
+    }
+    
+    /**
     The method uses an SKU/Apple id of an article, gets its content from the Magnet API and adds it to the database
     
     - parameter appleId: The Apple id for the article
