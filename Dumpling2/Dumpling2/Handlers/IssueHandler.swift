@@ -667,7 +667,10 @@ public class IssueHandler: NSObject {
         else {
             //All articles downloaded (with or without errors) - send notif only if status of an article was updated
             if url.rangeOfString("/articles/") != nil {
-                NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(object: issueId, forKey: "issue") as! [String : String])
+                let replaceUrl = "\(baseURL)articles/"
+                let articleId = url.stringByReplacingOccurrencesOfString(replaceUrl, withString: "")
+                
+                NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(objects: [issueId, articleId], forKeys: ["issue", "article"]) as! [String : String])
             }
         }
         

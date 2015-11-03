@@ -205,41 +205,82 @@ public class Asset: RLMObject {
                     finalURL = "\(volume.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 
-                networkManager.downloadFile(fileUrl, toPath: finalURL) {
-                    (status:AnyObject?, error:NSError?) -> () in
-                    if status != nil {
-                        let completed = status as! NSNumber
-                        if completed.boolValue {
-                            //Mark asset download as done
-                            if delegate != nil {
-                                (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                var toDownload = true //Define whether the image should be downloaded or not
+                if let existingAsset = Asset.getAsset(currentAsset.globalId) {
+                    //Asset exists already
+                    if let updateDate: String = existingAsset.getValue("updateDate") as? String {
+                        //Get date from this string
+                        let lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
+                        var newUpdatedDate = NSDate()
+                        if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                            if let dt: String = updated["date"] as? String {
+                                newUpdatedDate = Helper.publishedDateFromISO(dt)
+                            }
+                        }
+                        //Compare the two dates - if newUpdated <= lastUpdated, don't download
+                        if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                            toDownload = false //Don't download - this file is up-to-date (if present)
+                        }
+                    }
+                    //Check if the image exists already
+                    if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
+                        let dict = try? NSFileManager.defaultManager().attributesOfItemAtPath(finalURL)
+                        if let fileSize: NSNumber = dict![NSFileSize] as? NSNumber {
+                            if fileSize.longLongValue > 0 {
+                                toDownload = false //we have a valid file
+                            }
+                            else {
+                                toDownload = true //file not downloaded
                             }
                         }
                     }
-                    else if let err = error {
-                        print("Error cdn: " + err.description)
-                        //Try downloading with url if cdn url download failed
-                        if isCdn {
-                            fileUrl = mediaFile.valueForKey("url") as! String
-                            networkManager.downloadFile(fileUrl, toPath: finalURL) {
-                                (status:AnyObject?, error:NSError?) -> () in
-                                if status != nil {
-                                    let completed = status as! NSNumber
-                                    if completed.boolValue {
-                                        //Mark asset download as done
-                                        if delegate != nil {
-                                            (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                    else {
+                        toDownload = true //file not downloaded
+                    }
+                }
+                
+                if toDownload {
+                    networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                        (status:AnyObject?, error:NSError?) -> () in
+                        if status != nil {
+                            let completed = status as! NSNumber
+                            if completed.boolValue {
+                                //Mark asset download as done
+                                if delegate != nil {
+                                    (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                                }
+                            }
+                        }
+                        else if let err = error {
+                            print("Error cdn: " + err.description)
+                            //Try downloading with url if cdn url download failed
+                            if isCdn {
+                                fileUrl = mediaFile.valueForKey("url") as! String
+                                networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                                    (status:AnyObject?, error:NSError?) -> () in
+                                    if status != nil {
+                                        let completed = status as! NSNumber
+                                        if completed.boolValue {
+                                            //Mark asset download as done
+                                            if delegate != nil {
+                                                (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                                            }
                                         }
                                     }
-                                }
-                                else if let err = error {
-                                    print("Error non cdn: " + err.description)
-                                    if delegate != nil {
-                                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                                    else if let err = error {
+                                        print("Error non cdn: " + err.description)
+                                        if delegate != nil {
+                                            (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId: "", url: requestURL, status: 2)
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+                else {
+                    if delegate != nil {
+                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
                     }
                 }
                 
@@ -296,6 +337,11 @@ public class Asset: RLMObject {
                         }
                         if let width = meta.objectForKey("width") {
                             metadataDict.setObject(width, forKey: "width")
+                        }
+                        if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                            if let updateDate: String = updated["date"] as? String {
+                                metadataDict.setObject(updateDate, forKey: "updateDate")
+                            }
                         }
                         currentAsset.metadata = Helper.stringFromJSON(metadataDict)!
                     }
@@ -374,57 +420,105 @@ public class Asset: RLMObject {
                     finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
                 }
                 
-                networkManager.downloadFile(fileUrl, toPath: finalURL) {
-                    (status:AnyObject?, error:NSError?) -> () in
-                    if status != nil {
-                        let completed = status as! NSNumber
-                        if completed.boolValue {
-                            //Mark asset download as done
-                            if delegate != nil {
-                                if !issue.globalId.isEmpty {
-                                    //This is an issue's asset or an article's (belonging to an issue) asset
-                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                var toDownload = true //Define whether the image should be downloaded or not
+                if let existingAsset = Asset.getAsset(currentAsset.globalId) {
+                    //Asset exists already
+                    if let updateDate: String = existingAsset.getValue("updateDate") as? String {
+                        //Get date from this string
+                        let lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
+                        var newUpdatedDate = NSDate()
+                        if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                            if let dt: String = updated["date"] as? String {
+                                newUpdatedDate = Helper.publishedDateFromISO(dt)
+                            }
+                        }
+                        //Compare the two dates - if newUpdated <= lastUpdated, don't download
+                        if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                            toDownload = false //Don't download
+                        }
+                    }
+                    //Check if the image exists already
+                    if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
+                        let dict = try? NSFileManager.defaultManager().attributesOfItemAtPath(finalURL)
+                        if let fileSize: NSNumber = dict![NSFileSize] as? NSNumber {
+                            if fileSize.longLongValue > 0 {
+                                toDownload = false //we have a valid file
+                            }
+                            else {
+                                toDownload = true
+                            }
+                        }
+                    }
+                    else {
+                        toDownload = true
+                    }
+                }
+
+                if toDownload {
+                    networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                        (status:AnyObject?, error:NSError?) -> () in
+                        if status != nil {
+                            let completed = status as! NSNumber
+                            if completed.boolValue {
+                                //Mark asset download as done
+                                if delegate != nil {
+                                    if !issue.globalId.isEmpty {
+                                        //This is an issue's asset or an article's (belonging to an issue) asset
+                                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                                    }
+                                    else {
+                                        //This is an independent article's asset
+                                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                                    }
                                 }
-                                else {
-                                    //This is an independent article's asset
-                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                            }
+                        }
+                        else if let err = error {
+                            print("Error: " + err.description)
+                            if isCdn {
+                                fileUrl = mediaFile.valueForKey("url") as! String
+                                networkManager.downloadFile(fileUrl, toPath: finalURL) {
+                                    (status:AnyObject?, error:NSError?) -> () in
+                                    if status != nil {
+                                        let completed = status as! NSNumber
+                                        if completed.boolValue {
+                                            //Mark asset download as done
+                                            if delegate != nil {
+                                                if !issue.globalId.isEmpty {
+                                                    //This is an issue's asset or an article's (belonging to an issue) asset
+                                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                                                }
+                                                else {
+                                                    //This is an independent article's asset
+                                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else if let _ = error {
+                                        if delegate != nil {
+                                            if !issue.globalId.isEmpty {
+                                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                                            }
+                                            else {
+                                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    else if let err = error {
-                        print("Error: " + err.description)
-                        if isCdn {
-                            fileUrl = mediaFile.valueForKey("url") as! String
-                            networkManager.downloadFile(fileUrl, toPath: finalURL) {
-                                (status:AnyObject?, error:NSError?) -> () in
-                                if status != nil {
-                                    let completed = status as! NSNumber
-                                    if completed.boolValue {
-                                        //Mark asset download as done
-                                        if delegate != nil {
-                                            if !issue.globalId.isEmpty {
-                                                //This is an issue's asset or an article's (belonging to an issue) asset
-                                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
-                                            }
-                                            else {
-                                                //This is an independent article's asset
-                                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
-                                            }
-                                        }
-                                    }
-                                }
-                                else if let _ = error {
-                                    if delegate != nil {
-                                        if !issue.globalId.isEmpty {
-                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
-                                        }
-                                        else {
-                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 2)
-                                        }
-                                    }
-                                }
-                            }
+                }
+                else {
+                    if delegate != nil {
+                        if !issue.globalId.isEmpty {
+                            //This is an issue's asset or an article's (belonging to an issue) asset
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                        }
+                        else {
+                            //This is an independent article's asset
+                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
                         }
                     }
                 }
@@ -484,6 +578,11 @@ public class Asset: RLMObject {
                         }
                         if let width = meta.objectForKey("width") {
                             metadataDict.setObject(width, forKey: "width")
+                        }
+                        if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                            if let updateDate: String = updated["date"] as? String {
+                                metadataDict.setObject(updateDate, forKey: "updateDate")
+                            }
                         }
                         currentAsset.metadata = Helper.stringFromJSON(metadataDict)!
                     }
