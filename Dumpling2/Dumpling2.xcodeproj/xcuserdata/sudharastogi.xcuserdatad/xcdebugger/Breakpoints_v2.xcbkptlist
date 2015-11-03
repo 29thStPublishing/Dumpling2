@@ -10,13 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "D2consumer/ViewController.swift"
-            timestampString = "467105086.888272"
+            timestampString = "468220515.92906"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "76"
-            endingLineNumber = "76"
-            landmarkName = "issueDownloadComplete(_:)"
-            landmarkType = "5">
+            startingLineNumber = "77"
+            endingLineNumber = "77">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -33,22 +31,6 @@
             endingLineNumber = "52"
             landmarkName = "IssueHandler"
             landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Models/Article.swift"
-            timestampString = "463493316.758979"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "295"
-            endingLineNumber = "295"
-            landmarkName = "createIndependentArticle(_:delegate:)"
-            landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -92,12 +74,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Dumpling2/Models/Asset.swift"
-            timestampString = "467110631.7779"
+            timestampString = "468220186.839216"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
-            landmarkName = "downloadAndCreateAsset(_:issue:articleId:placement:delegate:)"
+            startingLineNumber = "326"
+            endingLineNumber = "326"
+            landmarkName = "downloadAndCreateVolumeAsset(_:volume:placement:delegate:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Models/Article.swift"
+            timestampString = "467888833.884812"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "220"
+            endingLineNumber = "220"
+            landmarkName = "createArticleForId(_:issue:placement:delegate:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -108,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Dumpling2/Models/Asset.swift"
-            timestampString = "467110637.187195"
+            timestampString = "468216862.640181"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
             landmarkName = "downloadAndCreateVolumeAsset(_:volume:placement:delegate:)"
             landmarkType = "5">
          </BreakpointContent>
