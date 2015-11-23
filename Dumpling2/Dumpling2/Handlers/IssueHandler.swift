@@ -460,9 +460,10 @@ public class IssueHandler: NSObject {
             for (index, assetDict) in issueMedia.enumerate() {
                 //Download images and create Asset object for issue
                 //Add asset to Issue dictionary
-                let assetId = assetDict.valueForKey("id") as! NSString
+                //TODO: TEST
+                /*let assetId = assetDict.valueForKey("id") as! NSString
                 self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)media/\(assetId)", status: 0)
-                Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)
+                Asset.downloadAndCreateAsset(assetId, issue: currentIssue, articleId: "", placement: index+1, delegate: self)*/
             }
         }
         

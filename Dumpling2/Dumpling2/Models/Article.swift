@@ -216,13 +216,14 @@ public class Article: RLMObject {
                     for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
-                        if delegate != nil {
+                        //TODO: TEST
+                        /*if delegate != nil {
                             (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
-                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)
+                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)*/
                         
                         if index == 0 {
-                            currentArticle.thumbImageURL = assetDict.valueForKey("id") as! String
+                            currentArticle.thumbImageURL = assetid as String
                         }
                     }
                 }
@@ -802,7 +803,7 @@ public class Article: RLMObject {
     /**
     This method downloads assets for the article
     */
-    public func downloadArticleAssets() {
+    public func downloadArticleAssets(delegate: IssueHandler?) {
         let issueId = self.issueId
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
@@ -821,9 +822,17 @@ public class Article: RLMObject {
                 assetFolder = folder!.stringByReplacingOccurrencesOfString("/\(issue?.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
             }
         }
-        let issueHandler = IssueHandler(folder: assetFolder)!
+        
         let requestURL = "\(baseURL)articles/\(self.globalId)"
-        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        
+        var issueHandler: IssueHandler
+        if delegate != nil {
+            issueHandler = delegate!
+        }
+        else {
+            issueHandler = IssueHandler(folder: assetFolder)!
+            issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -841,12 +850,16 @@ public class Article: RLMObject {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
                         
-                        issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        if delegate != nil {
+                            issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
+                        else {
+                            issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
                         Asset.downloadAndCreateAsset(assetid, issue: issue!, articleId: self.globalId as String, placement: index+1, delegate: issueHandler)
                     }
                 }
-                
-                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 1)
+                //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 1)
             }
             else if let err = error {
                 print("Error: " + err.description)

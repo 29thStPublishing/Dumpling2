@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "D2consumer/ViewController.swift"
-            timestampString = "468220515.92906"
+            timestampString = "469952259.937608"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77">
+            startingLineNumber = "79"
+            endingLineNumber = "79">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -40,11 +40,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Dumpling2/Handlers/IssueHandler.swift"
-            timestampString = "467108541.110062"
+            timestampString = "469947748.615877"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "463"
-            endingLineNumber = "463"
+            startingLineNumber = "464"
+            endingLineNumber = "464"
             landmarkName = "updateIssueFromAPI(_:globalId:volumeId:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -81,22 +81,38 @@
             endingLineNumber = "326"
             landmarkName = "downloadAndCreateVolumeAsset(_:volume:placement:delegate:)"
             landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Models/Article.swift"
-            timestampString = "467888833.884812"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "220"
-            endingLineNumber = "220"
-            landmarkName = "createArticleForId(_:issue:placement:delegate:)"
-            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "function signature specialization &lt;Arg[2] = Dead, Arg[3] = Value Promoted from InOut, Arg[8] = Dead, Arg[9] = Value Promoted from InOut&gt; of static Dumpling2.Asset.(downloadAndCreateVolumeAsset (Dumpling2.Asset.Type) -&gt; (__ObjC.NSString, volume : Dumpling2.Volume, placement : Swift.Int, delegate : Swift.Optional&lt;Swift.AnyObject&gt;) -&gt; ()).(closure #1).(closure #2)"
+                  moduleName = "Dumpling2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sudharastogi/Project%20Docs/PowerToFly/29%20Street/git/D2Master_Latest_25Sept/Dumpling2/Dumpling2/Dumpling2/Models/Asset.swift"
+                  timestampString = "469947749.816408"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "327"
+                  endingLineNumber = "327"
+                  offsetFromSymbolStart = "1420">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "function signature specialization &lt;Arg[2] = Dead, Arg[3] = Value Promoted from InOut, Arg[8] = Dead, Arg[9] = Value Promoted from InOut&gt; of static Dumpling2.Asset.(downloadAndCreateVolumeAsset (Dumpling2.Asset.Type) -&gt; (__ObjC.NSString, volume : Dumpling2.Volume, placement : Swift.Int, delegate : Swift.Optional&lt;Swift.AnyObject&gt;) -&gt; ()).(closure #1).(closure #2)"
+                  moduleName = "Dumpling2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sudharastogi/Project%20Docs/PowerToFly/29%20Street/git/D2Master_Latest_25Sept/Dumpling2/Dumpling2/Dumpling2/Models/Asset.swift"
+                  timestampString = "469947749.817704"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "327"
+                  endingLineNumber = "327"
+                  offsetFromSymbolStart = "1432">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -112,6 +128,38 @@
             startingLineNumber = "174"
             endingLineNumber = "174"
             landmarkName = "downloadAndCreateVolumeAsset(_:volume:placement:delegate:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Models/Issue.swift"
+            timestampString = "469947664.617713"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "246"
+            endingLineNumber = "246"
+            landmarkName = "downloadAllAssets()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Handlers/IssueHandler.swift"
+            timestampString = "469951950.984897"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "653"
+            endingLineNumber = "653"
+            landmarkName = "updateStatusDictionary(_:issueId:url:status:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
