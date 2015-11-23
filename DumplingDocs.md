@@ -236,6 +236,8 @@ Realm object for Issues. Also has methods for directly dealing with issues
 
 5. **downloadIssueAssets()** This method downloads assets for the issue (only issue assets, not article assets)
 
+6. **downloadAllAssets()** This method downloads assets for the issue and all its articles
+
 
 ## Article
 
@@ -325,6 +327,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 6. **downloadArticleAssets()** This method downloads assets for the article
 
 7. **deleteArticle()** This method deletes all assets for the article and the article from the database
+
+8. **downloadArticleAssets(delegate: AnyObject?)** This method downloads the assets for the given article. Send the delegate as nil
 
 
 ## Asset
