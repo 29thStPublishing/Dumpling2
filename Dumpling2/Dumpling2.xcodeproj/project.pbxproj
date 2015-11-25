@@ -23,9 +23,10 @@
 /* Begin PBXBuildFile section */
 		630953431B28501600DBDB46 /* PurchaseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 630953421B28501600DBDB46 /* PurchaseHandler.swift */; };
 		630F202F1BD76F5100A0B2DE /* GTMNSString+HTML.h in Headers */ = {isa = PBXBuildFile; fileRef = 630F202B1BD76F5100A0B2DE /* GTMNSString+HTML.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		630F20301BD76F5100A0B2DE /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */; settings = {ASSET_TAGS = (); }; };
+		630F20301BD76F5100A0B2DE /* GTMNSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */; };
 		630F20311BD76F5100A0B2DE /* NSString+HTML.h in Headers */ = {isa = PBXBuildFile; fileRef = 630F202D1BD76F5100A0B2DE /* NSString+HTML.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		630F20321BD76F5100A0B2DE /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202E1BD76F5100A0B2DE /* NSString+HTML.m */; settings = {ASSET_TAGS = (); }; };
+		630F20321BD76F5100A0B2DE /* NSString+HTML.m in Sources */ = {isa = PBXBuildFile; fileRef = 630F202E1BD76F5100A0B2DE /* NSString+HTML.m */; };
+		63268B3E1C05D15C00EB7DBA /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 63268B3D1C05D15C00EB7DBA /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 634BA6121B17230A007B2630 /* ArticleHandler.swift */; };
 		636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 636FF7BD1B0097D7006FF05A /* AccessControl.swift */; };
 		639B4E2E1BB47338001DC8CE /* Dumpling2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFCB3AF71A78A12700F52BC6 /* Dumpling2.framework */; };
@@ -61,7 +62,8 @@
 		639B4EBB1BB564E3001DC8CE /* RLMResults_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B4D341BB416B4001DC8CE /* libc++.tbd */; };
-		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; settings = {ASSET_TAGS = (); }; };
+		63AF689A1BE8807E00405D53 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AF68991BE8807E00405D53 /* Realm */; };
+		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
 		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
 		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -144,7 +146,9 @@
 		630F202C1BD76F5100A0B2DE /* GTMNSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "GTMNSString+HTML.m"; sourceTree = "<group>"; };
 		630F202D1BD76F5100A0B2DE /* NSString+HTML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HTML.h"; sourceTree = "<group>"; };
 		630F202E1BD76F5100A0B2DE /* NSString+HTML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HTML.m"; sourceTree = "<group>"; };
+		63268B3D1C05D15C00EB7DBA /* RLMOptionalBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMOptionalBase.h; sourceTree = "<group>"; };
 		634BA6121B17230A007B2630 /* ArticleHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArticleHandler.swift; sourceTree = "<group>"; };
+		6350EEA31C05D484002E2899 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		636FF7BD1B0097D7006FF05A /* AccessControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessControl.swift; sourceTree = "<group>"; };
 		639B4D341BB416B4001DC8CE /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		639B4D361BB416C0001DC8CE /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -165,7 +169,6 @@
 		639B4E8B1BB564E3001DC8CE /* RLMRealmConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration.h; sourceTree = "<group>"; };
 		639B4E8C1BB564E3001DC8CE /* RLMResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults.h; sourceTree = "<group>"; };
 		639B4E8D1BB564E3001DC8CE /* RLMSchema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema.h; sourceTree = "<group>"; };
-		639B4E8F1BB564E3001DC8CE /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		639B4E911BB564E3001DC8CE /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		639B4E921BB564E3001DC8CE /* RLMArray_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArray_Private.h; sourceTree = "<group>"; };
 		639B4E931BB564E3001DC8CE /* RLMListBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMListBase.h; sourceTree = "<group>"; };
@@ -179,6 +182,7 @@
 		639B4E9B1BB564E3001DC8CE /* RLMRealmUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmUtil.h; sourceTree = "<group>"; };
 		639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
 		639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
+		63AF68991BE8807E00405D53 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
 		63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "Helpers/strip-frameworks.sh"; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
 		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
@@ -234,6 +238,7 @@
 			files = (
 				639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */,
 				FFD0EDB01AFCA8F00055A102 /* StoreKit.framework in Frameworks */,
+				63AF689A1BE8807E00405D53 /* Realm in Frameworks */,
 				FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,7 +293,7 @@
 		639B4E8E1BB564E3001DC8CE /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				639B4E8F1BB564E3001DC8CE /* module.modulemap */,
+				6350EEA31C05D484002E2899 /* module.modulemap */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -296,6 +301,7 @@
 		639B4E901BB564E3001DC8CE /* PrivateHeaders */ = {
 			isa = PBXGroup;
 			children = (
+				63268B3D1C05D15C00EB7DBA /* RLMOptionalBase.h */,
 				639B4E911BB564E3001DC8CE /* RLMAccessor.h */,
 				639B4E921BB564E3001DC8CE /* RLMArray_Private.h */,
 				639B4E931BB564E3001DC8CE /* RLMListBase.h */,
@@ -462,6 +468,7 @@
 		FFCF423A1A7A582B00E847E8 /* RHeaders */ = {
 			isa = PBXGroup;
 			children = (
+				63AF68991BE8807E00405D53 /* Realm */,
 				639B4E7C1BB564E3001DC8CE /* Headers */,
 				639B4E8E1BB564E3001DC8CE /* Modules */,
 				639B4E901BB564E3001DC8CE /* PrivateHeaders */,
@@ -490,6 +497,7 @@
 				FFCA0FDF1A80DBF1000C9AFD /* AFURLConnectionOperation.h in Headers */,
 				639B4EB61BB564E3001DC8CE /* RLMObjectStore.h in Headers */,
 				FFCA0FE31A80DBF1000C9AFD /* AFURLResponseSerialization.h in Headers */,
+				63268B3E1C05D15C00EB7DBA /* RLMOptionalBase.h in Headers */,
 				639B4EB41BB564E3001DC8CE /* RLMObject_Private.h in Headers */,
 				639B4EB21BB564E3001DC8CE /* RLMListBase.h in Headers */,
 				639B4EA01BB564E3001DC8CE /* RLMArray.h in Headers */,

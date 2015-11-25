@@ -294,7 +294,11 @@ public class VolumeHandler: NSObject {
         }
         
         realm.addOrUpdateObject(currentVolume)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving volume details: \(error)")
+        }
         
         //Add all assets of the volume (which do not have an associated issue/article)
         let volumeMedia = volume.objectForKey("media") as! NSArray

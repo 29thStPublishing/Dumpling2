@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2015 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,22 +17,18 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMConstants.h"
 
-#import "RLMArray.h"
-#import "RLMMigration.h"
-#import "RLMObject.h"
-#import "RLMObjectSchema.h"
-#import "RLMPlatform.h"
-#import "RLMProperty.h"
-#import "RLMRealm.h"
-#import "RLMRealmConfiguration.h"
-#import "RLMResults.h"
-#import "RLMSchema.h"
+@class RLMObjectBase, RLMProperty;
 
-#import "RLMAccessor.h"
-#import "RLMListBase.h"
-#import "RLMObjectStore.h"
-#import "RLMRealmUtil.h"
-#import "RLMObjectBase.h"
-#import "RLMObjectBase_Dynamic.h"
-#import "RLMRealm_Dynamic.h"
+@interface RLMOptionalBase : NSProxy
+
+- (instancetype)init;
+
+@property (nonatomic, weak) RLMObjectBase *object;
+
+@property (nonatomic, unsafe_unretained) RLMProperty *property;
+
+@property (nonatomic) id underlyingValue;
+
+@end
