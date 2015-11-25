@@ -342,7 +342,11 @@ public class IssueHandler: NSObject {
         currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         realm.addOrUpdateObject(currentIssue)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving issue: \(error)")
+        }
 
         //Add all assets of the issue (which do not have an associated article)
         let orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as! NSArray
@@ -358,7 +362,11 @@ public class IssueHandler: NSObject {
             realm.beginWriteTransaction()
             currentIssue.coverImageId = firstAsset.globalId
             realm.addOrUpdateObject(currentIssue)
-            realm.commitWriteTransaction()
+            do {
+                try realm.commitWriteTransaction()
+            } catch let error {
+                NSLog("Error saving issue details: \(error)")
+            }
         }
         
         //Now add all articles into the database
@@ -452,12 +460,16 @@ public class IssueHandler: NSObject {
         }
         
         realm.addOrUpdateObject(currentIssue)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving issue details: \(error)")
+        }
         
         //Add all assets of the issue (which do not have an associated article)
         let issueMedia = issue.objectForKey("media") as! NSArray
         if issueMedia.count > 0 {
-            for (index, assetDict) in issueMedia.enumerate() {
+            for _ in issueMedia {
                 //Download images and create Asset object for issue
                 //Add asset to Issue dictionary
                 //TODO: TEST

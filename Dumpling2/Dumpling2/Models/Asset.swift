@@ -145,7 +145,11 @@ public class Asset: RLMObject {
         currentAsset.placement = placement
         
         realm.addOrUpdateObject(currentAsset)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error creating asset: \(error)")
+        }
     }
     
     //Add asset from API for volumes
@@ -351,7 +355,11 @@ public class Asset: RLMObject {
                 }
                 
                 realm.addOrUpdateObject(currentAsset)
-                realm.commitWriteTransaction()
+                do {
+                    try realm.commitWriteTransaction()
+                } catch let error {
+                    NSLog("Error writing volume asset: \(error)")
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -592,7 +600,11 @@ public class Asset: RLMObject {
                 }
                 
                 realm.addOrUpdateObject(currentAsset)
-                realm.commitWriteTransaction()
+                do {
+                    try realm.commitWriteTransaction()
+                } catch let error {
+                    NSLog("Error creating asset: \(error)")
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -651,7 +663,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting asset: \(error)")
+        }
     }
     
     
@@ -675,7 +691,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting assets for articles: \(error)")
+        }
     }
     
     //Delete all assets for multiple issues
@@ -698,7 +718,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting assets for issues: \(error)")
+        }
     }
     
     //Delete all assets for a single issue
@@ -721,7 +745,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting assets for issues: \(error)")
+        }
     }
     
     // MARK: Public methods
@@ -736,7 +764,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving asset: \(error)")
+        }
     }
     
     /**
@@ -765,7 +797,11 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting asset: \(error)")
+        }
     }
     
     /**

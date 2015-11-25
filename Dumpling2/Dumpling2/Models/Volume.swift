@@ -66,7 +66,11 @@ public class Volume: RLMObject {
             //Delete volume
             realm.beginWriteTransaction()
             realm.deleteObjects(currentVolume)
-            realm.commitWriteTransaction()
+            do {
+                try realm.commitWriteTransaction()
+            } catch let error {
+                NSLog("Error deleting volume: \(error)")
+            }
         }
     }
     
@@ -180,7 +184,11 @@ public class Volume: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving volume: \(error)")
+        }
     }
     
     /**

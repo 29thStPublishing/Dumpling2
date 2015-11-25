@@ -63,7 +63,11 @@ public class Issue: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting issues for volume: \(error)")
+        }
     }
     
     // MARK: Public methods
@@ -94,7 +98,11 @@ public class Issue: RLMObject {
             //Delete issue
             realm.beginWriteTransaction()
             realm.deleteObjects(currentIssue)
-            realm.commitWriteTransaction()
+            do {
+                try realm.commitWriteTransaction()
+            } catch let error {
+                NSLog("Error deleting issue: \(error)")
+            }
         }
     }
     
@@ -305,7 +313,11 @@ public class Issue: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        realm.commitWriteTransaction()
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error saving issue: \(error)")
+        }
     }
     
     /**
