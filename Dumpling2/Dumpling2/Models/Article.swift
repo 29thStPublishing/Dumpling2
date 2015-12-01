@@ -65,6 +65,11 @@ public class Article: RLMObject {
         return "globalId"
     }
     
+    //Required for backward compatibility when upgrading to V 0.96.2
+    override public class func requiredProperties() -> Array<AnyObject> {
+        return ["globalId", "title", "articleDesc", "slug", "dek", "body", "permalink", "url", "sourceURL", "authorName", "authorURL", "section", "articleType", "keywords", "commentary", "date", "metadata", "versionStashed", "placement", "mainImageURL", "thumbImageURL", "isPublished", "isFeatured", "issueId", "appleId"]
+    }
+    
     //Add article
     class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
         let realm = RLMRealm.defaultRealm()

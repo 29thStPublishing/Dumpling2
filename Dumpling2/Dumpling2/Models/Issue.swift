@@ -43,6 +43,11 @@ public class Issue: RLMObject {
         return "globalId"
     }
     
+    //Required for backward compatibility when upgrading to V 0.96.2
+    override public class func requiredProperties() -> Array<AnyObject> {
+        return ["globalId", "appleId", "title", "issueDesc", "assetFolder", "coverImageId", "coverImageiPadId", "coverImageiPadLndId", "iconImageURL", "publishedDate", "lastUpdateDate", "displayDate", "metadata", "volumeId"]
+    }
+    
     // MARK: Private methods
 
     // Delete all issues for a volume - this will delete the issues, their assets, articles and article assets
