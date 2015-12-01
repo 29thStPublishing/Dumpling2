@@ -52,6 +52,11 @@ public class Asset: RLMObject {
         return "globalId"
     }
     
+    //Required for backward compatibility when upgrading to V 0.96.2
+    override public class func requiredProperties() -> Array<AnyObject> {
+        return ["globalId", "caption", "source", "squareURL", "originalURL", "mainPortraitURL", "mainLandscapeURL", "iconURL", "metadata", "type", "placement", "fullFolderPath", "articleId", "issue", "volumeId"]
+    }
+    
     //Add asset
     class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, placement: Int) {
         createAsset(asset, issue: issue, articleId: articleId, sound: false, placement: placement)
