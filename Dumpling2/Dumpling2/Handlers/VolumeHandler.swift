@@ -164,6 +164,8 @@ public class VolumeHandler: NSObject {
     public func addVolumeFromAPI(globalId: String) {
         
         let requestURL = "\(baseURL)volumes/\(globalId)"
+        
+        //self.issueHandler.updateStatusDictionary(nil, issueId: globalId, url: requestURL, status: 0)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -204,6 +206,8 @@ public class VolumeHandler: NSObject {
                 
                 //Update volume now
                 let volumeId = volumeDetails.objectForKey("id") as! String
+                
+                //self.issueHandler.updateStatusDictionary(nil, issueId: volumeId, url: requestURL, status: 0)
                 self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volumeId)
                 self.updateVolumeFromAPI(volumeDetails, globalId: volumeId)
             }
@@ -294,11 +298,12 @@ public class VolumeHandler: NSObject {
         }
         
         realm.addOrUpdateObject(currentVolume)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving volume details: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
         
         //Add all assets of the volume (which do not have an associated issue/article)
         let volumeMedia = volume.objectForKey("media") as! NSArray
@@ -318,7 +323,7 @@ public class VolumeHandler: NSObject {
             //Insert issue
             //Add issue to dictionary
             let issueId: String = issueDict.valueForKey("id") as! String
-            self.issueHandler.addIssueFromAPI(issueId, volumeId: currentVolume.globalId)
+            self.issueHandler.addIssueFromAPI(issueId, volumeId: currentVolume.globalId, withArticles: true)
         }
         
         //Mark volume URL as done

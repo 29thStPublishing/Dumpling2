@@ -48,7 +48,6 @@ RLM_ASSUME_NONNULL_BEGIN
  - `BOOL` or `bool`
  - `NSDate`
  - `NSData`
- - `NSNumber<X>`, where X is one of RLMInt, RLMFloat, RLMDouble or RLMBool, for optional number properties
  - `RLMObject` subclasses, so you can have many-to-one relationships.
  - `RLMArray<X>`, where X is an `RLMObject` subclass, so you can have many-to-many relationships.
 
@@ -283,13 +282,11 @@ RLM_ASSUME_NONNULL_BEGIN
  Implement to return an array of property names that should not allow storing nil.
 
  By default, all properties of a type that support storing nil are considered optional properties.
- To require that an object in a Realm always have a non-nil value for a property,
- add the name of the property to the array returned from this method.
- 
- Currently Object properties cannot be required. Array and NSNumber properties
- can, but it makes little sense to do so: arrays do not support storing nil, and
- if you want a non-optional number you should instead use the primitive type.
+ To require that an object in a Realm always have a non-nil value for a property, add the name of the property to the array returned from this method.
 
+ Currently only String, Data, and Object properties support storing nil, and all other properties are implicitly treated as if they were required properties.
+ Support for additional types will come in the future.
+ 
  @return    NSArray of property names that are required.
  */
 + (NSArray *)requiredProperties;

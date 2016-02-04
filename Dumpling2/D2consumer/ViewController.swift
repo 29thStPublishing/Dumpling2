@@ -13,6 +13,7 @@ class ViewController: UIViewController {
 
     var issueHandler: IssueHandler?
     var volumeHandler: VolumeHandler?
+    var issue: Issue?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,8 +38,10 @@ class ViewController: UIViewController {
     
     //Add issue details from API
     @IBAction func useAPI () {
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateArticleStatus:", name: "articlesDownloadComplete", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "articlesDownloaded:", name: "articlesDownloadComplete", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "issueDownloadComplete:", name: "issueDownloadComplete", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "downloadComplete:", name: "downloadComplete", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "allDownloadsComplete:", name: "allDownloadsComplete", object: nil)
         
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
@@ -60,15 +63,53 @@ class ViewController: UIViewController {
         }*/
     }
     
-    func updateArticleStatus(notif: NSNotification) {
-        print("#####DOWNLOADED######")
-        //NSNotificationCenter.defaultCenter().removeObserver(self)
+    func articlesDownloaded(notif: NSNotification) {
+        NSLog("###DOWNLOAD ARTICLES###")
     }
     
     func issueDownloadComplete(notif: NSNotification) {
+        print("#####ISSUE DOWNLOAD######")
         if let issueId: String = notif.userInfo?["issue"] as? String {
-            NSLog("ISSUE DOWNLOAD ID: \(issueId)")
+            if issueId == "566ea797ada6e263d36edeb3" {
+                if let issue = Issue.getIssue("566ea797ada6e263d36edeb3") {
+                    issue.downloadIssueArticles()
+                    issue.downloadAllAssets()
+                }
+            }
         }
+        /*if let issueId: String = notif.userInfo?["issue"] as? String {
+            let newIssue = Issue.getIssue(issueId)
+            if issueId == "5631a4b9ada6e225e83c0338" {
+                self.issue = newIssue
+                self.issue!.downloadAllAssets()
+            }
+        }*/
+    }
+    
+    func downloadComplete(notif: NSNotification) {
+        print("#####DOWNLOAD COMP######")
+        if let article = Article.getArticle("566ea797ada6e263d36edeb3", appleId: nil) {
+            let str = article.replacePatternsWithAssets()
+            NSLog("STR: \(str)")
+        }
+        /*if let issueId: String = notif.userInfo?["issue"] as? String {
+            if self.issue == nil {
+                return
+            }
+            if issueId == self.issue!.globalId {
+                let dict = self.issueHandler!.findAllDownloads(self.issue!.globalId)
+                NSLog("##FROM DOWNLOAD: \(dict)")
+            }
+        }*/
+    }
+    
+    func allDownloadsComplete(notif: NSNotification) {
+        print("#####ALL DOWNLOAD######")
+        if self.issue == nil {
+            return
+        }
+        let dict = self.issueHandler!.findAllDownloads(self.issue!.globalId)
+        NSLog("##FROM ALL: \(dict)")
     }
 }
 

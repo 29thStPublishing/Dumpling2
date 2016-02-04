@@ -46,6 +46,7 @@ public class PurchaseHandler: NSObject {
             clientKey = key
         }
         else {
+            lLog("Init failed")
             return nil
         }
     }
@@ -108,11 +109,13 @@ public class PurchaseHandler: NSObject {
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(purchase)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error adding purchase: \(error)")
-        }
+        }*/
+        lLog("Add purchase")
+        realm.commitWriteTransaction()
     }
     
     /**
@@ -140,6 +143,7 @@ public class PurchaseHandler: NSObject {
                 array.append(obj)
             }
             
+            lLog("Return purchases \(array)")
             return array
         }
         
@@ -205,6 +209,7 @@ public class PurchaseHandler: NSObject {
                     let obj: Purchase = object as! Purchase
                     array.append(obj)
                 }
+                lLog("Found purchase \(array)")
                 return array
             }
         }

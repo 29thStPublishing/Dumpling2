@@ -66,9 +66,9 @@ public class Article: RLMObject {
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<AnyObject> {
+    /*override public class func requiredProperties() -> Array<AnyObject> {
         return ["globalId", "title", "articleDesc", "slug", "dek", "body", "permalink", "url", "sourceURL", "authorName", "authorURL", "section", "articleType", "keywords", "commentary", "date", "metadata", "versionStashed", "placement", "mainImageURL", "thumbImageURL", "isPublished", "isFeatured", "issueId", "appleId"]
-    }
+    }*/
     
     //Add article
     class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
@@ -149,11 +149,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentArticle)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error creating article: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     //Get article details from API and create
@@ -225,11 +226,10 @@ public class Article: RLMObject {
                     for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! NSString
-                        //TODO: TEST
-                        /*if delegate != nil {
+                        if delegate != nil {
                             (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
-                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)*/
+                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: articleId as String, placement: index+1, delegate: delegate)
                         
                         if index == 0 {
                             currentArticle.thumbImageURL = assetid as String
@@ -244,11 +244,12 @@ public class Article: RLMObject {
                 
                 realm.beginWriteTransaction()
                 realm.addOrUpdateObject(currentArticle)
-                do {
+                /*do {
                     try realm.commitWriteTransaction()
                 } catch let error {
                     NSLog("Error creating article: \(error)")
-                }
+                }*/
+                realm.commitWriteTransaction()
                 
                 if delegate != nil {
                     //Mark article as done
@@ -284,11 +285,12 @@ public class Article: RLMObject {
         //Delete articles
         realm.beginWriteTransaction()
         realm.deleteObjects(articles)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting articles for issues: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     /**
@@ -302,7 +304,7 @@ public class Article: RLMObject {
     */
     class func createIndependentArticle(articleId: String, delegate: AnyObject?) {
         let requestURL = "\(baseURL)articles/\(articleId)"
-        
+        lLog("Create independent article")
         let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
@@ -327,6 +329,7 @@ public class Article: RLMObject {
     //Add article with given issue global id
     class func createArticle(articleId: String, issueId: String, delegate: AnyObject?) {
         let requestURL = "\(baseURL)articles/\(articleId)"
+        lLog("Article \(articleId)")
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -357,8 +360,27 @@ public class Article: RLMObject {
     class func addArticle(article: NSDictionary, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
         
+        let gid = article.valueForKey("id") as! String
+        let meta = article.objectForKey("meta") as! NSDictionary
+        
+        if let existingArticle = Article.getArticle(gid, appleId: nil) {
+            if let updateDate: String = existingArticle.getValue("updateDate") as? String {
+                let lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
+                var newUpdatedDate = NSDate()
+                if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                    if let dt: String = updated["date"] as? String {
+                        newUpdatedDate = Helper.publishedDateFromISO(dt)
+                    }
+                }
+                if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                    return
+                    //Don't download if already downloaded and not updated
+                }
+            }
+        }
+        
         let currentArticle = Article()
-        currentArticle.globalId = article.valueForKey("id") as! String
+        currentArticle.globalId = gid
         currentArticle.title = article.valueForKey("title") as! String
         currentArticle.body = article.valueForKey("body") as! String
         currentArticle.articleDesc = article.valueForKey("description") as! String
@@ -374,7 +396,6 @@ public class Article: RLMObject {
             currentArticle.appleId = sku
         }
         
-        let meta = article.objectForKey("meta") as! NSDictionary
         let featured = meta.valueForKey("featured") as! NSNumber
         currentArticle.isFeatured = featured.boolValue
         if let published = meta.valueForKey("published") as? NSNumber {
@@ -392,7 +413,13 @@ public class Article: RLMObject {
         
         if let metadata: AnyObject = article.objectForKey("customMeta") {
             if metadata.isKindOfClass(NSDictionary) {
-                currentArticle.metadata = Helper.stringFromJSON(metadata)!
+                let metadataDict = NSMutableDictionary(dictionary: metadata as! NSDictionary)
+                if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
+                    if let updateDate: String = updated["date"] as? String {
+                        metadataDict.setObject(updateDate, forKey: "updateDate")
+                    }
+                }
+                currentArticle.metadata = Helper.stringFromJSON(metadataDict)!
             }
             else {
                 currentArticle.metadata = metadata as! String
@@ -426,11 +453,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentArticle)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error adding article: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
         
         //Article downloaded (not necessarily assets)
         if delegate != nil {
@@ -465,11 +493,12 @@ public class Article: RLMObject {
         //Delete articles
         realm.beginWriteTransaction()
         realm.deleteObjects(articles)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting articles: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     /**
@@ -561,6 +590,7 @@ public class Article: RLMObject {
     public class func getArticlesFor(issueId: NSString?, key: String, value: String, count: Int, page: Int) -> Array<Article>? {
         _ = RLMRealm.defaultRealm()
         
+        lLog("Articles for \(key) = \(value)")
         var subPredicates = Array<NSPredicate>()
         
         if issueId != nil {
@@ -680,6 +710,8 @@ public class Article: RLMObject {
     */
     public class func searchArticlesWith(keywords: [String], issueId: String?) -> Array<Article>? {
         _ = RLMRealm.defaultRealm()
+        
+        lLog("Search articles with \(keywords)")
         
         var subPredicates = Array<NSPredicate>()
         
@@ -821,11 +853,12 @@ public class Article: RLMObject {
         //Delete article
         realm.beginWriteTransaction()
         realm.deleteObject(self)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting article: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     
@@ -833,6 +866,7 @@ public class Article: RLMObject {
     This method downloads assets for the article
     */
     public func downloadArticleAssets(delegate: IssueHandler?) {
+        lLog("Download assets for \(self.globalId)")
         let issueId = self.issueId
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
@@ -860,6 +894,7 @@ public class Article: RLMObject {
         }
         else {
             issueHandler = IssueHandler(folder: assetFolder)!
+            //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
             issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         }
         
@@ -899,6 +934,88 @@ public class Article: RLMObject {
     }
     
     /**
+     This method downloads assets for the article
+     */
+    public func downloadFirstAsset(delegate: IssueHandler?) {
+        lLog("Download first asset for \(self.globalId)")
+        let issueId = self.issueId
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        let docsDir: NSString = docPaths[0] as NSString
+        var assetFolder = docsDir as String
+        
+        var issue = Issue.getIssue(issueId)
+        if issue == nil {
+            issue = Issue()
+            issue?.assetFolder = assetFolder
+        }
+        else {
+            let folder = issue?.assetFolder
+            if folder!.hasPrefix("/Documents") {
+            }
+            else {
+                assetFolder = folder!.stringByReplacingOccurrencesOfString("/\(issue?.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            }
+        }
+        
+        let requestURL = "\(baseURL)articles/\(self.globalId)"
+        
+        var issueHandler: IssueHandler
+        if delegate != nil {
+            issueHandler = delegate!
+        }
+        else {
+            issueHandler = IssueHandler(folder: assetFolder)!
+            //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
+            issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        }
+        
+        if !self.thumbImageURL.isEmpty {
+            if delegate != nil {
+                issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(self.thumbImageURL)", status: 0)
+            }
+            else {
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(self.thumbImageURL)", status: 0)
+            }
+            
+            Asset.downloadAndCreateAsset(self.thumbImageURL, issue: issue!, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
+            return
+        }
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
+                
+                //Add all assets of the article
+                let articleMedia = articleInfo.objectForKey("media") as! NSArray
+                if articleMedia.count > 0 {
+                    if let assetDict = articleMedia.firstObject {
+                        let assetid = assetDict.valueForKey("id") as! NSString
+                        
+                        if delegate != nil {
+                            issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
+                        else {
+                            issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
+                        Asset.downloadAndCreateAsset(assetid, issue: issue!, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
+                    }
+                }
+                //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 1)
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(self.globalId)", status: 2)
+            }
+            
+        }
+    }
+    
+    /**
     This method can be called on an Article object to save it back to the database
     
     :brief: Save an Article to the database
@@ -908,11 +1025,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving article: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     /**

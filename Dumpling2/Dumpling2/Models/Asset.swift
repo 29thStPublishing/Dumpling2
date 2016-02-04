@@ -53,9 +53,9 @@ public class Asset: RLMObject {
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<AnyObject> {
-        return ["globalId", "caption", "source", "squareURL", "originalURL", "mainPortraitURL", "mainLandscapeURL", "iconURL", "metadata", "type", "placement", "fullFolderPath", "articleId", "issue", "volumeId"]
-    }
+    /*override public class func requiredProperties() -> Array<AnyObject> {
+        return ["globalId", "caption", "source", "squareURL", "originalURL", "mainPortraitURL", "mainLandscapeURL", "iconURL", "metadata", "type", "placement", "fullFolderPath", "articleId", "volumeId"]
+    }*/
     
     //Add asset
     class func createAsset(asset: NSDictionary, issue: Issue, articleId: String, placement: Int) {
@@ -150,15 +150,17 @@ public class Asset: RLMObject {
         currentAsset.placement = placement
         
         realm.addOrUpdateObject(currentAsset)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error creating asset: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     //Add asset from API for volumes
     class func downloadAndCreateVolumeAsset(assetId: NSString, volume: Volume, placement: Int, delegate: AnyObject?) {
+        lLog("Volume asset \(assetId)")
         let realm = RLMRealm.defaultRealm()
         
         let requestURL = "\(baseURL)media/\(assetId)"
@@ -360,11 +362,12 @@ public class Asset: RLMObject {
                 }
                 
                 realm.addOrUpdateObject(currentAsset)
-                do {
+                /*do {
                     try realm.commitWriteTransaction()
                 } catch let error {
                     NSLog("Error writing volume asset: \(error)")
-                }
+                }*/
+                realm.commitWriteTransaction()
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -378,6 +381,7 @@ public class Asset: RLMObject {
     
     //Add asset from API - for issues or articles
     class func downloadAndCreateAsset(assetId: NSString, issue: Issue, articleId: String, placement: Int, delegate: AnyObject?) {
+        lLog("Asset \(assetId)")
         let realm = RLMRealm.defaultRealm()
         
         let requestURL = "\(baseURL)media/\(assetId)"
@@ -605,11 +609,12 @@ public class Asset: RLMObject {
                 }
                 
                 realm.addOrUpdateObject(currentAsset)
-                do {
+                /*do {
                     try realm.commitWriteTransaction()
                 } catch let error {
                     NSLog("Error creating asset: \(error)")
-                }
+                }*/
+                realm.commitWriteTransaction()
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -668,11 +673,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting asset: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     
@@ -696,11 +702,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting assets for articles: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     //Delete all assets for multiple issues
@@ -723,11 +730,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting assets for issues: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     //Delete all assets for a single issue
@@ -750,11 +758,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting assets for issues: \(error)")
-        }
+        */
+        realm.commitWriteTransaction()
     }
     
     // MARK: Public methods
@@ -769,11 +778,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving asset: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     /**
@@ -802,11 +812,12 @@ public class Asset: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        do {
+        /*do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting asset: \(error)")
-        }
+        }*/
+        realm.commitWriteTransaction()
     }
     
     /**
@@ -878,6 +889,7 @@ public class Asset: RLMObject {
                 let assets = Asset.objectsWithPredicate(predicate)
                 
                 if assets.count > 0 {
+                    lLog("\(assets.count)")
                     return assets.count
                 }
             }
@@ -887,6 +899,7 @@ public class Asset: RLMObject {
         let assets = Asset.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
+            lLog("\(assets.count)")
             return assets.count
         }
         
@@ -955,6 +968,7 @@ public class Asset: RLMObject {
     */
     public class func getAsset(assetId: String) -> Asset? {
         _ = RLMRealm.defaultRealm()
+        lLog("\(assetId)")
         
         let predicate = NSPredicate(format: "globalId = %@", assetId)
         let assets = Asset.objectsWithPredicate(predicate)
@@ -1030,6 +1044,7 @@ public class Asset: RLMObject {
                     folderPath = "\(folderPath)/"
                 }
                 let filePath = "\(folderPath)\(fileURL)"
+                lLog("\(filePath) for \(self.globalId)")
                 return filePath
             }
         }

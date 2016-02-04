@@ -435,6 +435,8 @@ Dumpling issues notifications at various stages of a download. This information 
 
 4. **allDownloadsComplete** This notification is fired when all articles/volumes added via the respective ArticleHandler/VolumeHandler methods are downloaded completely
 
+5. **mediaDownloaded** This notification is fired for each media file downloaded. It can be used for updating issue/article views in real time
+
 
 ## Usage
 

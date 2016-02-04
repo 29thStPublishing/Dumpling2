@@ -33,9 +33,9 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeInt    = 0,
     /** Boolean type: BOOL, bool, Bool (Swift) */
     RLMPropertyTypeBool   = 1,
-    /** Float type: float, Float (Swift) */
+    /** Float type: CGFloat (32bit), float, Float (Swift) */
     RLMPropertyTypeFloat  = 9,
-    /** Double type: double, Double (Swift) */
+    /** Double type: CGFloat (64bit), double, Double (Swift) */
     RLMPropertyTypeDouble = 10,
 
     ////////////////////////////////

@@ -30,7 +30,7 @@ public class Purchase: RLMObject {
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<AnyObject> {
+    /*override public class func requiredProperties() -> Array<AnyObject> {
         return ["appleId", "globalId", "mode", "type", "purchaseDate", "expirationDate", "userIdentity"]
-    }
+    }*/
 }

@@ -15,7 +15,7 @@ class Magazine: RLMObject {
     dynamic var type = ""
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override class func requiredProperties() -> Array<AnyObject> {
+    /*override class func requiredProperties() -> Array<AnyObject> {
         return ["type", "name"]
-    }
+    }*/
 }
