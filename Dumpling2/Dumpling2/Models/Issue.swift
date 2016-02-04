@@ -229,12 +229,21 @@ public class Issue: RLMObject {
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Download articles for the issue
                     let articles = issueDetails.objectForKey("articles") as! NSArray
-                    for (index, articleDict) in articles.enumerate() {
-                        //Insert article
-                        //Add article and its assets to Issue dictionary
-                        let articleId = articleDict.valueForKey("id") as! NSString
-                        issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
-                        Article.createArticleForId(articleId, issue: self, placement: index+1, delegate: issueHandler)
+                    if articles.count > 0 {
+                        var articleList = ""
+                        for (index, articleDict) in articles.enumerate() {
+                            //Insert article
+                            //Add article and its assets to Issue dictionary
+                            let articleId = articleDict.valueForKey("id") as! String
+                            articleList += articleId
+                            if index < (articles.count - 1) {
+                                articleList += ","
+                            }
+                            issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                            //Article.createArticleForId(articleId, issue: self, placement: index+1, delegate: issueHandler)
+                        }
+                        //Send request to get all articles info in 1 call
+                        Article.createArticlesForIds(articleList, issue: self, delegate: issueHandler)
                     }
                     
                     issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 1)
@@ -279,11 +288,16 @@ public class Issue: RLMObject {
                     //Download assets for the issue
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
+                        var assetList = ""
                         for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! NSString
+                            let assetid = assetDict.valueForKey("id") as! String
+                            assetList += assetid
+                            if index < (issueMedia.count - 1) {
+                                assetList += ","
+                            }
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
-                            Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
                         }
+                        Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
                     issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)issues/\(self.globalId)", status: 1)
@@ -328,11 +342,16 @@ public class Issue: RLMObject {
                     //Download assets for the issue
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
+                        var assetList = ""
                         for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! NSString
+                            let assetid = assetDict.valueForKey("id") as! String
+                            assetList += assetid
+                            if index < (issueMedia.count - 1) {
+                                assetList += ","
+                            }
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
-                            Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
                         }
+                        Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
                     if let articles = issueDetails.objectForKey("articles") as? NSArray {
