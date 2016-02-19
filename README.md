@@ -31,11 +31,11 @@ The current Dumpling2 version as of September 2015 uses [Realm v0.96.2](https://
 ###Updating Realm in Dumpling2
 1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases)
 
-2. From the Realm.framework **ios** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/RHeaders*
+2. From the Realm.framework **ios** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/RHeaders* out of the static directory (you cannot have one dynamic framework inside another)
 
 3. Make sure *Realm* is added to *Linked Frameworks & Libraries* for Dumpling2 target
 
-4. All the `.h` files added **should** have public access (can be checked in the File Inspector
+4. All the `.h` files added **should** have public access (can be checked in the File Inspector)
 
 5. Change all references to `#import <Realm/file_name.h>` to `#import file_name.h`
 
