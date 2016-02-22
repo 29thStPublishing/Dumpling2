@@ -241,10 +241,10 @@ public class Article: RLMObject {
                     Asset.downloadAndCreateAssetsForIds(assetList, issue: issue, articleId: articleId as String, delegate: delegate)
                 }
                 
-                //Set thumbnail for article
+                /*//Set thumbnail for article
                 if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: articleId as String, volumeId: nil) {
                     currentArticle.thumbImageURL = firstAsset.globalId as String
-                }
+                }*/
                 
                 realm.beginWriteTransaction()
                 realm.addOrUpdateObject(currentArticle)
@@ -348,17 +348,17 @@ public class Article: RLMObject {
                             if delegate != nil {
                                 (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             }
-                            if index == 0 {
+                            if assetIndex == 0 {
                                 currentArticle.thumbImageURL = assetid as String
                             }
                         }
                         Asset.downloadAndCreateAssetsForIds(assetList, issue: issue, articleId: currentArticle.globalId, delegate: delegate)
                     }
                     
-                    //Set thumbnail for article
+                    /*//Set thumbnail for article
                     if let firstAsset = Asset.getFirstAssetFor(issue.globalId, articleId: currentArticle.globalId, volumeId: nil) {
                         currentArticle.thumbImageURL = firstAsset.globalId as String
-                    }
+                    }*/
                     
                     realm.beginWriteTransaction()
                     realm.addOrUpdateObject(currentArticle)
@@ -572,7 +572,7 @@ public class Article: RLMObject {
                 }
                 
                 if index == 0 {
-                    currentArticle.thumbImageURL = assetDict.valueForKey("id") as! String
+                    currentArticle.thumbImageURL = assetid
                 }
             }
             Asset.downloadAndCreateAssetsForIds(assetList, issue: issue, articleId: currentArticle.globalId, delegate: delegate)
@@ -966,6 +966,108 @@ public class Article: RLMObject {
     //MARK: Instance methods
     
     /**
+    This method refreshes the given article by downloading it again
+    */
+    public func refreshArticle(handler: IssueHandler?) {
+        let realm = RLMRealm.defaultRealm()
+        let requestURL = "\(baseURL)articles/\(self.globalId)"
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        if handler != nil {
+            if !self.issueId.isEmpty {
+                handler!.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: "\(baseURL)issues/\(self.issueId)"), forKey: self.issueId)
+                handler!.updateStatusDictionary("", issueId: self.issueId, url: requestURL, status: 0)
+            }
+            else {
+                handler!.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+                handler!.updateStatusDictionary("", issueId: self.globalId, url: requestURL, status: 0)
+            }
+        }
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                
+                realm.beginWriteTransaction()
+                
+                let articleInfo = allArticles.firstObject as! NSDictionary
+                //self.globalId = articleInfo.valueForKey("id") as! String
+                self.title = articleInfo.valueForKey("title") as! String
+                self.body = articleInfo.valueForKey("body") as! String
+                self.articleDesc = articleInfo.valueForKey("description") as! String
+                self.authorName = articleInfo.valueForKey("authorName") as! String
+                self.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                self.url = articleInfo.valueForKey("sharingUrl") as! String
+                self.section = articleInfo.valueForKey("section") as! String
+                self.articleType = articleInfo.valueForKey("type") as! String
+                self.commentary = articleInfo.valueForKey("commentary") as! String
+                self.slug = articleInfo.valueForKey("slug") as! String
+                
+                let meta = articleInfo.objectForKey("meta") as! NSDictionary
+                let featured = meta.valueForKey("featured") as! NSNumber
+                self.isFeatured = featured.boolValue
+                if let published = meta.valueForKey("published") as? NSNumber {
+                    self.isPublished = published.boolValue
+                }
+                
+                if let publishedDate = meta.valueForKey("publishedDate") as? String {
+                    self.date = Helper.publishedDateFromISO2(publishedDate)
+                }
+                
+                if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
+                    if metadata.isKindOfClass(NSDictionary) {
+                        self.metadata = Helper.stringFromJSON(metadata)!
+                    }
+                    else {
+                        self.metadata = metadata as! String
+                    }
+                }
+                
+                let keywords = articleInfo.objectForKey("keywords") as! NSArray
+                if keywords.count > 0 {
+                    self.keywords = Helper.stringFromJSON(keywords)!
+                }
+                
+                realm.addOrUpdateObject(self)
+                realm.commitWriteTransaction()
+                
+                if handler != nil {
+                    //Mark article as done
+                    if !self.issueId.isEmpty {
+                        handler!.updateStatusDictionary("", issueId: self.issueId, url: requestURL, status: 1)
+                    }
+                    else {
+                        handler!.updateStatusDictionary("", issueId: self.globalId, url: requestURL, status: 1)
+                    }
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+                if handler != nil {
+                    //Mark all articles from the list as done with errors
+                    if !self.issueId.isEmpty {
+                        handler!.updateStatusDictionary("", issueId: self.issueId, url: requestURL, status: 2)
+                    }
+                    else {
+                        handler!.updateStatusDictionary("", issueId: self.globalId, url: requestURL, status: 2)
+                    }
+                }
+            }
+            
+            if handler != nil {
+                if !self.issueId.isEmpty {
+                    handler!.updateStatusDictionary("", issueId: self.issueId, url: "\(baseURL)issues/\(self.issueId)", status: 1)
+                }
+                else {
+                    handler!.updateStatusDictionary("", issueId: self.globalId, url: requestURL, status: 1)
+                }
+            }
+        }
+    }
+    
+    /**
     This method deletes a stand-alone article and all assets for the given article
     */
     
@@ -1234,6 +1336,10 @@ public class Article: RLMObject {
                         }
                         
                         updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched as String, withString: finalHTML)
+                    }
+                    else {
+                        //Asset hasn't been downloaded yet (or record created)
+                        updatedBody = updatedBody.stringByReplacingOccurrencesOfString(originallyMatched as String, withString: "")
                     }
                 }
             }

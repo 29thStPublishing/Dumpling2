@@ -493,6 +493,7 @@ public class IssueHandler: NSObject {
         
         let meta = issue.valueForKey("meta") as! NSDictionary
         let updatedInfo = meta.valueForKey("updated") as! NSDictionary
+        let published = meta.valueForKey("published") as! NSNumber
         
         if updatedInfo.count > 0 {
             currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as! String
@@ -544,6 +545,7 @@ public class IssueHandler: NSObject {
             if metadata.isKindOfClass(NSDictionary) {
                 let metadataDict = NSMutableDictionary(dictionary: metadata as! NSDictionary)
                 metadataDict.setObject("\(articles.count)", forKey: "articles") //count of articles
+                metadataDict.setObject(published, forKey: "published")
                 
                 currentIssue.metadata = Helper.stringFromJSON(metadataDict)!
             }
