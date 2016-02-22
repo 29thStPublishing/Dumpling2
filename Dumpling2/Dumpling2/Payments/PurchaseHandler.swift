@@ -109,13 +109,13 @@ public class PurchaseHandler: NSObject {
         let realm = RLMRealm.defaultRealm()
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(purchase)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error adding purchase: \(error)")
-        }*/
+        }
         lLog("Add purchase")
-        realm.commitWriteTransaction()
+        //realm.commitWriteTransaction()
     }
     
     /**

@@ -107,10 +107,6 @@ public class VolumeHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        
-        //Call this if the schema version has changed - pass new schema version as integer
-        //VolumeHandler.checkAndMigrateData(2)
     }
     
     /**
@@ -126,30 +122,6 @@ public class VolumeHandler: NSObject {
         }
         
         return currentSchemaVersion
-    }
-    
-    //Check and migrate Realm data if needed
-    class func checkAndMigrateData(schemaVersion: UInt64) {
-        
-        let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
-        if currentSchemaVersion < schemaVersion {
-            let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-            realmConfiguration.schemaVersion = schemaVersion
-            realmConfiguration.migrationBlock = { migration, oldSchemaVersion in
-                
-                //Enumerate through the models and migrate data as needed
-            }
-            RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        }
-        
-        /*if currentSchemaVersion < schemaVersion {
-            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealmConfiguration.defaultConfiguration().path!,
-                withMigrationBlock: { migration, oldSchemaVersion in
-                    
-                    //Enumerate through the models and migrate data as needed
-                }
-            )
-        }*/
     }
     
     // MARK: Use API
@@ -298,12 +270,12 @@ public class VolumeHandler: NSObject {
         }
         
         realm.addOrUpdateObject(currentVolume)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving volume details: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
         
         //Add all assets of the volume (which do not have an associated issue/article)
         let volumeMedia = volume.objectForKey("media") as! NSArray

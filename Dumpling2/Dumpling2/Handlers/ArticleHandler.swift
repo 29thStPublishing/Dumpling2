@@ -41,8 +41,6 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
 
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        ArticleHandler.checkAndMigrateData(2)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -70,8 +68,6 @@ public class ArticleHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        ArticleHandler.checkAndMigrateData(2)
         
         issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
     }
@@ -101,8 +97,6 @@ public class ArticleHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        ArticleHandler.checkAndMigrateData(2)
         
         issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
         
@@ -121,28 +115,6 @@ public class ArticleHandler: NSObject {
         }
         
         return 0
-    }
-    
-    //Check and migrate Realm data if needed
-    class func checkAndMigrateData(schemaVersion: UInt64) {
-        
-        let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
-        if currentSchemaVersion <= schemaVersion {
-            let config = RLMRealmConfiguration.defaultConfiguration()
-            config.schemaVersion = schemaVersion
-            
-            let migrationBlock: (RLMMigration, UInt64) -> Void = { (migration, oldSchemeVersion) in
-                if oldSchemeVersion < 1 {
-                    migration.enumerateObjects(Issue.className()) { oldObject, newObject in
-                        let coverId = oldObject!["coverImageId"] as! String
-                        newObject!["coverImageiPadId"] = coverId
-                        newObject!["coverImageiPadLndId"] = coverId
-                    }
-                }
-            }
-            config.migrationBlock = migrationBlock
-            RLMRealmConfiguration.setDefaultConfiguration(config)
-        }
     }
     
     /**

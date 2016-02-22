@@ -16,23 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealmConfiguration.h"
+#import <Foundation/Foundation.h>
+#import "RLMConstants.h"
 
-@class RLMSchema;
+@class RLMObjectBase, RLMProperty;
 
-@interface RLMRealmConfiguration ()
+@interface RLMOptionalBase : NSProxy
 
-@property (nonatomic, readwrite) bool cache;
-@property (nonatomic, readwrite) bool dynamic;
-@property (nonatomic, readwrite) bool disableFormatUpgrade;
-@property (nonatomic, copy) RLMSchema *customSchema;
+- (instancetype)init;
 
-// Get the default confiugration without copying it
-+ (RLMRealmConfiguration *)rawDefaultConfiguration;
+@property (nonatomic, weak) RLMObjectBase *object;
 
-+ (void)resetRealmConfigurationState;
+@property (nonatomic, unsafe_unretained) RLMProperty *property;
+
+@property (nonatomic, strong) id underlyingValue;
+
 @end
-
-// Get a path in the platform-appropriate documents directory with the given filename
-FOUNDATION_EXTERN NSString *RLMRealmPathForFile(NSString *fileName);
-FOUNDATION_EXTERN NSString *RLMRealmPathForFileAndBundleIdentifier(NSString *fileName, NSString *mainBundleIdentifier);

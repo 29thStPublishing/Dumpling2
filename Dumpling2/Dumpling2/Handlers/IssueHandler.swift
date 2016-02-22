@@ -20,31 +20,6 @@ public class IssueHandler: NSObject {
     // MARK: Initializers
     
     /**
-    :brief: Initializer object
-    
-    :discussion: Initializes the IssueHandler with the Documents directory. This is where the database and assets will be saved
-    */
-    /*public convenience override init() {
-        //super.init()
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-        var docsDir: NSString = docPaths[0] as! NSString
-        
-        self.defaultFolder = docsDir
-        self.activeDownloads = NSMutableDictionary()
-        
-        let defaultRealmPath = "\(self.defaultFolder)/default.realm"
-        RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        
-        var mainBundle = NSBundle.mainBundle()
-        if let key: String = mainBundle.objectForInfoDictionaryKey("APIKey") as? String {
-            apiKey = key
-        }
-        else {
-            return nil
-        }
-    }*/
-    
-    /**
     Initializes the IssueHandler with the given folder. This is where the database and assets will be saved. The method expects to find a key `ClientKey` in the project's Info.plist with your client key. If none is found, the method returns a nil
     
     :brief: Initializer object
@@ -71,7 +46,6 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //TODO: IssueHandler.checkAndMigrateData(3)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -101,7 +75,6 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //TODO: IssueHandler.checkAndMigrateData(3)
     }
     
     /**
@@ -132,50 +105,7 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //TODO: IssueHandler.checkAndMigrateData(3)
         
-    }
-    
-    //For moving to Realm 0.96.2 (properties made optional - Asset.issue cannot be made required)
-    class func checkAndMigrateData(schemaVersion: UInt64) {
-        
-        let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
-        if currentSchemaVersion <= schemaVersion {
-            let config = RLMRealmConfiguration.defaultConfiguration()
-            config.schemaVersion = schemaVersion
-            
-            let migrationBlock: (RLMMigration, UInt64) -> Void = { (migration, oldSchemeVersion) in
-                if oldSchemeVersion < 1 {
-                    migration.enumerateObjects(Issue.className()) { oldObject, newObject in
-                        let coverId = oldObject!["coverImageId"] as! String
-                        newObject!["coverImageiPadId"] = coverId
-                        newObject!["coverImageiPadLndId"] = coverId
-                    }
-                }
-                if oldSchemeVersion < 3 {
-                    let mutableSet = NSMutableSet()
-                    let toDelete = NSMutableArray()
-                    migration.enumerateObjects(Asset.className()) { oldObject, newObject in
-                        if mutableSet.containsObject(newObject!["primaryKey"]!) {
-                            toDelete.addObject(newObject!)
-                        }
-                        mutableSet.addObject(newObject!["primaryKey"]!)
-                        
-                        /*if let issue = oldObject!["issue"] as? Issue {
-                            newObject!["issue"] = issue
-                        }
-                        else {
-                            newObject!["issue"] = Issue()
-                        }*/
-                    }
-                    for object in toDelete {
-                        migration.deleteObject(object as! RLMObject)
-                    }
-                }
-            }
-            config.migrationBlock = migrationBlock
-            RLMRealmConfiguration.setDefaultConfiguration(config)
-        }
     }
     
     class func getCurrentSchemaVersion() -> UInt64 {
@@ -335,7 +265,7 @@ public class IssueHandler: NSObject {
     }
     
     /**
-     The method gets all issues from the Magnet API for the client key and adds them to the database without databases
+     The method gets all issues from the Magnet API for the client key and adds them to the database without articles
      */
     public func addOnlyIssuesWithoutArticles() {
         
@@ -428,12 +358,12 @@ public class IssueHandler: NSObject {
         currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
         
         realm.addOrUpdateObject(currentIssue)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving issue: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
 
         //Add all assets of the issue (which do not have an associated article)
         let orderedArray = issue.objectForKey("images")?.objectForKey("ordered") as! NSArray
@@ -449,12 +379,12 @@ public class IssueHandler: NSObject {
             realm.beginWriteTransaction()
             currentIssue.coverImageId = firstAsset.globalId
             realm.addOrUpdateObject(currentIssue)
-            /*do {
+            do {
                 try realm.commitWriteTransaction()
             } catch let error {
                 NSLog("Error saving issue details: \(error)")
-            }*/
-            realm.commitWriteTransaction()
+            }
+            //realm.commitWriteTransaction()
         }
         
         //Now add all articles into the database
@@ -555,12 +485,12 @@ public class IssueHandler: NSObject {
         }
         
         realm.addOrUpdateObject(currentIssue)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving issue details: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
         
         //Add all assets of the issue (which do not have an associated article)
         //Commented out - this will be handled by the client app - download assets when you want to
@@ -681,6 +611,11 @@ public class IssueHandler: NSObject {
         return nil
     }
     
+    /**
+     Downloads all the articles for a given issue
+     
+     - parameter issueId: global id of the issue
+     */
     public func downloadArticlesFor(issueId: String) {
         _ = RLMRealm.defaultRealm()
         
@@ -689,6 +624,11 @@ public class IssueHandler: NSObject {
         }
     }
     
+    /**
+     Downloads all assets for a given issue (only issue assets)
+     
+     - parameter issueId: global id of the issue
+     */
     public func downloadAssetsFor(issueId: String) {
         _ = RLMRealm.defaultRealm()
         
@@ -697,6 +637,11 @@ public class IssueHandler: NSObject {
         }
     }
     
+    /**
+     Downloads all assets for a given issue including article assets
+     
+     - parameter issueId: global id of the issue
+     */
     public func downloadAllAssetsFor(issueId: String) {
         _ = RLMRealm.defaultRealm()
         

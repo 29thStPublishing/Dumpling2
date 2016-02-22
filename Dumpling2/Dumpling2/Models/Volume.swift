@@ -39,11 +39,6 @@ public class Volume: RLMObject {
         return "globalId"
     }
     
-    //Required for backward compatibility when upgrading to V 0.96.2
-    /*override public class func requiredProperties() -> Array<AnyObject> {
-        return ["globalId", "title", "subtitle", "volumeDesc", "assetFolder", "coverImageId", "publisher", "publishedDate", "releaseDate", "metadata", "keywords", "published"]
-    }*/
-    
     // MARK: Public methods
     
     //MARK: Class methods
@@ -71,12 +66,12 @@ public class Volume: RLMObject {
             //Delete volume
             realm.beginWriteTransaction()
             realm.deleteObjects(currentVolume)
-            /*do {
+            do {
                 try realm.commitWriteTransaction()
             } catch let error {
                 NSLog("Error deleting volume: \(error)")
-            }*/
-            realm.commitWriteTransaction()
+            }
+            //realm.commitWriteTransaction()
         }
     }
     
@@ -190,12 +185,12 @@ public class Volume: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving volume: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     /**

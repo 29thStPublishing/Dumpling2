@@ -43,11 +43,6 @@ public class Issue: RLMObject {
         return "globalId"
     }
     
-    //Required for backward compatibility when upgrading to V 0.96.2
-    /*override public class func requiredProperties() -> Array<AnyObject> {
-        return ["globalId", "appleId", "title", "issueDesc", "assetFolder", "coverImageId", "coverImageiPadId", "coverImageiPadLndId", "iconImageURL", "publishedDate", "lastUpdateDate", "displayDate", "metadata", "volumeId"]
-    }*/
-    
     // MARK: Private methods
 
     // Delete all issues for a volume - this will delete the issues, their assets, articles and article assets
@@ -68,12 +63,12 @@ public class Issue: RLMObject {
         
         realm.beginWriteTransaction()
         realm.deleteObjects(results)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting issues for volume: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     // MARK: Public methods
@@ -104,12 +99,12 @@ public class Issue: RLMObject {
             //Delete issue
             realm.beginWriteTransaction()
             realm.deleteObjects(currentIssue)
-            /*do {
+            do {
                 try realm.commitWriteTransaction()
             } catch let error {
                 NSLog("Error deleting issue: \(error)")
-            }*/
-            realm.commitWriteTransaction()
+            }
+            //realm.commitWriteTransaction()
         }
     }
     
@@ -384,12 +379,12 @@ public class Issue: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving issue: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     /**

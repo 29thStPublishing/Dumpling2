@@ -65,11 +65,6 @@ public class Article: RLMObject {
         return "globalId"
     }
     
-    //Required for backward compatibility when upgrading to V 0.96.2
-    /*override public class func requiredProperties() -> Array<AnyObject> {
-        return ["globalId", "title", "articleDesc", "slug", "dek", "body", "permalink", "url", "sourceURL", "authorName", "authorURL", "section", "articleType", "keywords", "commentary", "date", "metadata", "versionStashed", "placement", "mainImageURL", "thumbImageURL", "isPublished", "isFeatured", "issueId", "appleId"]
-    }*/
-    
     //Add article
     class func createArticle(article: NSDictionary, issue: Issue, placement: Int) {
         let realm = RLMRealm.defaultRealm()
@@ -149,12 +144,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentArticle)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error creating article: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     //Get article details from API and create
@@ -248,12 +243,12 @@ public class Article: RLMObject {
                 
                 realm.beginWriteTransaction()
                 realm.addOrUpdateObject(currentArticle)
-                /*do {
+                do {
                     try realm.commitWriteTransaction()
                 } catch let error {
                     NSLog("Error creating article: \(error)")
-                }*/
-                realm.commitWriteTransaction()
+                }
+                //realm.commitWriteTransaction()
                 
                 if delegate != nil {
                     //Mark article as done
@@ -362,12 +357,12 @@ public class Article: RLMObject {
                     
                     realm.beginWriteTransaction()
                     realm.addOrUpdateObject(currentArticle)
-                    /*do {
-                    try realm.commitWriteTransaction()
+                    do {
+                        try realm.commitWriteTransaction()
                     } catch let error {
-                    NSLog("Error creating article: \(error)")
-                    }*/
-                    realm.commitWriteTransaction()
+                        NSLog("Error saving issue: \(error)")
+                    }
+                    //realm.commitWriteTransaction()
                     
                     if delegate != nil {
                         //Mark article as done
@@ -407,12 +402,12 @@ public class Article: RLMObject {
         //Delete articles
         realm.beginWriteTransaction()
         realm.deleteObjects(articles)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting articles for issues: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     /**
@@ -580,12 +575,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(currentArticle)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error adding article: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
         
         //Article downloaded (not necessarily assets)
         if delegate != nil {
@@ -620,12 +615,12 @@ public class Article: RLMObject {
         //Delete articles
         realm.beginWriteTransaction()
         realm.deleteObjects(articles)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting articles: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     /**
@@ -1031,7 +1026,12 @@ public class Article: RLMObject {
                 }
                 
                 realm.addOrUpdateObject(self)
-                realm.commitWriteTransaction()
+                do {
+                    try realm.commitWriteTransaction()
+                } catch let error {
+                    NSLog("Error saving issue: \(error)")
+                }
+                //realm.commitWriteTransaction()
                 
                 if handler != nil {
                     //Mark article as done
@@ -1082,12 +1082,12 @@ public class Article: RLMObject {
         //Delete article
         realm.beginWriteTransaction()
         realm.deleteObject(self)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error deleting article: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     
@@ -1256,12 +1256,12 @@ public class Article: RLMObject {
         
         realm.beginWriteTransaction()
         realm.addOrUpdateObject(self)
-        /*do {
+        do {
             try realm.commitWriteTransaction()
         } catch let error {
             NSLog("Error saving article: \(error)")
-        }*/
-        realm.commitWriteTransaction()
+        }
+        //realm.commitWriteTransaction()
     }
     
     /**

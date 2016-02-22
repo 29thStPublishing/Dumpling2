@@ -92,17 +92,25 @@ This class handles adding issues to the database. If using a VolumeHandler, you 
 
 6. **addAllIssues()** The method gets all issues from the Magnet API for given client and adds it to the database
 
-7. **addPreviewIssues()** The method gets all preview issues from the Magnet API for given client and adds it to the database
+7. **addOnlyIssuesWithoutArticles()** This method gets all issues from the Magnet API for the client key and adds them to the database without downloading their articles
 
-8. **listIssues()** The method is for testing only. It prints the available issues for a client api key
+8. **addPreviewIssues()** The method gets all preview issues from the Magnet API for given client and adds it to the database
 
-9. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
+9. **listIssues()** The method is for testing only. It prints the available issues for a client api key
 
-10. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
+10. **searchIssueFor(appleId: String)** ```returns Issue or nil``` The method searches for an issue with a specific Apple ID. If the issue is not available in the database, the issue will be downloaded from the Magnet API and added to the DB
 
-11. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
+11. **getIssue(issueId: NSString)** ```returns Issue or nil``` Get issue details from database for a specific global id
 
-12. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
+12. **downloadArticlesFor(issueId: String)** Downloads all the articles for a given issue
+
+13. **downloadAssetsFor(issueId: String)** Downloads all assets for a given issue (only issue assets)
+
+14. **downloadAllAssetsFor(issueId: String)** Downloads all assets for a given issue including article assets
+
+15. **addIssueOnNewsstand(issueId: String)** Add issue on Newsstand
+
+16. **getActiveDownloads()** ```returns NSArray``` Get issue ids whose download not complete yet
 
 
 ## ArticleHandler
@@ -238,6 +246,8 @@ Realm object for Issues. Also has methods for directly dealing with issues
 
 6. **downloadAllAssets()** This method downloads assets for the issue and all its articles
 
+7. **downloadIssueArticles()** This method downloads the articles for the issue
+
 
 ## Article
 
@@ -329,6 +339,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 7. **deleteArticle()** This method deletes all assets for the article and the article from the database
 
 8. **downloadArticleAssets(delegate: AnyObject?)** This method downloads the assets for the given article. Send the delegate as nil
+
+9. **refreshArticle(delegate: IssueHandler?)** This method downloads an article again and saves its new values (if updated). The issue handler is needed if you wish to listen for notifications
 
 
 ## Asset

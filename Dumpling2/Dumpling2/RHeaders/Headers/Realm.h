@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-//Realm Version 0.95
-
 #import <Foundation/Foundation.h>
 
 #import "RLMArray.h"
@@ -30,10 +28,3 @@
 #import "RLMRealmConfiguration.h"
 #import "RLMResults.h"
 #import "RLMSchema.h"
-#import "RLMAccessor.h"
-#import "RLMListBase.h"
-#import "RLMObjectStore.h"
-#import "RLMRealmUtil.h"
-#import "RLMObjectBase.h"
-#import "RLMObjectBase_Dynamic.h"
-#import "RLMRealm_Dynamic.h"

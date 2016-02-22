@@ -58,7 +58,6 @@
 		639B4EB71BB564E3001DC8CE /* RLMProperty_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E981BB564E3001DC8CE /* RLMProperty_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EB81BB564E3001DC8CE /* RLMRealm_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E991BB564E3001DC8CE /* RLMRealm_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EB91BB564E3001DC8CE /* RLMRealmConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9A1BB564E3001DC8CE /* RLMRealmConfiguration_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		639B4EBA1BB564E3001DC8CE /* RLMRealmUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9B1BB564E3001DC8CE /* RLMRealmUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EBB1BB564E3001DC8CE /* RLMResults_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B4D341BB416B4001DC8CE /* libc++.tbd */; };
@@ -66,6 +65,8 @@
 		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
 		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
+		63F7BBF51C7B1E3B00ABED75 /* RLMOptionalBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 63F7BBF31C7B1E3B00ABED75 /* RLMOptionalBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		63F7BBF61C7B1E3B00ABED75 /* RLMRealmUtil.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 63F7BBF41C7B1E3B00ABED75 /* RLMRealmUtil.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FFCA0FD41A80DBF1000C9AFD /* AFHTTPRequestOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFCA0FD51A80DBF1000C9AFD /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = FFCA0FC21A80DBF1000C9AFD /* AFHTTPRequestOperation.m */; };
@@ -179,13 +180,14 @@
 		639B4E981BB564E3001DC8CE /* RLMProperty_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMProperty_Private.h; sourceTree = "<group>"; };
 		639B4E991BB564E3001DC8CE /* RLMRealm_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Private.h; sourceTree = "<group>"; };
 		639B4E9A1BB564E3001DC8CE /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
-		639B4E9B1BB564E3001DC8CE /* RLMRealmUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmUtil.h; sourceTree = "<group>"; };
 		639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
 		639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
 		63AF68991BE8807E00405D53 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
 		63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "Helpers/strip-frameworks.sh"; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
 		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
+		63F7BBF31C7B1E3B00ABED75 /* RLMOptionalBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMOptionalBase.h; sourceTree = "<group>"; };
+		63F7BBF41C7B1E3B00ABED75 /* RLMRealmUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMRealmUtil.hpp; sourceTree = "<group>"; };
 		FF1A70051AEA5F85001B350F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		FF2B7D171AB1A32900263FF3 /* NewsstandKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NewsstandKit.framework; path = System/Library/Frameworks/NewsstandKit.framework; sourceTree = SDKROOT; };
 		FFCA0FC11A80DBF1000C9AFD /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
@@ -301,6 +303,8 @@
 		639B4E901BB564E3001DC8CE /* PrivateHeaders */ = {
 			isa = PBXGroup;
 			children = (
+				63F7BBF31C7B1E3B00ABED75 /* RLMOptionalBase.h */,
+				63F7BBF41C7B1E3B00ABED75 /* RLMRealmUtil.hpp */,
 				639B4E911BB564E3001DC8CE /* RLMAccessor.h */,
 				639B4E921BB564E3001DC8CE /* RLMArray_Private.h */,
 				639B4E931BB564E3001DC8CE /* RLMListBase.h */,
@@ -311,7 +315,6 @@
 				639B4E981BB564E3001DC8CE /* RLMProperty_Private.h */,
 				639B4E991BB564E3001DC8CE /* RLMRealm_Private.h */,
 				639B4E9A1BB564E3001DC8CE /* RLMRealmConfiguration_Private.h */,
-				639B4E9B1BB564E3001DC8CE /* RLMRealmUtil.h */,
 				639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */,
 				639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */,
 			);
@@ -497,6 +500,7 @@
 				FFCA0FDF1A80DBF1000C9AFD /* AFURLConnectionOperation.h in Headers */,
 				639B4EB61BB564E3001DC8CE /* RLMObjectStore.h in Headers */,
 				FFCA0FE31A80DBF1000C9AFD /* AFURLResponseSerialization.h in Headers */,
+				63F7BBF51C7B1E3B00ABED75 /* RLMOptionalBase.h in Headers */,
 				639B4EB41BB564E3001DC8CE /* RLMObject_Private.h in Headers */,
 				639B4EB21BB564E3001DC8CE /* RLMListBase.h in Headers */,
 				639B4EA01BB564E3001DC8CE /* RLMArray.h in Headers */,
@@ -509,6 +513,7 @@
 				639B4EA71BB564E3001DC8CE /* RLMObjectBase_Dynamic.h in Headers */,
 				639B4EA21BB564E3001DC8CE /* RLMConstants.h in Headers */,
 				639B4EB51BB564E3001DC8CE /* RLMObjectSchema_Private.h in Headers */,
+				63F7BBF61C7B1E3B00ABED75 /* RLMRealmUtil.hpp in Headers */,
 				630F20311BD76F5100A0B2DE /* NSString+HTML.h in Headers */,
 				FFCA0FD81A80DBF1000C9AFD /* AFHTTPSessionManager.h in Headers */,
 				639B4EA41BB564E3001DC8CE /* RLMMigration.h in Headers */,
@@ -534,7 +539,6 @@
 				FFCA0FDD1A80DBF1000C9AFD /* AFSecurityPolicy.h in Headers */,
 				639B4EA81BB564E3001DC8CE /* RLMObjectSchema.h in Headers */,
 				FFCA0FD61A80DBF1000C9AFD /* AFHTTPRequestOperationManager.h in Headers */,
-				639B4EBA1BB564E3001DC8CE /* RLMRealmUtil.h in Headers */,
 				FFCA0FDA1A80DBF1000C9AFD /* AFNetworking.h in Headers */,
 				639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */,
 			);
