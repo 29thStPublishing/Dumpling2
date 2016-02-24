@@ -31,6 +31,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
 
     func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
+        lLog("URL String:\(urlString)")
         //let authorization = "method=apikey,token=\(apiKey)"
         let authorization = "method=clientkey,token=\(clientKey)"
         self.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
@@ -60,6 +61,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     }
     
     func downloadFile(fromPath: String, toPath: String, completion:(status:AnyObject?, error:NSError?) -> ()) {
+        lLog("Download file:\(fromPath)")
         let url = NSURL(string: fromPath)
         let urlRequest = NSURLRequest(URL: url!)
         

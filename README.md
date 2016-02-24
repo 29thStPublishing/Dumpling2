@@ -18,24 +18,27 @@ There are two targets which will be used with Dumpling2 - **Dumpling2** and **Du
 
 3. When submitting the app to the App Store or uploading to iTunes Connect for testing or submitting, use the framework from the Phone OS folder (*Debug-iphoneos*)
 
+### Note for this release
+Use this version of Dumpling2 **ONLY** for projects which are using Dumpling2 for the first time. **DO NOT** use them for apps which have used an older version of Dumpling2.
+
 
 ## Dependencies
 
 1. The Dumpling2 framework looks for **AFNetworking** libraries for making calls to the Magnet API. We had initially intended to use Cocoapods, but they don't work with frameworks. So have included AFNetworking source files into the framework. The current Dumpling2 version as of September 2015 uses [AFNetworking v2.6.0](https://github.com/AFNetworking/AFNetworking/releases/tag/2.6.0)
 
 2. Dumpling2 uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately.
-The current Dumpling2 version as of September 2015 uses [Realm v0.96.2](https://github.com/realm/realm-cocoa/releases/download/v0.96.2/realm-objc-0.96.2.zip)
+The current Dumpling2 version as of September 2015 uses [Realm v0.98.2](https://github.com/realm/realm-cocoa/releases/download/v0.98.2/realm-objc-0.98.2.zip)
 
 3. Dumpling2 uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 ###Updating Realm in Dumpling2
-1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases)
+1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases/download/v0.98.2/realm-objc-0.98.2.zip)
 
-2. From the Realm.framework **ios** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/RHeaders*
+2. From the Realm.framework **ios/static** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/Headers*. You must use the static directory, you cannot have one dynamic framework inside another.
 
 3. Make sure *Realm* is added to *Linked Frameworks & Libraries* for Dumpling2 target
 
-4. All the `.h` files added **should** have public access (can be checked in the File Inspector
+4. All the `.h` files added **should** have public access (can be checked in the File Inspector)
 
 5. Change all references to `#import <Realm/file_name.h>` to `#import file_name.h`
 

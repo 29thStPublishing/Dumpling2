@@ -107,10 +107,6 @@ public class VolumeHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        //RLMRealm.setDefaultRealmPath(defaultRealmPath)
-        
-        //Call this if the schema version has changed - pass new schema version as integer
-        //VolumeHandler.checkAndMigrateData(2)
     }
     
     /**
@@ -128,30 +124,6 @@ public class VolumeHandler: NSObject {
         return currentSchemaVersion
     }
     
-    //Check and migrate Realm data if needed
-    class func checkAndMigrateData(schemaVersion: UInt64) {
-        
-        let currentSchemaVersion: UInt64 = getCurrentSchemaVersion()
-        if currentSchemaVersion < schemaVersion {
-            let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-            realmConfiguration.schemaVersion = schemaVersion
-            realmConfiguration.migrationBlock = { migration, oldSchemaVersion in
-                
-                //Enumerate through the models and migrate data as needed
-            }
-            RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        }
-        
-        /*if currentSchemaVersion < schemaVersion {
-            RLMRealm.setSchemaVersion(schemaVersion, forRealmAtPath: RLMRealmConfiguration.defaultConfiguration().path!,
-                withMigrationBlock: { migration, oldSchemaVersion in
-                    
-                    //Enumerate through the models and migrate data as needed
-                }
-            )
-        }*/
-    }
-    
     // MARK: Use API
     
     /**
@@ -164,6 +136,8 @@ public class VolumeHandler: NSObject {
     public func addVolumeFromAPI(globalId: String) {
         
         let requestURL = "\(baseURL)volumes/\(globalId)"
+        
+        //self.issueHandler.updateStatusDictionary(nil, issueId: globalId, url: requestURL, status: 0)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -204,6 +178,8 @@ public class VolumeHandler: NSObject {
                 
                 //Update volume now
                 let volumeId = volumeDetails.objectForKey("id") as! String
+                
+                //self.issueHandler.updateStatusDictionary(nil, issueId: volumeId, url: requestURL, status: 0)
                 self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volumeId)
                 self.updateVolumeFromAPI(volumeDetails, globalId: volumeId)
             }
@@ -299,6 +275,7 @@ public class VolumeHandler: NSObject {
         } catch let error {
             NSLog("Error saving volume details: \(error)")
         }
+        //realm.commitWriteTransaction()
         
         //Add all assets of the volume (which do not have an associated issue/article)
         let volumeMedia = volume.objectForKey("media") as! NSArray
@@ -318,7 +295,7 @@ public class VolumeHandler: NSObject {
             //Insert issue
             //Add issue to dictionary
             let issueId: String = issueDict.valueForKey("id") as! String
-            self.issueHandler.addIssueFromAPI(issueId, volumeId: currentVolume.globalId)
+            self.issueHandler.addIssueFromAPI(issueId, volumeId: currentVolume.globalId, withArticles: true)
         }
         
         //Mark volume URL as done
