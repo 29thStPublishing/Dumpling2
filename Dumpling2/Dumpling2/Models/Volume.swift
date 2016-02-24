@@ -40,7 +40,7 @@ public class Volume: RLMObject {
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<AnyObject> {
+    override public class func requiredProperties() -> Array<String> {
         return ["globalId", "title", "subtitle", "volumeDesc", "assetFolder", "coverImageId", "publisher", "publishedDate", "releaseDate", "metadata", "keywords", "published"]
     }
     
@@ -76,6 +76,7 @@ public class Volume: RLMObject {
             } catch let error {
                 NSLog("Error deleting volume: \(error)")
             }
+            //realm.commitWriteTransaction()
         }
     }
     
@@ -194,6 +195,7 @@ public class Volume: RLMObject {
         } catch let error {
             NSLog("Error saving volume: \(error)")
         }
+        //realm.commitWriteTransaction()
     }
     
     /**

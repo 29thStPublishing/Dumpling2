@@ -44,7 +44,7 @@ public class Issue: RLMObject {
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<AnyObject> {
+    override public class func requiredProperties() -> Array<String> {
         return ["globalId", "appleId", "title", "issueDesc", "assetFolder", "coverImageId", "coverImageiPadId", "coverImageiPadLndId", "iconImageURL", "publishedDate", "lastUpdateDate", "displayDate", "metadata", "volumeId"]
     }
     
@@ -73,6 +73,7 @@ public class Issue: RLMObject {
         } catch let error {
             NSLog("Error deleting issues for volume: \(error)")
         }
+        //realm.commitWriteTransaction()
     }
     
     // MARK: Public methods
@@ -108,6 +109,7 @@ public class Issue: RLMObject {
             } catch let error {
                 NSLog("Error deleting issue: \(error)")
             }
+            //realm.commitWriteTransaction()
         }
     }
     
@@ -207,9 +209,10 @@ public class Issue: RLMObject {
     //MARK: Instance methods
     
     /**
-    This method downloads assets for the issue (only issue assets, not article assets)
+    This method downloads articles for the issue
     */
-    public func downloadIssueAssets() {
+    public func downloadIssueArticles() {
+        lLog("Download issues articles for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -222,6 +225,65 @@ public class Issue: RLMObject {
         let issueHandler = IssueHandler(folder: assetFolder)!
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
+        
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
+                    //Download articles for the issue
+                    let articles = issueDetails.objectForKey("articles") as! NSArray
+                    if articles.count > 0 {
+                        var articleList = ""
+                        for (index, articleDict) in articles.enumerate() {
+                            //Insert article
+                            //Add article and its assets to Issue dictionary
+                            let articleId = articleDict.valueForKey("id") as! String
+                            articleList += articleId
+                            if index < (articles.count - 1) {
+                                articleList += ","
+                            }
+                            issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                            //Article.createArticleForId(articleId, issue: self, placement: index+1, delegate: issueHandler)
+                        }
+                        //Send request to get all articles info in 1 call
+                        Article.createArticlesForIds(articleList, issue: self, delegate: issueHandler)
+                    }
+                    
+                    issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 1)
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+                issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 2)
+            }
+        }
+    }
+    
+    /**
+    This method downloads assets for the issue (only issue assets, not article assets)
+    */
+    public func downloadIssueAssets() {
+        lLog("Download issues assets for \(self.globalId)")
+        var assetFolder = self.assetFolder
+        if assetFolder.hasPrefix("/Documents") {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            let docsDir: NSString = docPaths[0] as NSString
+            assetFolder = docsDir as String
+        }
+        else {
+            assetFolder = assetFolder.stringByReplacingOccurrencesOfString("/\(self.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+        }
+        let issueHandler = IssueHandler(folder: assetFolder)!
+        
+        let requestURL = "\(baseURL)issues/\(self.globalId)"
+        
+        //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -235,11 +297,16 @@ public class Issue: RLMObject {
                     //Download assets for the issue
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
+                        var assetList = ""
                         for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! NSString
+                            let assetid = assetDict.valueForKey("id") as! String
+                            assetList += assetid
+                            if index < (issueMedia.count - 1) {
+                                assetList += ","
+                            }
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
-                            Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
                         }
+                        Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
                     issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)issues/\(self.globalId)", status: 1)
@@ -256,6 +323,7 @@ public class Issue: RLMObject {
      This method downloads assets for the issue and its articles
      */
     public func downloadAllAssets() {
+        lLog("Download all assets for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -268,6 +336,8 @@ public class Issue: RLMObject {
         let issueHandler = IssueHandler(folder: assetFolder)!
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
+        
+        //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -281,11 +351,16 @@ public class Issue: RLMObject {
                     //Download assets for the issue
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
+                        var assetList = ""
                         for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! NSString
+                            let assetid = assetDict.valueForKey("id") as! String
+                            assetList += assetid
+                            if index < (issueMedia.count - 1) {
+                                assetList += ","
+                            }
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
-                            Asset.downloadAndCreateAsset(assetid, issue: self, articleId: "", placement: index+1, delegate: issueHandler)
                         }
+                        Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
                     if let articles = issueDetails.objectForKey("articles") as? NSArray {
@@ -323,6 +398,7 @@ public class Issue: RLMObject {
         } catch let error {
             NSLog("Error saving issue: \(error)")
         }
+        //realm.commitWriteTransaction()
     }
     
     /**
