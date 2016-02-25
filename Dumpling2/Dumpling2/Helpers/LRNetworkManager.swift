@@ -10,8 +10,10 @@ import UIKit
 
 class LRNetworkManager: AFHTTPRequestOperationManager {
     
+    var preview: Bool = false
+    
     struct Singleton {
-        static let sharedInstance = LRNetworkManager()
+        static let sharedInstance = LRNetworkManager(baseURL: nil)
     }
     
     class var sharedInstance: LRNetworkManager {
@@ -20,6 +22,9 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     
     override init(baseURL url: NSURL?) {
         super.init(baseURL: url)
+        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+            self.preview = previewApp.boolValue
+        }
     }
     
     init() {
@@ -28,6 +33,9 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
+        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+            self.preview = previewApp.boolValue
+        }
     }
 
     func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
@@ -35,6 +43,9 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         //let authorization = "method=apikey,token=\(apiKey)"
         let authorization = "method=clientkey,token=\(clientKey)"
         self.requestSerializer.setValue(authorization, forHTTPHeaderField: "Authorization")
+        if self.preview {
+            self.requestSerializer.setValue("preview", forHTTPHeaderField: "X-Preview-App")
+        }
         
         if methodType == "GET" {
         
