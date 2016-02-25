@@ -121,6 +121,7 @@ public class IssueHandler: NSObject {
         config.schemaVersion = schemaVersion
         
         let migrationBlock: (RLMMigration, UInt64) -> Void = { (migration, oldSchemeVersion) in
+            //0 to 1 - adding coverImageiPadId and coverImageiPadLndId to Issue
             if oldSchemeVersion < 1 {
                 migration.enumerateObjects(Issue.className()) { oldObject, newObject in
                     let coverId = oldObject!["coverImageId"] as! String
@@ -136,6 +137,9 @@ public class IssueHandler: NSObject {
                     }
                 }
             }
+            //1 to 2 - upgrade to Realm 0.92
+            //2 to 3 - upgrade to Realm 0.94/.95
+            //3 to 4 - upgrade to Realm 0.98.2 (required/optional properties)
             if oldSchemeVersion < 4 {
                 migration.enumerateObjects(Asset.className()) { oldObject, newObject in
                     if let issue = oldObject!["issue"] as? Issue {
