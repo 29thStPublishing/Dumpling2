@@ -47,7 +47,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        IssueHandler.checkAndMigrateData(4)
+        self.checkAndMigrateData(4)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -66,6 +66,7 @@ public class IssueHandler: NSObject {
     - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
+        super.init()
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
@@ -78,7 +79,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        IssueHandler.checkAndMigrateData(4)
+        self.checkAndMigrateData(4)
     }
     
     /**
@@ -91,6 +92,7 @@ public class IssueHandler: NSObject {
     - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
+        super.init()
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
@@ -110,12 +112,12 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        IssueHandler.checkAndMigrateData(4)
+        self.checkAndMigrateData(4)
         
     }
     
     //Check and migrate Realm data if needed
-    private class func checkAndMigrateData(schemaVersion: UInt64) {
+    private func checkAndMigrateData(schemaVersion: UInt64) {
         
         let config = RLMRealmConfiguration.defaultConfiguration()
         config.schemaVersion = schemaVersion
@@ -150,6 +152,52 @@ public class IssueHandler: NSObject {
         }
         config.migrationBlock = migrationBlock
         RLMRealmConfiguration.setDefaultConfiguration(config)
+        
+        do {
+            let _ = try RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
+        } catch {
+            self.cleanupRealm()
+            self.createRealmAgain(schemaVersion)
+        }
+    }
+    
+    private func cleanupRealm() {
+        var folderPath = ""
+        if defaultFolder == "/Documents" {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            let docsDir: String = docPaths[0] as String
+            folderPath = docsDir
+        }
+        else {
+            folderPath = self.defaultFolder as String
+        }
+        do {
+            let files: NSArray = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(folderPath) as NSArray
+            let realmFiles = files.filteredArrayUsingPredicate(NSPredicate(format: "self BEGINSWITH %@", "default.realm"))
+            
+            //Delete all files with the given names
+            for fileName: String in realmFiles as! [String] {
+                try NSFileManager.defaultManager().removeItemAtPath("\(folderPath)/\(fileName)")
+            }
+        } catch{
+            NSLog("REALM:: Deleting failed")
+        }
+    }
+    
+    private func createRealmAgain(schemaVersion: UInt64) {
+        var folderPath = self.defaultFolder
+        if folderPath == "/Documents" {
+            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            let docsDir: NSString = docPaths[0] as NSString
+            folderPath = "\(docsDir)/default.realm"
+        }
+        else {
+            folderPath = "\(folderPath)/default.realm"
+        }
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.schemaVersion = schemaVersion
+        realmConfiguration.path = folderPath as String
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
     }
         
     // MARK: Use zip
