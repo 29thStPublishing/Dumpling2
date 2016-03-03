@@ -111,7 +111,6 @@ public class ArticleHandler: NSObject {
     }
     
     //Check and migrate Realm data if needed
-    //Check and migrate Realm data if needed
     private func checkAndMigrateData(schemaVersion: UInt64) {
         
         let config = RLMRealmConfiguration.defaultConfiguration()
@@ -138,9 +137,18 @@ public class ArticleHandler: NSObject {
             //2 to 3 - upgrade to Realm 0.94/.95
             //3 to 4 - upgrade to Realm 0.98.2 (required/optional properties)
             if oldSchemeVersion < 4 {
-                migration.enumerateObjects(Asset.className()) { oldObject, newObject in
-                    if let issue = oldObject!["issue"] as? Issue {
-                        newObject!["issue"] = issue
+                let classes = [Article.className(), Issue.className(), Asset.className(), Magazine.className(), Volume.className(), Purchase.className()]
+                for cls in classes {
+                    migration.enumerateObjects(cls) { oldObject, newObject in
+                        for prop in oldObject!.objectSchema.properties {
+                            if let newProp = newObject!.objectSchema[prop.name] {
+                                // Property does still exist
+                                if prop.optional && !newProp.optional {
+                                    // Property was optional, but is now required
+                                    newObject![prop.name] = oldObject![prop.name]
+                                }
+                            }
+                        }
                     }
                 }
             }
