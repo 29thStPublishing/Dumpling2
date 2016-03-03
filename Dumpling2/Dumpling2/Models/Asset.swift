@@ -632,7 +632,7 @@ public class Asset: RLMObject {
     }
     
     //Add list of assets from API - for issues or articles
-    class func downloadAndCreateAssetsForIds(assetIds: String, issue: Issue, articleId: String, delegate: AnyObject?) {
+    class func downloadAndCreateAssetsForIds(assetIds: String, issue: Issue?, articleId: String, delegate: AnyObject?) {
         lLog("downloadAndCreateAssetsFrom \(assetIds)")
         let realm = RLMRealm.defaultRealm()
         
@@ -653,7 +653,9 @@ public class Asset: RLMObject {
                     let currentAsset = Asset()
                     currentAsset.globalId = mediaFile.valueForKey("id") as! String
                     currentAsset.caption = mediaFile.valueForKey("caption") as! String
-                    currentAsset.issue = issue
+                    if let issue = issue {
+                        currentAsset.issue = issue
+                    }
                     currentAsset.articleId = articleId
                     
                     let meta = mediaFile.objectForKey("meta") as! NSDictionary
@@ -678,15 +680,22 @@ public class Asset: RLMObject {
                         fileUrl = mediaFile.valueForKey("url") as! String
                         isCdn = false
                     }
-                    var finalURL: String
-                    if issue.assetFolder.hasPrefix("/Documents") {
-                        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                        let docsDir: NSString = docPaths[0] as NSString
-                        let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                        finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                    var finalURL: String = ""
+                    if let issue = issue {
+                        if issue.assetFolder.hasPrefix("/Documents") {
+                            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                            let docsDir: NSString = docPaths[0] as NSString
+                            let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                            finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                        }
+                        else {
+                            finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                        }
                     }
                     else {
-                        finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                        let docsDir = docPaths[0]
+                        finalURL = "\(docsDir)/original-\((fileUrl as NSString).lastPathComponent)"
                     }
                     
                     var toDownload = true //Define whether the image should be downloaded or not
@@ -731,9 +740,15 @@ public class Asset: RLMObject {
                                 if completed.boolValue {
                                     //Mark asset download as done
                                     if delegate != nil {
-                                        if !issue.globalId.isEmpty {
-                                            //This is an issue's asset or an article's (belonging to an issue) asset
-                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                        if let issue = issue {
+                                            if !issue.globalId.isEmpty {
+                                                //This is an issue's asset or an article's (belonging to an issue) asset
+                                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                            }
+                                            else {
+                                                //This is an independent article's asset
+                                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                            }
                                         }
                                         else {
                                             //This is an independent article's asset
@@ -753,12 +768,17 @@ public class Asset: RLMObject {
                                             if completed.boolValue {
                                                 //Mark asset download as done
                                                 if delegate != nil {
-                                                    if !issue.globalId.isEmpty {
-                                                        //This is an issue's asset or an article's (belonging to an issue) asset
-                                                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                                    if let issue = issue {
+                                                        if !issue.globalId.isEmpty {
+                                                            //This is an issue's asset or an article's (belonging to an issue) asset
+                                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                                        }
+                                                        else {
+                                                            //This is an independent article's asset
+                                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                                        }
                                                     }
                                                     else {
-                                                        //This is an independent article's asset
                                                         (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
                                                     }
                                                 }
@@ -766,8 +786,13 @@ public class Asset: RLMObject {
                                         }
                                         else if let _ = error {
                                             if delegate != nil {
-                                                if !issue.globalId.isEmpty {
-                                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 2)
+                                                if let issue = issue {
+                                                    if !issue.globalId.isEmpty {
+                                                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 2)
+                                                    }
+                                                    else {
+                                                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 2)
+                                                    }
                                                 }
                                                 else {
                                                     (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 2)
@@ -781,12 +806,17 @@ public class Asset: RLMObject {
                     }
                     else {
                         if delegate != nil {
-                            if !issue.globalId.isEmpty {
-                                //This is an issue's asset or an article's (belonging to an issue) asset
-                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                            if let issue = issue {
+                                if !issue.globalId.isEmpty {
+                                    //This is an issue's asset or an article's (belonging to an issue) asset
+                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                }
+                                else {
+                                    //This is an independent article's asset
+                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                }
                             }
                             else {
-                                //This is an independent article's asset
                                 (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
                             }
                         }
@@ -801,14 +831,21 @@ public class Asset: RLMObject {
                     }
                     
                     var finalThumbURL: String
-                    if issue.assetFolder.hasPrefix("/Documents") {
-                        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                        let docsDir: NSString = docPaths[0] as NSString
-                        let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                        finalThumbURL = "\(finalFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
+                    if let issue = issue {
+                        if issue.assetFolder.hasPrefix("/Documents") {
+                            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                            let docsDir: NSString = docPaths[0] as NSString
+                            let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                            finalThumbURL = "\(finalFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
+                        }
+                        else {
+                            finalThumbURL = "\(issue.assetFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
+                        }
                     }
                     else {
-                        finalThumbURL = "\(issue.assetFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
+                        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                        let docsDir = docPaths[0]
+                        finalThumbURL = "\(docsDir)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                     }
                     
                     networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
@@ -872,14 +909,15 @@ public class Asset: RLMObject {
             else if let err = error {
                 print("Error: " + err.description)
                 if delegate != nil {
+                    var articleGlobalId = articleId
+                    if let issue = issue {
+                        if !issue.globalId.isEmpty {
+                            articleGlobalId = issue.globalId
+                        }
+                    }
                     let arr = assetIds.characters.split(",").map { String($0) }
                     for assetId in arr {
-                        if !issue.globalId.isEmpty {
-                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetId)", status: 2)
-                        }
-                        else {
-                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: 2)
-                        }
+                        (delegate as! IssueHandler).updateStatusDictionary("", issueId: articleGlobalId, url: "\(baseURL)media/\(assetId)", status: 2)
                     }
                 }
             }
@@ -1262,6 +1300,9 @@ public class Asset: RLMObject {
                     let volume: Volume = volumes.firstObject() as! Volume
                     assetFolder = volume.assetFolder
                 }
+            }
+            if Helper.isNilOrEmpty(assetFolder) {
+                assetFolder = "/Documents"
             }
             
             if !Helper.isNilOrEmpty(assetFolder) {
