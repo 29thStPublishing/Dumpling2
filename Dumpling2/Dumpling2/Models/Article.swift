@@ -272,7 +272,7 @@ public class Article: RLMObject {
     }
     
     //Get details for multiple comma-separate article ids from API and create
-    class func createArticlesForIds(articleIds: String, issue: Issue, delegate: AnyObject?) {
+    class func createArticlesForIds(articleIds: String, issue: Issue?, delegate: AnyObject?) {
         let realm = RLMRealm.defaultRealm()
         
         let requestURL = "\(baseURL)articles/\(articleIds)"
@@ -289,7 +289,19 @@ public class Article: RLMObject {
                     let currentArticle = Article()
                     currentArticle.globalId = articleInfo.valueForKey("id") as! String
                     currentArticle.placement = index + 1
-                    currentArticle.issueId = issue.globalId
+                    if let articleIssue = issue {
+                        currentArticle.issueId = articleIssue.globalId
+                    }
+                    else {
+                        if let issue = Issue.getIssue("") {
+                            currentArticle.issueId = issue.globalId
+                        }
+                        else {
+                            let issue = Issue()
+                            issue.assetFolder = "/Documents"
+                            currentArticle.issueId = issue.globalId
+                        }
+                    }
                     currentArticle.title = articleInfo.valueForKey("title") as! String
                     currentArticle.body = articleInfo.valueForKey("body") as! String
                     currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
@@ -346,13 +358,18 @@ public class Article: RLMObject {
                                 assetList += ","
                             }
                             if delegate != nil {
-                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                                if let issue = issue {
+                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                                }
+                                else {
+                                    (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                                }
                             }
                             if assetIndex == 0 {
                                 currentArticle.thumbImageURL = assetid as String
                             }
                         }
-                        Asset.downloadAndCreateAssetsForIds(assetList, issue: issue, articleId: currentArticle.globalId, delegate: delegate)
+                        Asset.downloadAndCreateAssetsForIds(assetList, issue: Issue.getIssue(currentArticle.issueId), articleId: currentArticle.globalId, delegate: delegate)
                     }
                     
                     /*//Set thumbnail for article
@@ -371,7 +388,12 @@ public class Article: RLMObject {
                     
                     if delegate != nil {
                         //Mark article as done
-                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                        if let issue = issue {
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                        }
+                        else {
+                            (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                        }
                     }
                 }
             }
@@ -381,7 +403,139 @@ public class Article: RLMObject {
                     //Mark all articles from the list as done with errors
                     let arr = articleIds.characters.split(",").map { String($0) }
                     for articleId in arr {
-                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(articleId)", status: 2)
+                        if let issue = issue {
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(articleId)", status: 2)
+                        }
+                        else {
+                            (delegate as! IssueHandler).updateStatusDictionary("", issueId: articleId, url: "\(baseURL)articles/\(articleId)", status: 2)
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    //Get details for multiple comma-separate article ids from API and create
+    class func createArticlesForIdsWithThumb(articleIds: String, issue: Issue?, delegate: AnyObject?) {
+        let realm = RLMRealm.defaultRealm()
+        
+        let requestURL = "\(baseURL)articles/\(articleIds)"
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                
+                for (index, articleInfo) in allArticles.enumerate() {
+                    let currentArticle = Article()
+                    currentArticle.globalId = articleInfo.valueForKey("id") as! String
+                    currentArticle.placement = index + 1
+                    if let articleIssue = issue {
+                        currentArticle.issueId = articleIssue.globalId
+                    }
+                    else {
+                        if let issue = Issue.getIssue("") {
+                            currentArticle.issueId = issue.globalId
+                        }
+                        else {
+                            let issue = Issue()
+                            issue.assetFolder = "/Documents"
+                            currentArticle.issueId = issue.globalId
+                        }
+                    }
+                    currentArticle.title = articleInfo.valueForKey("title") as! String
+                    currentArticle.body = articleInfo.valueForKey("body") as! String
+                    currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
+                    currentArticle.authorName = articleInfo.valueForKey("authorName") as! String
+                    currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                    currentArticle.url = articleInfo.valueForKey("sharingUrl") as! String
+                    currentArticle.section = articleInfo.valueForKey("section") as! String
+                    currentArticle.articleType = articleInfo.valueForKey("type") as! String
+                    currentArticle.commentary = articleInfo.valueForKey("commentary") as! String
+                    currentArticle.slug = articleInfo.valueForKey("slug") as! String
+                    
+                    if let sku = articleInfo.valueForKey("sku") as? String {
+                        currentArticle.appleId = sku
+                    }
+                    
+                    let meta = articleInfo.objectForKey("meta") as! NSDictionary
+                    let featured = meta.valueForKey("featured") as! NSNumber
+                    currentArticle.isFeatured = featured.boolValue
+                    if let published = meta.valueForKey("published") as? NSNumber {
+                        currentArticle.isPublished = published.boolValue
+                    }
+                    
+                    if let publishedDate = meta.valueForKey("publishedDate") as? String {
+                        currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+                    }
+                    
+                    if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
+                        if metadata.isKindOfClass(NSDictionary) {
+                            currentArticle.metadata = Helper.stringFromJSON(metadata)!
+                        }
+                        else {
+                            currentArticle.metadata = metadata as! String
+                        }
+                    }
+                    
+                    let keywords = articleInfo.objectForKey("keywords") as! NSArray
+                    if keywords.count > 0 {
+                        currentArticle.keywords = Helper.stringFromJSON(keywords)!
+                    }
+                    
+                    //Add all assets of the article (will add images and sound)
+                    let articleMedia = articleInfo.objectForKey("media") as! NSArray
+                    if articleMedia.count > 0 {
+                        let assetDict = articleMedia.firstObject
+                        let assetid = assetDict!.valueForKey("id") as! String
+                        if delegate != nil {
+                            if let issue = issue {
+                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            }
+                            else {
+                                (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            }
+                        }
+                        currentArticle.thumbImageURL = assetid as String
+                        Asset.downloadAndCreateAssetsForIds(assetid, issue: Issue.getIssue(currentArticle.issueId), articleId: currentArticle.globalId, delegate: delegate)
+                    }
+                    
+                    realm.beginWriteTransaction()
+                    realm.addOrUpdateObject(currentArticle)
+                    do {
+                        try realm.commitWriteTransaction()
+                    } catch let error {
+                        NSLog("Error saving issue: \(error)")
+                    }
+                    //realm.commitWriteTransaction()
+                    
+                    if delegate != nil {
+                        //Mark article as done
+                        if let issue = issue {
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                        }
+                        else {
+                            (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                        }
+                    }
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+                if delegate != nil {
+                    //Mark all articles from the list as done with errors
+                    let arr = articleIds.characters.split(",").map { String($0) }
+                    for articleId in arr {
+                        if let issue = issue {
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)articles/\(articleId)", status: 2)
+                        }
+                        else {
+                            (delegate as! IssueHandler).updateStatusDictionary("", issueId: articleId, url: "\(baseURL)articles/\(articleId)", status: 2)
+                        }
                     }
                 }
             }

@@ -337,7 +337,7 @@ public class ArticleHandler: NSObject {
         if page > 0 {
             requestURL = requestURL + "&page=\(page+1)"
         }
-
+        
         let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
@@ -346,15 +346,73 @@ public class ArticleHandler: NSObject {
                 let response: NSDictionary = data as! NSDictionary
                 let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (_, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! NSString
+                    var articleList = ""
+                    for (index, articleDict) in allArticles.enumerate() {
+                        let articleId = articleDict.valueForKey("id") as! String
+                        articleList += articleId
+                        if index < (allArticles.count - 1) {
+                            articleList += ","
+                        }
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         
-                        //self.issueHandler.updateStatusDictionary(nil, issueId: articleId as String, url: requestURL, status: 0)
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
                         
-                        Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
+                        //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
+                    //Send request to get all articles info in 1 call
+                    Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+            }
+        }
+    }
+    
+    /**
+     The method lets you download and add all preview articles to the database
+     
+     - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+     
+     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+     */
+    public func addPreviewArticles(page: Int, limit: Int) {
+        var requestURL = "\(baseURL)articles/preview?limit="
+        
+        if limit > 0 {
+            requestURL += "\(limit)"
+        }
+        else {
+            requestURL += "20"
+        }
+        
+        if page > 0 {
+            requestURL = requestURL + "&page=\(page+1)"
+        }
+        
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                if allArticles.count > 0 {
+                    var articleList = ""
+                    for (index, articleDict) in allArticles.enumerate() {
+                        let articleId = articleDict.valueForKey("id") as! String
+                        articleList += articleId
+                        if index < (allArticles.count - 1) {
+                            articleList += ","
+                        }
+                        let requestURL = "\(baseURL)articles/\(articleId)"
+                        
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        
+                        //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
+                    }
+                    //Send request to get all articles info in 1 call
+                    Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
                 }
             }
             else if let err = error {
@@ -392,15 +450,21 @@ public class ArticleHandler: NSObject {
                 let response: NSDictionary = data as! NSDictionary
                 let allArticles: NSArray = response.valueForKey("articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (_, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! NSString
+                    var articleList = ""
+                    for (index, articleDict) in allArticles.enumerate() {
+                        let articleId = articleDict.valueForKey("id") as! String
+                        articleList += articleId
+                        if index < (allArticles.count - 1) {
+                            articleList += ","
+                        }
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         
-                        //self.issueHandler.updateStatusDictionary(nil, issueId: articleId as String, url: requestURL, status: 0)
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
                         
-                        Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
+                        //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
+                    //Send request to get all articles info in 1 call
+                    Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
                 }
             }
             else if let err = error {
