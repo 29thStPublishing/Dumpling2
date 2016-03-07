@@ -23,6 +23,13 @@ import Foundation
  */
 
 func lLog<T>(@autoclosure object: () -> T, _ file: String = __FILE__, _ function: String = __FUNCTION__, _ line: Int = __LINE__) {
+    //If LLOG is present and != 1, return - no logging
+    let environmentVars = NSProcessInfo.processInfo().environment
+    if let logging = environmentVars["LLOG"] {
+        if logging != "1" {
+            return
+        }
+    }
     #if DEBUG
         let value = object()
         let stringRepresentation: String
