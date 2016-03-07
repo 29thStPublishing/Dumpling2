@@ -77,7 +77,7 @@ To do this, follow these steps
 
 3. Add the following command to the `Run Script`
 ```
-/bin/sh ${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Dumpling2.framework/strip-frameworks.sh
+/bin/sh "${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Dumpling2.framework/strip-frameworks.sh"
 ```
 
 ## Logging
