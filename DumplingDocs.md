@@ -32,6 +32,13 @@ To do this, follow these steps
 /bin/sh ${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/Dumpling2.framework/strip-frameworks.sh
 ```
 
+## Logging
+Dumpling2 prints logs in the console when running an app on a simulator or using a developer mobileprovision (on a device). You can disable logging in two ways
+
+1. Run the app using an adhoc or App Store mobile provision on a device
+
+2. Set an environment variable named `LLOG` with value = `1` for `Debug` configuration (under `Run`)
+
 
 ## VolumeHandler
 
