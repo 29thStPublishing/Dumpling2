@@ -33,6 +33,8 @@ public class Article: RLMObject {
     dynamic public var authorName = ""
     /// Link to the article author's profile
     dynamic public var authorURL = ""
+    /// Article author's bio
+    dynamic public var authorBio = ""
     /// Section under which the article falls
     dynamic public var section = ""
     /// Type of article
@@ -67,7 +69,7 @@ public class Article: RLMObject {
     
     //Required for backward compatibility when upgrading to V 0.96.2
     override public class func requiredProperties() -> Array<String> {
-        return ["globalId", "title", "articleDesc", "slug", "dek", "body", "permalink", "url", "sourceURL", "authorName", "authorURL", "section", "articleType", "keywords", "commentary", "date", "metadata", "versionStashed", "placement", "mainImageURL", "thumbImageURL", "isPublished", "isFeatured", "issueId", "appleId"]
+        return ["globalId", "title", "articleDesc", "slug", "dek", "body", "permalink", "url", "sourceURL", "authorName", "authorURL", "authorBio", "section", "articleType", "keywords", "commentary", "date", "metadata", "versionStashed", "placement", "mainImageURL", "thumbImageURL", "isPublished", "isFeatured", "issueId", "appleId"]
     }
     
     //Add article
@@ -85,6 +87,7 @@ public class Article: RLMObject {
         currentArticle.sourceURL = article.objectForKey("source") as! String
         currentArticle.dek = article.objectForKey("dek") as! String
         currentArticle.authorURL = article.objectForKey("author_url") as! String
+        currentArticle.authorBio = article.objectForKey("author_bio") as! String
         currentArticle.keywords = article.objectForKey("keywords") as! String
         currentArticle.commentary = article.objectForKey("commentary") as! String
         currentArticle.articleType = article.objectForKey("type") as! String
@@ -181,6 +184,7 @@ public class Article: RLMObject {
                 currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
                 currentArticle.authorName = articleInfo.valueForKey("authorName") as! String
                 currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                currentArticle.authorBio = articleInfo.valueForKey("authorBio") as! String
                 currentArticle.url = articleInfo.valueForKey("sharingUrl") as! String
                 currentArticle.section = articleInfo.valueForKey("section") as! String
                 currentArticle.articleType = articleInfo.valueForKey("type") as! String
@@ -307,6 +311,7 @@ public class Article: RLMObject {
                     currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
                     currentArticle.authorName = articleInfo.valueForKey("authorName") as! String
                     currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                    currentArticle.authorBio = articleInfo.valueForKey("authorBio") as! String
                     currentArticle.url = articleInfo.valueForKey("sharingUrl") as! String
                     currentArticle.section = articleInfo.valueForKey("section") as! String
                     currentArticle.articleType = articleInfo.valueForKey("type") as! String
@@ -452,6 +457,7 @@ public class Article: RLMObject {
                     currentArticle.articleDesc = articleInfo.valueForKey("description") as! String
                     currentArticle.authorName = articleInfo.valueForKey("authorName") as! String
                     currentArticle.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                    currentArticle.authorBio = articleInfo.valueForKey("authorBio") as! String
                     currentArticle.url = articleInfo.valueForKey("sharingUrl") as! String
                     currentArticle.section = articleInfo.valueForKey("section") as! String
                     currentArticle.articleType = articleInfo.valueForKey("type") as! String
@@ -662,6 +668,7 @@ public class Article: RLMObject {
         currentArticle.articleDesc = article.valueForKey("description") as! String
         currentArticle.authorName = article.valueForKey("authorName") as! String
         currentArticle.authorURL = article.valueForKey("authorUrl") as! String
+        currentArticle.authorBio = article.valueForKey("authorBio") as! String
         currentArticle.url = article.valueForKey("sharingUrl") as! String
         currentArticle.section = article.valueForKey("section") as! String
         currentArticle.articleType = article.valueForKey("type") as! String
@@ -1153,6 +1160,7 @@ public class Article: RLMObject {
                 self.articleDesc = articleInfo.valueForKey("description") as! String
                 self.authorName = articleInfo.valueForKey("authorName") as! String
                 self.authorURL = articleInfo.valueForKey("authorUrl") as! String
+                self.authorBio = articleInfo.valueForKey("authorBio") as! String
                 self.url = articleInfo.valueForKey("sharingUrl") as! String
                 self.section = articleInfo.valueForKey("section") as! String
                 self.articleType = articleInfo.valueForKey("type") as! String
@@ -1263,7 +1271,7 @@ public class Article: RLMObject {
         var issue = Issue.getIssue(issueId)
         if issue == nil {
             issue = Issue()
-            issue?.assetFolder = assetFolder
+            issue?.assetFolder = "/Documents"
         }
         else {
             let folder = issue?.assetFolder
@@ -1337,7 +1345,7 @@ public class Article: RLMObject {
         var issue = Issue.getIssue(issueId)
         if issue == nil {
             issue = Issue()
-            issue?.assetFolder = assetFolder
+            issue?.assetFolder = "/Documents"
         }
         else {
             let folder = issue?.assetFolder
