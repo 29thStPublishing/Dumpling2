@@ -47,7 +47,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -79,8 +79,10 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
     }
+    
+    
     
     /**
     Initializes the IssueHandler with a custom directory. This is where the database and assets will be saved. The API key is used for making calls to the Magnet API
@@ -112,7 +114,34 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
+        
+    }
+    
+    public init(folder: NSString, clientkey: NSString, migration: Bool) {
+        super.init()
+        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        let docsDir: NSString = docPaths[0] as NSString
+        
+        if folder.hasPrefix(docsDir as String) {
+            //Documents directory path - just save the /Documents... in defaultFolder
+            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
+            self.defaultFolder = folderPath
+        }
+        else {
+            self.defaultFolder = folder
+        }
+        clientKey = clientkey as String
+        self.activeDownloads = NSMutableDictionary()
+        
+        let defaultRealmPath = "\(folder)/default.realm"
+        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        realmConfiguration.path = defaultRealmPath
+        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        
+        if migration {
+            self.checkAndMigrateData(5)
+        }
         
     }
     
@@ -156,6 +185,11 @@ public class IssueHandler: NSObject {
                             }
                         }
                     }
+                }
+            }
+            //authorBio added to articles
+            if oldSchemeVersion < 5 {
+                migration.enumerateObjects(Article.className()) { oldObject, newObject in
                 }
             }
         }
@@ -343,9 +377,15 @@ public class IssueHandler: NSObject {
                         self.addIssueFromAPI(issueId, volumeId: nil, withArticles: true)
                     }
                 }
+                else {
+                    //No issues, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -370,9 +410,15 @@ public class IssueHandler: NSObject {
                         self.addIssueFromAPI(issueId, volumeId: nil, withArticles: false)
                     }
                 }
+                else {
+                    //No issues, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -397,9 +443,15 @@ public class IssueHandler: NSObject {
                         self.addIssueFromAPI(issueId, volumeId: nil, withArticles: true)
                     }
                 }
+                else {
+                    //No issues, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }

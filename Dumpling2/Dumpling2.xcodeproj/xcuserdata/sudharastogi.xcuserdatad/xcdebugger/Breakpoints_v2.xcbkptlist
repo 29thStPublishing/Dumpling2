@@ -15,39 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "421"
             endingLineNumber = "421"
-            landmarkName = "createArticlesForIdsWithThumb(_:issue:delegate:)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Handlers/ArticleHandler.swift"
-            timestampString = "478586349.369082"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "328"
-            endingLineNumber = "328"
-            landmarkName = "ArticleHandler"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Handlers/ArticleHandler.swift"
-            timestampString = "478586352.424621"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "348"
-            endingLineNumber = "348"
-            landmarkName = "addAllArticles(_:limit:)"
+            landmarkName = "createArticlesForIds(_:issue:delegate:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -80,6 +48,38 @@
             startingLineNumber = "739"
             endingLineNumber = "739"
             landmarkName = "downloadAndCreateAssetsForIds(_:issue:articleId:delegate:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Handlers/ArticleHandler.swift"
+            timestampString = "479296913.644414"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "446"
+            endingLineNumber = "446"
+            landmarkName = "addPreviewArticles(_:limit:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Handlers/ArticleHandler.swift"
+            timestampString = "479296913.644414"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "463"
+            endingLineNumber = "463"
+            landmarkName = "addPreviewArticles(_:limit:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

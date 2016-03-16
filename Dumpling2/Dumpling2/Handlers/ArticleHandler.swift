@@ -42,12 +42,12 @@ public class ArticleHandler: NSObject {
 
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
             clientKey = key
-            issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
+            issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
         }
         else {
             return nil
@@ -72,9 +72,9 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
         
-        issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey)
+        issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey, migration: false)
     }
     
     /**
@@ -104,9 +104,9 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(4)
+        self.checkAndMigrateData(5)
         
-        issueHandler = IssueHandler(folder: folder, clientkey: clientKey)
+        issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
         
     }
     
@@ -150,6 +150,11 @@ public class ArticleHandler: NSObject {
                             }
                         }
                     }
+                }
+            }
+            //authorBio added to articles
+            if oldSchemeVersion < 5 {
+                migration.enumerateObjects(Article.className()) { oldObject, newObject in
                 }
             }
         }
@@ -264,6 +269,8 @@ public class ArticleHandler: NSObject {
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -318,9 +325,15 @@ public class ArticleHandler: NSObject {
                         Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
                 }
+                else {
+                    //No articles, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -368,11 +381,18 @@ public class ArticleHandler: NSObject {
                         //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
                     //Send request to get all articles info in 1 call
-                    Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
+                    //Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
+                    Article.createArticlesForIds(articleList, issue: nil, delegate: self.issueHandler)
+                }
+                else {
+                    //No articles, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
                 }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -474,9 +494,15 @@ public class ArticleHandler: NSObject {
                     //Send request to get all articles info in 1 call
                     Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
                 }
+                else {
+                    //No articles, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -491,11 +517,24 @@ public class ArticleHandler: NSObject {
     :return: Array of independent articles (without any issueIds)
     */
     public func getAllArticles(page: Int, count: Int) -> Array<Article>? {
-        
         _ = RLMRealm.defaultRealm()
         
         let array: Array<Article>? = Article.getArticlesFor("", type: nil, excludeType: nil, count: count, page: page)
         return array
+    }
+    
+    public func getArticle(articleId: NSString) -> Article? {
+        
+        _ = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId = %@", articleId)
+        let articles = Article.objectsWithPredicate(predicate)
+        
+        if articles.count > 0 {
+            return articles.firstObject() as? Article
+        }
+        
+        return nil
     }
     
 }
