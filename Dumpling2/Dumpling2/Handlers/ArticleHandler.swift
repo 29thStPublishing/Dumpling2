@@ -492,7 +492,8 @@ public class ArticleHandler: NSObject {
                         //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
                     //Send request to get all articles info in 1 call
-                    Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
+                    //Article.createArticlesForIdsWithThumb(articleList, issue: nil, delegate: self.issueHandler)
+                    Article.createArticlesForIds(articleList, issue: nil, delegate: self.issueHandler)
                 }
                 else {
                     //No articles, send allDownloadsComplete notif

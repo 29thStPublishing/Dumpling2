@@ -440,7 +440,7 @@ public class IssueHandler: NSObject {
                 if allIssues.count > 0 {
                     for (_, issueDict) in allIssues.enumerate() {
                         let issueId = issueDict.valueForKey("id") as! String
-                        self.addIssueFromAPI(issueId, volumeId: nil, withArticles: true)
+                        self.addIssueFromAPI(issueId, volumeId: nil, withArticles: false)
                     }
                 }
                 else {

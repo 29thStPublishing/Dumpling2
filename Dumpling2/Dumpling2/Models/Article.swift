@@ -831,13 +831,14 @@ public class Article: RLMObject {
             let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
             var articles: RLMResults
             
-            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false) as RLMResults
+            articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false)
             
             if articles.count > 0 {
                 var array = Array<Article>()
                 for object in articles {
-                    let obj: Article = object as! Article
-                    array.append(obj)
+                    if let obj = object as? Article {
+                        array.append(obj)
+                    }
                 }
                 
                 //If count > 0, return only values in that range

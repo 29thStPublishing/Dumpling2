@@ -1290,7 +1290,7 @@ public class Asset: RLMObject {
         let fileURL = self.originalURL
         if !Helper.isNilOrEmpty(fileURL) {
             var assetFolder = self.issue.assetFolder
-            if Helper.isNilOrEmpty(assetFolder) {
+            if Helper.isNilOrEmpty(assetFolder) && !volumeId.isEmpty {
                 _ = RLMRealm.defaultRealm()
                 
                 let predicate = NSPredicate(format: "globalId = %@", volumeId)
@@ -1305,22 +1305,64 @@ public class Asset: RLMObject {
                 assetFolder = "/Documents"
             }
             
-            if !Helper.isNilOrEmpty(assetFolder) {
-                //Found the asset folder. Get the file now
-                var folderPath = assetFolder
-                if assetFolder.hasPrefix("/Documents") {
-                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    let docsDir: NSString = docPaths[0] as NSString
-                    folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                }
+            //Found the asset folder. Get the file now
+            var folderPath = assetFolder
+            if assetFolder.hasPrefix("/Documents") {
+                var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                let docsDir: NSString = docPaths[0] as NSString
+                folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+            }
+            
+            if !folderPath.hasSuffix("/") {
+                //Add the trailing slash
+                folderPath = "\(folderPath)/"
+            }
+            let filePath = "\(folderPath)\(fileURL)"
+            lLog("\(filePath) for \(self.globalId)")
+            return filePath
+        }
+        return nil
+    }
+    
+    /**
+     This method returns an image for an asset if it exists
+     
+     :return: Image or nil if not found
+     */
+    public func getAssetImage() -> UIImage? {
+        let fileURL = self.originalURL
+        if !Helper.isNilOrEmpty(fileURL) {
+            var assetFolder = self.issue.assetFolder
+            if Helper.isNilOrEmpty(assetFolder) && !volumeId.isEmpty {
+                _ = RLMRealm.defaultRealm()
                 
-                if !folderPath.hasSuffix("/") {
-                    //Add the trailing slash
-                    folderPath = "\(folderPath)/"
+                let predicate = NSPredicate(format: "globalId = %@", volumeId)
+                let volumes = Volume.objectsWithPredicate(predicate)
+                
+                if volumes.count > 0 {
+                    let volume: Volume = volumes.firstObject() as! Volume
+                    assetFolder = volume.assetFolder
                 }
-                let filePath = "\(folderPath)\(fileURL)"
-                lLog("\(filePath) for \(self.globalId)")
-                return filePath
+            }
+            if Helper.isNilOrEmpty(assetFolder) {
+                assetFolder = "/Documents"
+            }
+            
+            //Found the asset folder. Get the file now
+            var folderPath = assetFolder
+            if assetFolder.hasPrefix("/Documents") {
+                var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                let docsDir: NSString = docPaths[0] as NSString
+                folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+            }
+            
+            if !folderPath.hasSuffix("/") {
+                //Add the trailing slash
+                folderPath = "\(folderPath)/"
+            }
+            let filePath = "\(folderPath)\(fileURL)"
+            if NSFileManager.defaultManager().fileExistsAtPath(filePath) {
+                return UIImage(contentsOfFile: filePath)
             }
         }
         return nil

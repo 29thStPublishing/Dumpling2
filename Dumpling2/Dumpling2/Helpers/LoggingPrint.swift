@@ -22,7 +22,7 @@ import Foundation
  :param: line     The line number, defaults to the line number within the file that the call is made.
  */
 
-func lLog<T>(@autoclosure object: () -> T, _ file: String = __FILE__, _ function: String = __FUNCTION__, _ line: Int = __LINE__) {
+func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: String = #function, _ line: Int = #line) {
     //If LLOG is present and != 1, return - no logging
     let environmentVars = NSProcessInfo.processInfo().environment
     if let logging = environmentVars["LLOG"] {

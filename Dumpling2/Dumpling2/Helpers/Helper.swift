@@ -91,7 +91,7 @@ public class Helper {
     
     class func isRetinaDevice() -> Bool {
         let mainScreen = UIScreen.mainScreen()
-        if mainScreen.respondsToSelector(Selector("displayLinkWithTarget:selector:")) && mainScreen.scale >= 2.0 {
+        if mainScreen.respondsToSelector(#selector(UIScreen.displayLinkWithTarget(_:selector:))) && mainScreen.scale >= 2.0 {
             return true
         }
         
