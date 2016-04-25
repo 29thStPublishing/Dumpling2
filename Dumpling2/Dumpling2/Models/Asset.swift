@@ -936,10 +936,13 @@ public class Asset: RLMObject {
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.getAssetPath()
-            do {
-                try fileManager.removeItemAtPath(originalURL!)
-            } catch _ {
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
             }
         }
         
@@ -965,10 +968,13 @@ public class Asset: RLMObject {
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.getAssetPath()
-            do {
-                try fileManager.removeItemAtPath(originalURL!)
-            } catch _ {
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
             }
         }
         
@@ -993,10 +999,13 @@ public class Asset: RLMObject {
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.getAssetPath()
-            do {
-                try fileManager.removeItemAtPath(originalURL!)
-            } catch _ {
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
             }
         }
         
@@ -1021,10 +1030,13 @@ public class Asset: RLMObject {
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.getAssetPath()
-            do {
-                try fileManager.removeItemAtPath(originalURL!)
-            } catch _ {
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
             }
         }
         
@@ -1059,6 +1071,43 @@ public class Asset: RLMObject {
     }
     
     /**
+     This method accepts an array of global ids for assets and deletes them from the database. The files for the assets are also deleted
+     
+     - parameter  assetIds: Array containing the global ids for assets to be deleted
+     */
+    public class func deleteAssets(assetIds: [String]) {
+        lLog("Deleting assets for \(assetIds)")
+        let realm = RLMRealm.defaultRealm()
+        
+        let predicate = NSPredicate(format: "globalId IN %@", assetIds)
+        let results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        
+        //Iterate through the results and delete the files saved
+        let fileManager = NSFileManager.defaultManager()
+        for asset in results {
+            let assetDetails = asset as! Asset
+            
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
+            }
+        }
+        
+        realm.beginWriteTransaction()
+        realm.deleteObjects(results)
+        do {
+            try realm.commitWriteTransaction()
+        } catch let error {
+            NSLog("Error deleting asset: \(error)")
+        }
+        //realm.commitWriteTransaction()
+    }
+    
+    /**
     This method accepts the global id of an asset and deletes it from the database. The file for the asset is also deleted
     
     :brief: Delete a specific asset
@@ -1075,10 +1124,13 @@ public class Asset: RLMObject {
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
-            let originalURL = assetDetails.getAssetPath()
-            do {
-                try fileManager.removeItemAtPath(originalURL!)
-            } catch _ {
+            if let originalURL = assetDetails.getAssetPath() {
+                do {
+                    try fileManager.removeItemAtPath(originalURL)
+                    let thumb = originalURL.stringByReplacingOccurrencesOfString(assetDetails.originalURL, withString: assetDetails.squareURL) as String
+                    try fileManager.removeItemAtPath(thumb)
+                } catch _ {
+                }
             }
         }
         

@@ -298,14 +298,30 @@ public class Issue: RLMObject {
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
                         var assetList = ""
+                        var assetArray = [String]()
+                        
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
+                            assetArray.append(assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
+                        var deleteAssets = [String]()
+                        if let assets = Asset.getAssetsFor(self.globalId, articleId: "", volumeId: nil, type: nil) {
+                            for asset in assets {
+                                if let _ = assetArray.indexOf(asset.globalId) {}
+                                else {
+                                    deleteAssets.append(asset.globalId)
+                                }
+                            }
+                        }
+                        if deleteAssets.count > 0 {
+                            Asset.deleteAssets(deleteAssets)
+                        }
+                        
                         Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
@@ -352,13 +368,27 @@ public class Issue: RLMObject {
                     let issueMedia = issueDetails.objectForKey("media") as! NSArray
                     if issueMedia.count > 0 {
                         var assetList = ""
+                        var assetArray = [String]()
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
+                            assetArray.append(assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
+                        }
+                        var deleteAssets = [String]()
+                        if let assets = Asset.getAssetsFor(self.globalId, articleId: "", volumeId: nil, type: nil) {
+                            for asset in assets {
+                                if let _ = assetArray.indexOf(asset.globalId) {}
+                                else {
+                                    deleteAssets.append(asset.globalId)
+                                }
+                            }
+                        }
+                        if deleteAssets.count > 0 {
+                            Asset.deleteAssets(deleteAssets)
                         }
                         Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
