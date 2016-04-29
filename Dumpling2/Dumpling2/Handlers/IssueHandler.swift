@@ -46,7 +46,6 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        
         self.checkAndMigrateData(5)
         
         let mainBundle = NSBundle.mainBundle()
@@ -328,12 +327,10 @@ public class IssueHandler: NSObject {
         if volumeId == nil {
             //Independent issue - have an entry with the issueId key
             
-            //self.updateStatusDictionary(nil, issueId: issueId, url: requestURL, status: 0)
             self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: issueId)
         }
         else if let volId = volumeId {
             //Issue of a volume. Add the issue as one of the downloads for the volume
-            //self.updateStatusDictionary(volId, issueId: issueId, url: requestURL, status: 0)
             self.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volId)
         }
         
@@ -852,7 +849,7 @@ public class IssueHandler: NSObject {
     
     //MARK: Downloads tracking
     
-    //status = 0 for not started, 1 for complete, 2 for error
+    //status = 0 for not started, 1 for complete, 2 for error, 3 for no change
     func updateStatusDictionary(volumeId: String?, issueId: String, url: String, status: Int) {
         let dictionaryLock = NSLock()
         dictionaryLock.lock()
@@ -894,7 +891,7 @@ public class IssueHandler: NSObject {
         if status == 1 && url.rangeOfString("/articles/") != nil {
             let replaceUrl = "\(baseURL)articles/"
             let articleId = url.stringByReplacingOccurrencesOfString(replaceUrl, withString: "")
-            lLog("Pushing ARTICLES_DOWNLOAD_COMPLETE for I:\(issueId)")
+            lLog("Pushing ARTICLES_DOWNLOAD_COMPLETE for I:\(issueId) and A: \(articleId)")
             NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(objects: [issueId, articleId], forKeys: ["issue", "article"]) as! [String : String])
         }
         
@@ -904,10 +901,14 @@ public class IssueHandler: NSObject {
         else {
             //All articles downloaded (with or without errors) - send notif only if status of an article was updated
             if url.rangeOfString("/articles/") != nil {
-                //let replaceUrl = "\(baseURL)articles/"
-                //let articleId = url.stringByReplacingOccurrencesOfString(replaceUrl, withString: "")
-                lLog("Pushing ARTICLES_DOWNLOAD_COMPLETE for I:\(issueId)")
-                NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(objects: [issueId], forKeys: ["issue"]) as! [String : String])
+                let replaceUrl = "\(baseURL)articles/"
+                let articleId = url.stringByReplacingOccurrencesOfString(replaceUrl, withString: "")
+                if  status == 3 && articleId == issueId { }
+                else {
+                    //Notif only if article was updated, not otherwise
+                    lLog("Pushing all ARTICLES_DOWNLOAD_COMPLETE for I:\(issueId)")
+                    NSNotificationCenter.defaultCenter().postNotificationName(ARTICLES_DOWNLOAD_COMPLETE, object: nil, userInfo: NSDictionary(objects: [issueId], forKeys: ["issue"]) as! [String : String])
+                }
             }
         }
         

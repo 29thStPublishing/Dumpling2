@@ -137,7 +137,6 @@ public class VolumeHandler: NSObject {
         
         let requestURL = "\(baseURL)volumes/\(globalId)"
         
-        //self.issueHandler.updateStatusDictionary(nil, issueId: globalId, url: requestURL, status: 0)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -179,7 +178,6 @@ public class VolumeHandler: NSObject {
                 //Update volume now
                 let volumeId = volumeDetails.objectForKey("id") as! String
                 
-                //self.issueHandler.updateStatusDictionary(nil, issueId: volumeId, url: requestURL, status: 0)
                 self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: volumeId)
                 self.updateVolumeFromAPI(volumeDetails, globalId: volumeId)
             }

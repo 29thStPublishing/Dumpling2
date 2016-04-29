@@ -218,7 +218,6 @@ public class ArticleHandler: NSObject {
     public func addArticleFromAPI(globalId: String) {
         let requestURL = "\(baseURL)articles/\(globalId)"
 
-        //self.issueHandler.updateStatusDictionary(nil, issueId: globalId, url: requestURL, status: 0)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
         
         Article.createIndependentArticle(globalId, delegate: self.issueHandler)
@@ -234,7 +233,6 @@ public class ArticleHandler: NSObject {
     public func addArticleFromAPI(globalId: String, issueId: String) {
         let requestURL = "\(baseURL)articles/\(globalId)"
 
-        //self.issueHandler.updateStatusDictionary("", issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 0)
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: "\(baseURL)issues/\(issueId)"), forKey: issueId)
 
         self.issueHandler.updateStatusDictionary("", issueId: issueId, url: requestURL, status: 0)
@@ -262,10 +260,9 @@ public class ArticleHandler: NSObject {
                 let articleDetails: NSDictionary = allArticles.firstObject as! NSDictionary
                 //Update article
                 
-                //self.issueHandler.updateStatusDictionary(nil, issueId: articleDetails.objectForKey("id") as! String, url: requestURL, status: 0)
                 self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleDetails.objectForKey("id") as! String)
                 
-                Article.addArticle(articleDetails, delegate: self.issueHandler)
+                Article.addArticle(articleDetails, issue: nil, placement: 0, delegate: self.issueHandler)
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -319,7 +316,6 @@ public class ArticleHandler: NSObject {
                         let articleId = articleDict.valueForKey("id") as! NSString
                         let requestURL = "\(baseURL)articles/\(articleId)"
 
-                        //self.issueHandler.updateStatusDictionary(nil, issueId: articleId as String, url: requestURL, status: 0)
                         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
                         
                         Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)

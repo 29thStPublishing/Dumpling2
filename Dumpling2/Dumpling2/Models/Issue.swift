@@ -203,6 +203,12 @@ public class Issue: RLMObject {
             return issues.firstObject() as? Issue
         }
         
+        if issueId.isEmpty {
+            let issue = Issue()
+            issue.assetFolder = "/Documents"
+            return issue
+        }
+        
         return nil
     }
     
@@ -283,7 +289,6 @@ public class Issue: RLMObject {
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         
-        //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -353,7 +358,6 @@ public class Issue: RLMObject {
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         
-        //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -398,7 +402,6 @@ public class Issue: RLMObject {
                             let articleId = articleDict.valueForKey("id") as! String
                             
                             if let article = Article.getArticle(articleId, appleId: nil) {
-                                //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
                                 article.downloadArticleAssets(issueHandler)
                             }
                         }

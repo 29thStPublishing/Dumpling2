@@ -291,7 +291,8 @@ public class Asset: RLMObject {
                 }
                 else {
                     if delegate != nil {
-                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                        //No change - not downloaded
+                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 3)
                     }
                 }
                 
@@ -531,11 +532,13 @@ public class Asset: RLMObject {
                     if delegate != nil {
                         if !issue.globalId.isEmpty {
                             //This is an issue's asset or an article's (belonging to an issue) asset
-                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                            //No change - not downloaded
+                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 3)
                         }
                         else {
                             //This is an independent article's asset
-                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                            //No change - not downloaded
+                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 3)
                         }
                     }
                 }
@@ -712,6 +715,7 @@ public class Asset: RLMObject {
                             }
                             //Compare the two dates - if newUpdated <= lastUpdated, don't download
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                                //Check if the image exists or not
                                 toDownload = false //Don't download
                             }
                         }
@@ -809,15 +813,18 @@ public class Asset: RLMObject {
                             if let issue = issue {
                                 if !issue.globalId.isEmpty {
                                     //This is an issue's asset or an article's (belonging to an issue) asset
-                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                    //No change - not downloaded
+                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 3)
                                 }
                                 else {
                                     //This is an independent article's asset
-                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                    //No change - not downloaded
+                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 3)
                                 }
                             }
                             else {
-                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                                //No change - not downloaded
+                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 3)
                             }
                         }
                     }
