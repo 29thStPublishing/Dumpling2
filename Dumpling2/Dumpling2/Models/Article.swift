@@ -154,6 +154,7 @@ public class Article: RLMObject {
         realm.addOrUpdateObject(currentArticle)
         do {
             try realm.commitWriteTransaction()
+            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
         } catch let error {
             NSLog("Error creating article: \(error)")
         }
@@ -251,6 +252,7 @@ public class Article: RLMObject {
                                 }
                             }
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                                Relation.createRelation(existingArticle.issueId, articleId: existingArticle.globalId, assetId: nil)
                                 if delegate != nil {
                                     //Mark article as done
                                     if let issue = issue {
@@ -328,9 +330,11 @@ public class Article: RLMObject {
                         let assetid = assetDict!.valueForKey("id") as! String
                         if delegate != nil {
                             if let issue = issue {
+                                Relation.createRelation(issue.globalId, articleId: currentArticle.globalId, assetId: assetid)
                                 (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             }
                             else {
+                                Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid)
                                 (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             }
                         }
@@ -342,6 +346,7 @@ public class Article: RLMObject {
                     realm.addOrUpdateObject(currentArticle)
                     do {
                         try realm.commitWriteTransaction()
+                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
                     } catch let error {
                         NSLog("Error saving issue: \(error)")
                     }
@@ -397,6 +402,7 @@ public class Article: RLMObject {
         realm.deleteObjects(articles)
         do {
             try realm.commitWriteTransaction()
+            Relation.deleteRelations(issues as? [String], articleId: nil, assetId: nil)
         } catch let error {
             NSLog("Error deleting articles for issues: \(error)")
         }
@@ -484,6 +490,7 @@ public class Article: RLMObject {
                     }
                 }
                 if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
+                    Relation.createRelation(existingArticle.issueId, articleId: gid, assetId: nil)
                     if delegate != nil {
                         if issue != nil {
                             (delegate as! IssueHandler).updateStatusDictionary(issue!.volumeId, issueId: issue!.globalId, url: "\(baseURL)articles/\(gid)", status: 3)
@@ -575,9 +582,11 @@ public class Article: RLMObject {
                 }
                 if delegate != nil {
                     if issue != nil {
+                        Relation.createRelation(currIssue.globalId, articleId: currentArticle.globalId, assetId: assetid)
                         (delegate as! IssueHandler).updateStatusDictionary(currIssue.volumeId, issueId: currIssue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                     }
                     else {
+                        Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid)
                         (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                     }
                 }
@@ -607,6 +616,7 @@ public class Article: RLMObject {
         realm.addOrUpdateObject(currentArticle)
         do {
             try realm.commitWriteTransaction()
+            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
         } catch let error {
             NSLog("Error adding article: \(error)")
         }
@@ -638,11 +648,11 @@ public class Article: RLMObject {
         let predicate = NSPredicate(format: "issueId = %@", issueId)
         let articles = Article.objectsWithPredicate(predicate)
         
-        let articleIds = NSMutableArray()
+        var articleIds = [String]()
         //go through each article and delete all assets associated with it
         for article in articles {
             let article = article as! Article
-            articleIds.addObject(article.globalId)
+            articleIds.append(article.globalId)
         }
         
         Asset.deleteAssetsForArticles(articleIds)
@@ -652,6 +662,7 @@ public class Article: RLMObject {
         realm.deleteObjects(articles)
         do {
             try realm.commitWriteTransaction()
+            Relation.deleteRelations(nil, articleId: articleIds, assetId: nil)
         } catch let error {
             NSLog("Error deleting articles: \(error)")
         }
@@ -678,13 +689,24 @@ public class Article: RLMObject {
     :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?, count: Int, page: Int) -> Array<Article>? {
+        let relations = Relation.allObjects()
+        if relations.count == 0 {
+            Relation.addAllArticles()
+            Relation.addAllAssets()
+        }
+        
         _ = RLMRealm.defaultRealm()
         
         var subPredicates = Array<NSPredicate>()
         
         if issueId != nil {
-            let predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.append(predicate)
+            var articleIds = [String]()
+            articleIds = Relation.getArticlesForIssue(issueId! as String)
+            
+            if articleIds.count > 0 {
+                let predicate = NSPredicate(format: "globalId IN %@", articleIds)
+                subPredicates.append(predicate)
+            }
         }
         
         if type != nil {
@@ -749,10 +771,14 @@ public class Article: RLMObject {
         _ = RLMRealm.defaultRealm()
         
         lLog("Articles for \(key) = \(value)")
+        var articleIds = [String]()
+        if let issueId = issueId {
+            articleIds = Relation.getArticlesForIssue(issueId as String)
+        }
         var subPredicates = Array<NSPredicate>()
         
-        if issueId != nil {
-            let predicate = NSPredicate(format: "issueId = %@", issueId!)
+        if articleIds.count > 0 {
+            let predicate = NSPredicate(format: "globalId IN %@", articleIds)
             subPredicates.append(predicate)
         }
         let testArticle = Article()
@@ -884,8 +910,11 @@ public class Article: RLMObject {
         subPredicates.append(orPredicate)
         
         if issueId != nil {
-            let predicate = NSPredicate(format: "issueId = %@", issueId!)
-            subPredicates.append(predicate)
+            let articleIds = Relation.getArticlesForIssue(issueId! as String)
+            if articleIds.count > 0 {
+                let predicate = NSPredicate(format: "globalId IN %@", articleIds)
+                subPredicates.append(predicate)
+            }
         }
         
         if subPredicates.count > 0 {
@@ -917,18 +946,20 @@ public class Article: RLMObject {
     public class func getFeaturedArticlesFor(issueId: NSString) -> Array<Article>? {
         _ = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = %@ AND isFeatured == true", issueId)
-        let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
-        
-        if articles.count > 0 {
-            var array = Array<Article>()
-            for object in articles {
-                let obj: Article = object as! Article
-                array.append(obj)
+        let articleIds = Relation.getArticlesForIssue(issueId as String)
+        if articleIds.count > 0 {
+            let predicate = NSPredicate(format: "globalId IN %@ AND isFeatured == true", articleIds)
+            let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
+            
+            if articles.count > 0 {
+                var array = Array<Article>()
+                for object in articles {
+                    let obj: Article = object as! Article
+                    array.append(obj)
+                }
+                return array
             }
-            return array
         }
-        
         return nil
     }
     
@@ -1121,6 +1152,7 @@ public class Article: RLMObject {
         realm.deleteObject(self)
         do {
             try realm.commitWriteTransaction()
+            Relation.deleteRelations(nil, articleId: [self.globalId], assetId: nil)
         } catch let error {
             NSLog("Error deleting article: \(error)")
         }
@@ -1133,22 +1165,22 @@ public class Article: RLMObject {
     */
     public func downloadArticleAssets(delegate: IssueHandler?) {
         lLog("Download assets for \(self.globalId)")
-        let issueId = self.issueId
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         var assetFolder = docsDir as String
         
-        var issue = Issue.getIssue(issueId)
-        if issue == nil {
-            issue = Issue()
-            issue?.assetFolder = "/Documents"
+        let issueIds = Relation.getIssuesForArticle(self.globalId)
+        var issue = Issue()
+        if issueIds.count == 0 {
+            issue.assetFolder = "/Documents"
         }
         else {
-            let folder = issue?.assetFolder
-            if folder!.hasPrefix("/Documents") {
+            issue = Issue.getIssue(issueIds.first!)!
+            let folder = issue.assetFolder
+            if folder.hasPrefix("/Documents") {
             }
-            else if !folder!.isEmpty {
-                assetFolder = folder!.stringByReplacingOccurrencesOfString("/\(issue?.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            else if !folder.isEmpty {
+                assetFolder = folder.stringByReplacingOccurrencesOfString("/\(issue.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
             }
         }
         
@@ -1180,20 +1212,23 @@ public class Article: RLMObject {
                     for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! String
+                        Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
                         assetList += assetid
                         if index < (articleMedia.count - 1) {
                             assetList += ","
                         }
                         assetArray.append(assetid)
                         if delegate != nil {
-                            issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(assetid)", status: 0)
+                            Relation.createRelation(issue.globalId, articleId: self.globalId, assetId: assetid)
+                            issueHandler.updateStatusDictionary(nil, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         else {
+                            Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                     }
                     var deleteAssets = [String]()
-                    if let assets = Asset.getAssetsFor(issue!.globalId, articleId: self.globalId, volumeId: nil, type: nil) {
+                    if let assets = Asset.getAssetsFor(issue.globalId, articleId: self.globalId, volumeId: nil, type: nil) {
                         for asset in assets {
                             if let _ = assetArray.indexOf(asset.globalId) {}
                             else {
@@ -1205,7 +1240,7 @@ public class Article: RLMObject {
                         Asset.deleteAssets(deleteAssets)
                     }
                     
-                    Asset.downloadAndCreateAssetsForIds(assetList, issue: issue!, articleId: self.globalId, delegate: issueHandler)
+                    Asset.downloadAndCreateAssetsForIds(assetList, issue: issue, articleId: self.globalId, delegate: issueHandler)
                 }
             }
             else if let err = error {
@@ -1221,22 +1256,22 @@ public class Article: RLMObject {
      */
     public func downloadFirstAsset(delegate: IssueHandler?) {
         lLog("Download first asset for \(self.globalId)")
-        let issueId = self.issueId
         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         var assetFolder = docsDir as String
         
-        var issue = Issue.getIssue(issueId)
-        if issue == nil {
-            issue = Issue()
-            issue?.assetFolder = "/Documents"
+        let issueIds = Relation.getIssuesForArticle(self.globalId)
+        var issue = Issue()
+        if issueIds.count == 0 {
+            issue.assetFolder = "/Documents"
         }
         else {
-            let folder = issue?.assetFolder
-            if folder!.hasPrefix("/Documents") {
+            issue = Issue.getIssue(issueIds.first!)!
+            let folder = issue.assetFolder
+            if folder.hasPrefix("/Documents") {
             }
-            else if !folder!.isEmpty {
-                assetFolder = folder!.stringByReplacingOccurrencesOfString("/\(issue?.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            else if !folder.isEmpty {
+                assetFolder = folder.stringByReplacingOccurrencesOfString("/\(issue.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
             }
         }
         
@@ -1258,7 +1293,7 @@ public class Article: RLMObject {
             else {
                 issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(self.thumbImageURL)", status: 0)
             }
-            Asset.downloadAndCreateAsset(self.thumbImageURL, issue: issue!, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
+            Asset.downloadAndCreateAsset(self.thumbImageURL, issue: issue, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
             return
         }
         
@@ -1276,14 +1311,14 @@ public class Article: RLMObject {
                 if articleMedia.count > 0 {
                     if let assetDict = articleMedia.firstObject {
                         let assetid = assetDict.valueForKey("id") as! String
-                        
+                        Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
                         if delegate != nil {
                             issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         else {
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
-                        Asset.downloadAndCreateAsset(assetid, issue: issue!, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
+                        Asset.downloadAndCreateAsset(assetid, issue: issue, articleId: self.globalId as String, placement: 1, delegate: issueHandler)
                     }
                 }
             }
@@ -1407,7 +1442,7 @@ public class Article: RLMObject {
     public func getNewerArticles() -> Array<Article>? {
         _ = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = %@ AND date > %@", self.issueId, self.date)
+        let predicate = NSPredicate(format: "date > %@", self.date)
         let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {
@@ -1432,7 +1467,7 @@ public class Article: RLMObject {
     public func getOlderArticles() -> Array<Article>? {
         _ = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issueId = %@ AND date < %@", self.issueId, self.date)
+        let predicate = NSPredicate(format: "date < %@", self.date)
         let articles: RLMResults = Article.objectsWithPredicate(predicate) as RLMResults
         
         if articles.count > 0 {

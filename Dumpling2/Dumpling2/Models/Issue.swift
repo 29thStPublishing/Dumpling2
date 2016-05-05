@@ -57,10 +57,10 @@ public class Issue: RLMObject {
         let predicate = NSPredicate(format: "volumeId = %@", volumeId)
         let results = Issue.objectsWithPredicate(predicate)
         
-        let issueIds = NSMutableArray()
+        var issueIds = [String]()
         for issue in results {
             let singleIssue = issue as! Issue
-            issueIds.addObject(singleIssue.globalId)
+            issueIds.append(singleIssue.globalId)
         }
         
         Article.deleteArticlesForIssues(issueIds)
@@ -70,6 +70,7 @@ public class Issue: RLMObject {
         realm.deleteObjects(results)
         do {
             try realm.commitWriteTransaction()
+            Relation.deleteRelations(issueIds, articleId: nil, assetId: nil)
         } catch let error {
             NSLog("Error deleting issues for volume: \(error)")
         }
@@ -106,6 +107,7 @@ public class Issue: RLMObject {
             realm.deleteObjects(currentIssue)
             do {
                 try realm.commitWriteTransaction()
+                Relation.deleteRelations([currentIssue.globalId], articleId: nil, assetId: nil)
             } catch let error {
                 NSLog("Error deleting issue: \(error)")
             }
@@ -214,10 +216,13 @@ public class Issue: RLMObject {
     
     //MARK: Instance methods
     
+    public func downloadIssueArticles() {
+        self.downloadIssueArticles(nil)
+    }
     /**
     This method downloads articles for the issue
     */
-    public func downloadIssueArticles() {
+    public func downloadIssueArticles(timestamp: String?) {
         lLog("Download issues articles for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
@@ -230,7 +235,10 @@ public class Issue: RLMObject {
         }
         let issueHandler = IssueHandler(folder: assetFolder)!
         
-        let requestURL = "\(baseURL)issues/\(self.globalId)"
+        var requestURL = "\(baseURL)issues/\(self.globalId)"
+        if let time = timestamp {
+            requestURL += "/since/\(time)"
+        }
         
         issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
         
@@ -250,6 +258,7 @@ public class Issue: RLMObject {
                             //Insert article
                             //Add article and its assets to Issue dictionary
                             let articleId = articleDict.valueForKey("id") as! String
+                            Relation.createRelation(self.globalId, articleId: articleId, assetId: nil)
                             articleList += articleId
                             if index < (articles.count - 1) {
                                 articleList += ","
@@ -307,11 +316,13 @@ public class Issue: RLMObject {
                         
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
                             assetArray.append(assetid)
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         var deleteAssets = [String]()
@@ -375,11 +386,13 @@ public class Issue: RLMObject {
                         var assetArray = [String]()
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
                             assetArray.append(assetid)
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         var deleteAssets = [String]()

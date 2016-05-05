@@ -152,6 +152,7 @@ public class Asset: RLMObject {
         realm.addOrUpdateObject(currentAsset)
         do {
             try realm.commitWriteTransaction()
+            Relation.createRelation(issue.globalId, articleId: articleId, assetId: currentAsset.globalId)
         } catch let error {
             NSLog("Error creating asset: \(error)")
         }
@@ -938,7 +939,7 @@ public class Asset: RLMObject {
         
         let predicate = NSPredicate(format: "articleId = %@", articleId)
         let results = Asset.objectsInRealm(realm, withPredicate: predicate)
-        
+
         //Iterate through the results and delete the files saved
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
@@ -1032,11 +1033,13 @@ public class Asset: RLMObject {
         
         let predicate = NSPredicate(format: "issue.globalId = %@", globalId)
         let results = Asset.objectsInRealm(realm, withPredicate: predicate)
+        var assetIds = [String]()
         
         //Iterate through the results and delete the files saved
         let fileManager = NSFileManager.defaultManager()
         for asset in results {
             let assetDetails = asset as! Asset
+            assetIds.append(assetDetails.globalId)
             if let originalURL = assetDetails.getAssetPath() {
                 do {
                     try fileManager.removeItemAtPath(originalURL)
@@ -1051,6 +1054,7 @@ public class Asset: RLMObject {
         realm.deleteObjects(results)
         do {
             try realm.commitWriteTransaction()
+            Relation.deleteRelations([globalId as String], articleId: nil, assetId: assetIds)
         } catch let error {
             NSLog("Error deleting assets for issues: \(error)")
         }
@@ -1179,19 +1183,25 @@ public class Asset: RLMObject {
         }
         
         if issueId == "" {
-            let predicate = NSPredicate(format: "articleId = %@ AND placement = 1 AND type = %@", articleId, "image")
-            let assets = Asset.objectsWithPredicate(predicate)
-            
-            if assets.count > 0 {
-                return assets.firstObject() as? Asset
+            let assetIds = Relation.getAssetsForArticle(articleId)
+            if assetIds.count > 0 {
+                let predicate = NSPredicate(format: "globalId IN %@ AND placement = 1 AND type = %@", assetIds, "image")
+                let assets = Asset.objectsWithPredicate(predicate)
+                
+                if assets.count > 0 {
+                    return assets.firstObject() as? Asset
+                }
             }
         }
         else {
-            let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND placement = 1 AND type = %@", issueId, articleId, "image")
-            let assets = Asset.objectsWithPredicate(predicate)
-        
-            if assets.count > 0 {
-                return assets.firstObject() as? Asset
+            let assetIds = Relation.getAssetsForIssue(issueId, articleId: articleId)
+            if assetIds.count > 0 {
+                let predicate = NSPredicate(format: "globalId IN %@ AND placement = 1 AND type = %@", assetIds, "image")
+                let assets = Asset.objectsWithPredicate(predicate)
+                
+                if assets.count > 0 {
+                    return assets.firstObject() as? Asset
+                }
             }
         }
         
@@ -1226,15 +1236,8 @@ public class Asset: RLMObject {
             }
         }
         
-        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
-        let assets = Asset.objectsWithPredicate(predicate)
-        
-        if assets.count > 0 {
-            lLog("\(assets.count)")
-            return assets.count
-        }
-        
-        return 0
+        let assets = Relation.getAssetsForIssue(issueId, articleId: articleId)
+        return UInt(assets.count)
     }
     
     /**
@@ -1264,8 +1267,11 @@ public class Asset: RLMObject {
             }
         }
         
-        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@", issueId, articleId)
-        subPredicates.append(predicate)
+        let assets = Relation.getAssetsForIssue(issueId, articleId: articleId)
+        if assets.count > 0 {
+            let predicate = NSPredicate(format: "globalId IN %@", assets)
+            subPredicates.append(predicate)
+        }
 
         if type != nil {
             let assetPredicate = NSPredicate(format: "type = %@", type!)
@@ -1273,12 +1279,11 @@ public class Asset: RLMObject {
         }
         
         let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
-        //let searchPredicate = NSCompoundPredicate.andPredicateWithSubpredicates(subPredicates as [NSPredicate])
-        let assets: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
+        let results: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
         
-        if assets.count > 0 {
+        if results.count > 0 {
             var array = Array<Asset>()
-            for object in assets {
+            for object in results {
                 let obj: Asset = object as! Asset
                 array.append(obj)
             }
@@ -1325,12 +1330,23 @@ public class Asset: RLMObject {
     public class func getPlaylistFor(issueId: String, articleId: String) -> Array<Asset>? {
         _ = RLMRealm.defaultRealm()
         
-        let predicate = NSPredicate(format: "issue.globalId = %@ AND articleId = %@ AND type = %@", issueId, articleId, "sound")
-        let assets = Asset.objectsWithPredicate(predicate)
+        var subPredicates = Array<NSPredicate>()
         
+        let assets = Relation.getAssetsForIssue(issueId, articleId: articleId)
         if assets.count > 0 {
+            let predicate = NSPredicate(format: "globalId IN %@", assets)
+            subPredicates.append(predicate)
+        }
+        
+        let assetPredicate = NSPredicate(format: "type = %@", "sound")
+        subPredicates.append(assetPredicate)
+        
+        let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+        let results: RLMResults = Asset.objectsWithPredicate(searchPredicate) as RLMResults
+        
+        if results.count > 0 {
             var array = Array<Asset>()
-            for object in assets {
+            for object in results {
                 let obj: Asset = object as! Asset
                 array.append(obj)
             }
@@ -1348,7 +1364,12 @@ public class Asset: RLMObject {
     public func getAssetPath() -> String? {
         let fileURL = self.originalURL
         if !Helper.isNilOrEmpty(fileURL) {
-            var assetFolder = self.issue.assetFolder
+            
+            var assetFolder = ""
+            let issueId = Relation.getIssuesForAsset(self.globalId).first
+            if let issue = Issue.getIssue(issueId!) {
+                assetFolder = issue.assetFolder
+            }
             if Helper.isNilOrEmpty(assetFolder) && !volumeId.isEmpty {
                 _ = RLMRealm.defaultRealm()
                 
@@ -1391,7 +1412,11 @@ public class Asset: RLMObject {
     public func getAssetImage() -> UIImage? {
         let fileURL = self.originalURL
         if !Helper.isNilOrEmpty(fileURL) {
-            var assetFolder = self.issue.assetFolder
+            var assetFolder = ""
+            let issueId = Relation.getIssuesForAsset(self.globalId).first
+            if let issue = Issue.getIssue(issueId!) {
+                assetFolder = issue.assetFolder
+            }
             if Helper.isNilOrEmpty(assetFolder) && !volumeId.isEmpty {
                 _ = RLMRealm.defaultRealm()
                 

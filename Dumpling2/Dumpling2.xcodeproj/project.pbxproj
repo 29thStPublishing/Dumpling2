@@ -62,6 +62,7 @@
 		639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B4D341BB416B4001DC8CE /* libc++.tbd */; };
 		63AF689A1BE8807E00405D53 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AF68991BE8807E00405D53 /* Realm */; };
+		63BA55F91CD7051C006A784B /* Relation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BA55F81CD7051C006A784B /* Relation.swift */; };
 		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
 		63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED8501B130B0A00C4200C /* VolumeHandler.swift */; };
@@ -177,6 +178,7 @@
 		639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
 		639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
 		63AF68991BE8807E00405D53 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
+		63BA55F81CD7051C006A784B /* Relation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relation.swift; sourceTree = "<group>"; };
 		63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "Helpers/strip-frameworks.sh"; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
 		63CED8501B130B0A00C4200C /* VolumeHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VolumeHandler.swift; sourceTree = "<group>"; };
@@ -424,6 +426,7 @@
 				FFCB3B3E1A78E5F500F52BC6 /* Issue.swift */,
 				FFCB3B3F1A78E5F500F52BC6 /* Magazine.swift */,
 				63CED84E1B1300A100C4200C /* Volume.swift */,
+				63BA55F81CD7051C006A784B /* Relation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -650,6 +653,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFCB3B421A78E5F600F52BC6 /* Issue.swift in Sources */,
+				63BA55F91CD7051C006A784B /* Relation.swift in Sources */,
 				635F0AC41C27E3C7000524F8 /* LoggingPrint.swift in Sources */,
 				FFCB3B371A78E5E400F52BC6 /* Helper.swift in Sources */,
 				FFCB3B411A78E5F600F52BC6 /* Asset.swift in Sources */,

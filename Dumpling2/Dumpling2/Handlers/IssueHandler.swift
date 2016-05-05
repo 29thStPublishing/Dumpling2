@@ -46,7 +46,7 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -78,7 +78,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
     }
     
     
@@ -113,7 +113,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
         
     }
     
@@ -139,7 +139,7 @@ public class IssueHandler: NSObject {
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
         if migration {
-            self.checkAndMigrateData(5)
+            self.checkAndMigrateData(6)
         }
         
     }
@@ -190,6 +190,9 @@ public class IssueHandler: NSObject {
             if oldSchemeVersion < 5 {
                 migration.enumerateObjects(Article.className()) { oldObject, newObject in
                 }
+            }
+            //Relation added
+            if oldSchemeVersion < 6 {
             }
         }
         config.migrationBlock = migrationBlock
@@ -357,9 +360,18 @@ public class IssueHandler: NSObject {
     /**
     The method gets all issues from the Magnet API for the client key and adds them to the database
     */
+    
     public func addAllIssues() {
+        self.addAllIssues(nil)
+    }
+    
+    public func addAllIssues(timestamp: String?) {
         
-        let requestURL = "\(baseURL)issues/published"
+        var requestURL = "\(baseURL)issues/published"
+        
+        if let timeSince = timestamp {
+            requestURL += "/since/\(timeSince)"
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -391,8 +403,21 @@ public class IssueHandler: NSObject {
      The method gets all issues from the Magnet API for the client key and adds them to the database without articles
      */
     public func addOnlyIssuesWithoutArticles() {
+        self.addOnlyIssuesWithoutArticles(nil)
+    }
+    
+    public func addOnlyIssuesWithoutArticles(timestamp: String?) {
+        let relations = Relation.allObjects()
+        if relations.count == 0 {
+            Relation.addAllArticles()
+            Relation.addAllAssets()
+        }
         
-        let requestURL = "\(baseURL)issues/published"
+        var requestURL = "\(baseURL)issues/published"
+        
+        if let timeSince = timestamp {
+            requestURL += "/since/\(timeSince)"
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -424,8 +449,47 @@ public class IssueHandler: NSObject {
     The method gets preview issues from the Magnet API for the client key and adds them to the database
     */
     public func addPreviewIssues() {
+        self.addPreviewIssues(nil)
+        /*let requestURL = "\(baseURL)issues/preview"
         
-        let requestURL = "\(baseURL)issues/preview"
+        let networkManager = LRNetworkManager.sharedInstance
+        
+        networkManager.requestData("GET", urlString: requestURL) {
+            (data:AnyObject?, error:NSError?) -> () in
+            if data != nil {
+                let response: NSDictionary = data as! NSDictionary
+                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                if allIssues.count > 0 {
+                    for (_, issueDict) in allIssues.enumerate() {
+                        let issueId = issueDict.valueForKey("id") as! String
+                        self.addIssueFromAPI(issueId, volumeId: nil, withArticles: false)
+                    }
+                }
+                else {
+                    //No issues, send allDownloadsComplete notif
+                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                }
+            }
+            else if let err = error {
+                print("Error: " + err.description)
+                //Error
+                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+            }
+        }*/
+    }
+    
+    public func addPreviewIssues(timestamp: String?) {
+        let relations = Relation.allObjects()
+        if relations.count == 0 {
+            Relation.addAllArticles()
+            Relation.addAllAssets()
+        }
+        
+        var requestURL = "\(baseURL)issues/preview"
+        
+        if let timeSince = timestamp {
+            requestURL += "/since/\(timeSince)"
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -490,7 +554,7 @@ public class IssueHandler: NSObject {
         currentIssue.displayDate = issue.valueForKey("display_date") as! String
         currentIssue.publishedDate = Helper.publishedDateFrom(issue.valueForKey("publish_date") as! String)
         currentIssue.appleId = issue.valueForKey("apple_id") as! String
-        currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
+        currentIssue.assetFolder = "\(self.defaultFolder)" ///\(currentIssue.appleId)"
         
         realm.addOrUpdateObject(currentIssue)
         do {
@@ -567,7 +631,7 @@ public class IssueHandler: NSObject {
         currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as? String)
         currentIssue.appleId = issue.valueForKey("sku") as! String
         
-        currentIssue.assetFolder = "\(self.defaultFolder)/\(currentIssue.appleId)"
+        currentIssue.assetFolder = "\(self.defaultFolder)" ///\(currentIssue.appleId)"
         
         var folderPath: String
         if self.defaultFolder.hasPrefix("/Documents") {
@@ -648,6 +712,7 @@ public class IssueHandler: NSObject {
                 //Insert article
                 //Add article and its assets to Issue dictionary
                 let articleId = articleDict.valueForKey("id") as! NSString
+                Relation.createRelation(currentIssue.globalId, articleId: articleId as String, assetId: nil)
                 self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
                 Article.createArticleForId(articleId, issue: currentIssue, placement: index+1, delegate: self)
             }

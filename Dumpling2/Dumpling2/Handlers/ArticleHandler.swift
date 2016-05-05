@@ -42,7 +42,7 @@ public class ArticleHandler: NSObject {
 
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -72,7 +72,7 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
         
         issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey, migration: false)
     }
@@ -104,7 +104,7 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(5)
+        self.checkAndMigrateData(6)
         
         issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
         
@@ -156,6 +156,9 @@ public class ArticleHandler: NSObject {
             if oldSchemeVersion < 5 {
                 migration.enumerateObjects(Article.className()) { oldObject, newObject in
                 }
+            }
+            //Relation added
+            if oldSchemeVersion < 6 {
             }
         }
         config.migrationBlock = migrationBlock
@@ -285,11 +288,10 @@ public class ArticleHandler: NSObject {
     */
     public func addArticlesFor(property: String, value: String, page: Int, limit: Int) {
         if Helper.isNilOrEmpty(property) || Helper.isNilOrEmpty(value) {
-            self.addAllArticles(page, limit: limit)
+            self.addAllArticles(page, limit: limit, timestamp: nil)
             return
         }
         
-        //let encodedVal = value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
         let encodedVal = value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
         var requestURL = "\(baseURL)articles/\(property)/" + encodedVal! + "?limit="
         
@@ -335,14 +337,38 @@ public class ArticleHandler: NSObject {
     }
     
     /**
+     The method lets you download and add all articles to the database
+     
+     - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+     
+     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+     */
+    public func addAllArticles(page: Int, limit: Int) {
+        self.addAllArticles(page, limit: limit, timestamp: nil)
+    }
+    
+    /**
     The method lets you download and add all articles to the database
     
     - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+     
+    - parameter timestamp: Parameter accepting an ISO string of time since when updates should be checked. If this is set to nil, we will fetch all records satisfying other constraints
     */
-    public func addAllArticles(page: Int, limit: Int) {
-        var requestURL = "\(baseURL)articles?limit="
+    public func addAllArticles(page: Int, limit: Int, timestamp: String?) {
+        let relations = Relation.allObjects()
+        if relations.count == 0 {
+            Relation.addAllArticles()
+            Relation.addAllAssets()
+        }
+        
+        var requestURL = "\(baseURL)articles"
+        if let time = timestamp {
+            requestURL += "/since/\(time)"
+        }
+        
+        requestURL += "?limit="
         
         if limit > 0 {
             requestURL += "\(limit)"
@@ -446,14 +472,37 @@ public class ArticleHandler: NSObject {
     }
     
     /**
+     The method lets you download and add all published articles to the database
+     
+     - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
+     
+     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
+     */
+    public func addAllPublishedArticles(page: Int, limit: Int) {
+        self.addAllPublishedArticles(page, limit: limit, timestamp: nil)
+    }
+    
+    /**
     The method lets you download and add all published articles to the database
     
     - parameter page: Page number of articles to fetch. Limit is set to 20. Pagination starts at 0
     
     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addAllPublishedArticles(page: Int, limit: Int) {
-        var requestURL = "\(baseURL)articles/published?limit="
+    public func addAllPublishedArticles(page: Int, limit: Int, timestamp: String?) {
+        let relations = Relation.allObjects()
+        if relations.count == 0 {
+            Relation.addAllArticles()
+            Relation.addAllAssets()
+        }
+        
+        var requestURL = "\(baseURL)articles/published"
+        
+        if let time = timestamp {
+            requestURL += "/since/\(time)"
+        }
+        
+        requestURL += "?limit="
         
         if limit > 0 {
             requestURL += "\(limit)"

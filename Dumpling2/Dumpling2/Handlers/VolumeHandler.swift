@@ -227,7 +227,7 @@ public class VolumeHandler: NSObject {
             currentVolume.keywords = Helper.stringFromJSON(keywords)!
         }
         
-        currentVolume.assetFolder = "\(self.defaultFolder)/\(currentVolume.globalId)"
+        currentVolume.assetFolder = "\(self.defaultFolder)" ///\(currentVolume.globalId)"
         
         var folderPath: String
         if self.defaultFolder.hasPrefix("/Documents") {
