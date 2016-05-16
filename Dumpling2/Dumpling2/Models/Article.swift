@@ -253,6 +253,7 @@ public class Article: RLMObject {
                             }
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                                 Relation.createRelation(existingArticle.issueId, articleId: existingArticle.globalId, assetId: nil)
+                                existingArticle.downloadArticleAssets(delegate as? IssueHandler)
                                 if delegate != nil {
                                     //Mark article as done
                                     if let issue = issue {
@@ -491,6 +492,8 @@ public class Article: RLMObject {
                 }
                 if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                     Relation.createRelation(existingArticle.issueId, articleId: gid, assetId: nil)
+                    //Check if the image is not downloaded - then download again
+                    existingArticle.downloadArticleAssets(delegate as? IssueHandler)
                     if delegate != nil {
                         if issue != nil {
                             (delegate as! IssueHandler).updateStatusDictionary(issue!.volumeId, issueId: issue!.globalId, url: "\(baseURL)articles/\(gid)", status: 3)
@@ -582,7 +585,7 @@ public class Article: RLMObject {
                 }
                 if delegate != nil {
                     if issue != nil {
-                        Relation.createRelation(currIssue.globalId, articleId: currentArticle.globalId, assetId: assetid)
+                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: assetid)
                         (delegate as! IssueHandler).updateStatusDictionary(currIssue.volumeId, issueId: currIssue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                     }
                     else {
@@ -723,6 +726,32 @@ public class Article: RLMObject {
             var articles: RLMResults
             
             articles = Article.objectsWithPredicate(searchPredicate).sortedResultsUsingProperty("date", ascending: false)
+            
+            if articles.count > 0 {
+                var array = Array<Article>()
+                for object in articles {
+                    if let obj = object as? Article {
+                        array.append(obj)
+                    }
+                }
+                
+                //If count > 0, return only values in that range
+                if count > 0 {
+                    let startIndex = page * count
+                    if startIndex >= array.count {
+                        return nil
+                    }
+                    let endIndex = (array.count > startIndex+count) ? (startIndex + count - 1) : (array.count - 1)
+                    let slicedArray = Array(array[startIndex...endIndex])
+                    
+                    return slicedArray
+                }
+                return array
+            }
+        }
+        else {
+            //Everything is nil, return all articles
+            let articles = Article.allObjects().sortedResultsUsingProperty("date", ascending: false)
             
             if articles.count > 0 {
                 var array = Array<Article>()

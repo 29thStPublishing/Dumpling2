@@ -250,6 +250,7 @@ public class Issue: RLMObject {
                 let response: NSDictionary = data as! NSDictionary
                 let allIssues: NSArray = response.valueForKey("issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
+                    //NSLog("ISSUE DETAILS: \(issueDetails)")
                     //Download articles for the issue
                     let articles = issueDetails.objectForKey("articles") as! NSArray
                     if articles.count > 0 {
@@ -259,15 +260,43 @@ public class Issue: RLMObject {
                             //Add article and its assets to Issue dictionary
                             let articleId = articleDict.valueForKey("id") as! String
                             Relation.createRelation(self.globalId, articleId: articleId, assetId: nil)
-                            articleList += articleId
-                            if index < (articles.count - 1) {
-                                articleList += ","
+                            if let existingArticle = Article.getArticle(articleId, appleId: nil) {
+                                var lastUpdatedDate = NSDate()
+                                if let updateDate: String = existingArticle.getValue("updateDate") as? String {
+                                    lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
+                                }
+                                var newUpdateDate = NSDate()
+                                if let updated = articleDict.valueForKey("updated") as? NSDictionary {
+                                    if let date = updated.valueForKey("date") as? String {
+                                        newUpdateDate = Helper.publishedDateFromISO(date)
+                                    }
+                                }
+                                if newUpdateDate.compare(lastUpdatedDate) == NSComparisonResult.OrderedDescending {
+                                    articleList += articleId
+                                    if index < (articles.count - 1) {
+                                        articleList += ","
+                                    }
+                                    issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                                }
+                                else {
+                                    existingArticle.downloadArticleAssets(issueHandler)
+                                }
                             }
-                            issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
-                            //Article.createArticleForId(articleId, issue: self, placement: index+1, delegate: issueHandler)
+                            else {
+                                articleList += articleId
+                                if index < (articles.count - 1) {
+                                    articleList += ","
+                                }
+                                issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                            }
                         }
                         //Send request to get all articles info in 1 call
-                        Article.createArticlesForIds(articleList, issue: self, delegate: issueHandler)
+                        if articleList.hasSuffix(",") {
+                            articleList = articleList.substringToIndex(articleList.endIndex.predecessor())
+                        }
+                        if !articleList.isEmpty {
+                            Article.createArticlesForIds(articleList, issue: self, delegate: issueHandler)
+                        }
                     }
                     
                     issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 1)

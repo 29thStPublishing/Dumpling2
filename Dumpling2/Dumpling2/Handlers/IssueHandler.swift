@@ -708,14 +708,54 @@ public class IssueHandler: NSObject {
         //add all articles into the database
         //Download and add articles ONLY if asked to
         if withArticles {
-            for (index, articleDict) in articles.enumerate() {
-                //Insert article
-                //Add article and its assets to Issue dictionary
-                let articleId = articleDict.valueForKey("id") as! NSString
-                Relation.createRelation(currentIssue.globalId, articleId: articleId as String, assetId: nil)
-                self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
-                Article.createArticleForId(articleId, issue: currentIssue, placement: index+1, delegate: self)
+            if articles.count > 0 {
+                var articleList = ""
+                for (index, articleDict) in articles.enumerate() {
+                    //Insert article
+                    //Add article and its assets to Issue dictionary
+                    let articleId = articleDict.valueForKey("id") as! String
+                    Relation.createRelation(currentIssue.globalId, articleId: articleId, assetId: nil)
+                    
+                    if let existingArticle = Article.getArticle(articleId, appleId: nil) {
+                        var lastUpdatedDate = NSDate()
+                        if let updateDate: String = existingArticle.getValue("updateDate") as? String {
+                            lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
+                        }
+                        var newUpdateDate = NSDate()
+                        if let updated = articleDict.valueForKey("updated") as? NSDictionary {
+                            if let date = updated.valueForKey("date") as? String {
+                                newUpdateDate = Helper.publishedDateFromISO(date)
+                            }
+                        }
+                        if newUpdateDate.compare(lastUpdatedDate) == NSComparisonResult.OrderedDescending {
+                            //Have to update article
+                            articleList += articleId
+                            if index < (articles.count - 1) {
+                                articleList += ","
+                            }
+                            self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                        }
+                        else {
+                            existingArticle.downloadArticleAssets(self)
+                        }
+                    }
+                    else {
+                        //Have to update article
+                        articleList += articleId
+                        if index < (articles.count - 1) {
+                            articleList += ","
+                        }
+                        self.updateStatusDictionary(volumeId, issueId: globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                    }
+                }
+                if articleList.hasSuffix(",") {
+                    articleList = articleList.substringToIndex(articleList.endIndex.predecessor())
+                }
+                if !articleList.isEmpty {
+                    Article.createArticlesForIds(articleList, issue: currentIssue, delegate: self)
+                }
             }
+            
         }
         
         //Mark issue URL as done
