@@ -481,7 +481,11 @@ public class Article: RLMObject {
         let gid = article.valueForKey("id") as! String
         let meta = article.objectForKey("meta") as! NSDictionary
         
+        var finalPlacement = placement
+        
         if let existingArticle = Article.getArticle(gid, appleId: nil) {
+            finalPlacement = existingArticle.placement
+            
             if let updateDate: String = existingArticle.getValue("updateDate") as? String {
                 let lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
                 var newUpdatedDate = NSDate()
@@ -521,7 +525,7 @@ public class Article: RLMObject {
         currentArticle.articleType = article.valueForKey("type") as! String
         currentArticle.commentary = article.valueForKey("commentary") as! String
         currentArticle.slug = article.valueForKey("slug") as! String
-        currentArticle.placement = placement
+        currentArticle.placement = finalPlacement
         
         if let sku = article.valueForKey("sku") as? String {
             currentArticle.appleId = sku

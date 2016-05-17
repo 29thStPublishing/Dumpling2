@@ -1362,6 +1362,7 @@ public class Asset: RLMObject {
     :return: Path of the asset file or nil if not found
     */
     public func getAssetPath() -> String? {
+        lLog("Get path for \(self.globalId)")
         let fileURL = self.originalURL
         if !Helper.isNilOrEmpty(fileURL) {
             
