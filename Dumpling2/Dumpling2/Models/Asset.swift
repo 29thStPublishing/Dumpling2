@@ -1357,6 +1357,15 @@ public class Asset: RLMObject {
     }
     
     /**
+     This method returns an array of articles for the asset
+     
+     :return: Array of articles associated with the asset
+     */
+    public func getArticlesForAsset() -> [String] {
+        return Relation.getArticlesForAsset(self.globalId)
+    }
+    
+    /**
     This method returns the path of the asset file for the current object
     
     :return: Path of the asset file or nil if not found

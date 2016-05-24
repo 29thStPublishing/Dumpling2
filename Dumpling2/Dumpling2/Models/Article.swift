@@ -162,7 +162,7 @@ public class Article: RLMObject {
     }
     
     //Get article details from API and create
-    class func createArticleForId(articleId: NSString, issue: Issue, placement: Int, delegate: AnyObject?) {
+    class func createArticleForId(articleId: NSString, issue: Issue?, placement: Int, delegate: AnyObject?) {
         
         let requestURL = "\(baseURL)articles/\(articleId)"
         
@@ -181,7 +181,12 @@ public class Article: RLMObject {
                 print("Error: " + err.description)
                 if delegate != nil {
                     //Mark article as done - even if with errors
-                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                    if let issue = issue {
+                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 2)
+                    }
+                    else {
+                        (delegate as! IssueHandler).updateStatusDictionary("", issueId: articleId as String, url: requestURL, status: 2)
+                    }
                 }
             }
             
@@ -537,10 +542,19 @@ public class Article: RLMObject {
             currentArticle.isPublished = published.boolValue
         }
         
+        var publishDateSave = false
         if let publishedDate = meta.valueForKey("publishedDate") as? String {
-            currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+            if !publishedDate.isEmpty {
+                currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+                publishDateSave = true
+            }
         } //For Gothamist
 
+        if !publishDateSave {
+            //Download the article again
+            createArticleForId(gid, issue: issue, placement: placement, delegate: delegate)
+            return
+        }
         /*var updated = meta.valueForKey("updated") as! NSDictionary
         if let updateDate: String = updated.valueForKey("date") as? String {
             currentArticle.date = Helper.publishedDateFromISO(updateDate)
@@ -552,6 +566,9 @@ public class Article: RLMObject {
                 if let updated: Dictionary<String, AnyObject> = meta.objectForKey("updated") as? Dictionary {
                     if let updateDate: String = updated["date"] as? String {
                         metadataDict.setObject(updateDate, forKey: "updateDate")
+                        if !publishDateSave {
+                            currentArticle.date = Helper.publishedDateFromISO(updateDate)
+                        }
                     }
                 }
                 currentArticle.metadata = Helper.stringFromJSON(metadataDict)!

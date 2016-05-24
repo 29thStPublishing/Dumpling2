@@ -134,6 +134,25 @@ class Relation: RLMObject {
         return [""]
     }
     
+    class func getArticlesForAsset(assetId: String) -> [String] {
+        _ = RLMRealm.defaultRealm()
+        
+        var articles: RLMResults
+        let predicate = NSPredicate(format: "assetId = %@ && articleId != %@", assetId, "")
+        articles = Relation.objectsWithPredicate(predicate)
+        
+        if articles.count > 0 {
+            var array = [String]()
+            for object in articles {
+                let obj: Relation = object as! Relation
+                array.append(obj.articleId)
+            }
+            return array
+        }
+        
+        return [""]
+    }
+    
     class func relationExistsFor(issueId: String?, articleId: String?, assetId: String?) -> Bool {
         _ = RLMRealm.defaultRealm()
         
