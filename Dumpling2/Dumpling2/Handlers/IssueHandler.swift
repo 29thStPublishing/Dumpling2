@@ -46,7 +46,7 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -78,7 +78,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
     }
     
     
@@ -113,7 +113,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
         
     }
     
@@ -139,7 +139,7 @@ public class IssueHandler: NSObject {
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
         if migration {
-            self.checkAndMigrateData(6)
+            self.checkAndMigrateData(7)
         }
         
     }
@@ -193,6 +193,12 @@ public class IssueHandler: NSObject {
             }
             //Relation added
             if oldSchemeVersion < 6 {
+            }
+            
+            //URL params added to Asset class
+            if oldSchemeVersion < 7 {
+                migration.enumerateObjects(Asset.className()) { oldObject, newObject in
+                }
             }
         }
         config.migrationBlock = migrationBlock
@@ -373,6 +379,8 @@ public class IssueHandler: NSObject {
             requestURL += "/since/\(timeSince)"
         }
         
+        requestURL += "?limit=20"
+        
         let networkManager = LRNetworkManager.sharedInstance
         
         networkManager.requestData("GET", urlString: requestURL) {
@@ -418,6 +426,8 @@ public class IssueHandler: NSObject {
         if let timeSince = timestamp {
             requestURL += "/since/\(timeSince)"
         }
+        
+        requestURL += "?limit=20"
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -490,6 +500,8 @@ public class IssueHandler: NSObject {
         if let timeSince = timestamp {
             requestURL += "/since/\(timeSince)"
         }
+        
+        requestURL += "?limit=20"
         
         let networkManager = LRNetworkManager.sharedInstance
         

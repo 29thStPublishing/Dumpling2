@@ -48,6 +48,12 @@ public class Asset: RLMObject {
     /// Global id of volume the asset is associated with. Can be blank if this is an issue or article asset
     dynamic public var volumeId = ""
     
+    /// Image file URLs
+    dynamic var cdnUrl = ""
+    dynamic var imgUrl = ""
+    dynamic var cdnThumbUrl = ""
+    dynamic var imgThumbUrl = ""
+    
     override public class func primaryKey() -> String {
         return "globalId"
     }
@@ -175,50 +181,11 @@ public class Asset: RLMObject {
                 let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 //Update Asset now
-
-                realm.beginWriteTransaction()
-                
-                let currentAsset = Asset()
-                currentAsset.globalId = mediaFile.valueForKey("id") as! String
-                currentAsset.caption = mediaFile.valueForKey("caption") as! String
-                currentAsset.volumeId = volume.globalId
                 
                 let meta = mediaFile.objectForKey("meta") as! NSDictionary
-                let dataType = meta.objectForKey("type") as! NSString
-                if dataType.isEqualToString("image") {
-                    currentAsset.type = AssetType.Image.rawValue
-                }
-                else if dataType.isEqualToString("audio") {
-                    currentAsset.type = AssetType.Sound.rawValue
-                }
-                else if dataType.isEqualToString("video") {
-                    currentAsset.type = AssetType.Video.rawValue
-                }
-                else {
-                    currentAsset.type = dataType as String
-                }
-                currentAsset.placement = placement
                 
-                var isCdn = true
-                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
-                if Helper.isNilOrEmpty(fileUrl) {
-                    fileUrl = mediaFile.valueForKey("url") as! String
-                    isCdn = false
-                }
-                
-                var finalURL: String
-                if volume.assetFolder.hasPrefix("/Documents") {
-                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    let docsDir: NSString = docPaths[0] as NSString
-                    let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
-                }
-                else {
-                    finalURL = "\(volume.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
-                }
-                
-                var toDownload = true //Define whether the image should be downloaded or not
-                if let existingAsset = Asset.getAsset(currentAsset.globalId) {
+                //var toDownload = true //Define whether the image should be downloaded or not
+                if let existingAsset = Asset.getAsset(mediaFile.valueForKey("id") as! String) {
                     //Asset exists already
                     if let updateDate: String = existingAsset.getValue("updateDate") as? String {
                         //Get date from this string
@@ -231,11 +198,16 @@ public class Asset: RLMObject {
                         }
                         //Compare the two dates - if newUpdated <= lastUpdated, don't download
                         if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
-                            toDownload = false //Don't download - this file is up-to-date (if present)
+                            //toDownload = false //Don't download - this file is up-to-date (if present)
+                            if delegate != nil {
+                                //No change - not downloaded
+                                (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 3)
+                            }
+                            return
                         }
                     }
                     //Check if the image exists already
-                    if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
+                    /*if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
                         let dict = try? NSFileManager.defaultManager().attributesOfItemAtPath(finalURL)
                         if let fileSize: NSNumber = dict![NSFileSize] as? NSNumber {
                             if fileSize.longLongValue > 0 {
@@ -248,10 +220,11 @@ public class Asset: RLMObject {
                     }
                     else {
                         toDownload = true //file not downloaded
-                    }
+                    }*/
                 }
                 
-                if toDownload {
+                //TODO: NUKE
+                /*if toDownload {
                     networkManager.downloadFile(fileUrl, toPath: finalURL) {
                         (status:AnyObject?, error:NSError?) -> () in
                         if status != nil {
@@ -295,18 +268,64 @@ public class Asset: RLMObject {
                         //No change - not downloaded
                         (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 3)
                     }
+                }*/
+                
+                realm.beginWriteTransaction()
+                
+                let currentAsset = Asset()
+                currentAsset.globalId = mediaFile.valueForKey("id") as! String
+                currentAsset.caption = mediaFile.valueForKey("caption") as! String
+                currentAsset.volumeId = volume.globalId
+                
+                let dataType = meta.objectForKey("type") as! NSString
+                if dataType.isEqualToString("image") {
+                    currentAsset.type = AssetType.Image.rawValue
                 }
+                else if dataType.isEqualToString("audio") {
+                    currentAsset.type = AssetType.Sound.rawValue
+                }
+                else if dataType.isEqualToString("video") {
+                    currentAsset.type = AssetType.Video.rawValue
+                }
+                else {
+                    currentAsset.type = dataType as String
+                }
+                currentAsset.placement = placement
+                
+                //var isCdn = true
+                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                currentAsset.cdnUrl = fileUrl
+                if Helper.isNilOrEmpty(fileUrl) {
+                    fileUrl = mediaFile.valueForKey("url") as! String
+                    currentAsset.imgUrl = fileUrl
+                    //isCdn = false
+                }
+                
+                //NUKE
+                /*var finalURL: String
+                 if volume.assetFolder.hasPrefix("/Documents") {
+                 var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                 let docsDir: NSString = docPaths[0] as NSString
+                 let finalFolder = volume.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                 finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                 }
+                 else {
+                 finalURL = "\(volume.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                 }*/
                 
                 currentAsset.originalURL = "original-\((fileUrl as NSString).lastPathComponent)"
                 
-                var isCdnThumb = true
+                //var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                currentAsset.cdnThumbUrl = thumbUrl
                 if Helper.isNilOrEmpty(thumbUrl) {
                     thumbUrl = mediaFile.valueForKey("urlThumb") as! String
-                    isCdnThumb = false
+                    currentAsset.imgThumbUrl = thumbUrl
+                    //isCdnThumb = false
                 }
                 
-                var finalThumbURL: String
+                //TODO: NUKE
+                /*var finalThumbURL: String
                 if volume.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
@@ -316,6 +335,7 @@ public class Asset: RLMObject {
                 else {
                     finalThumbURL = "\(volume.assetFolder)/thumb-\((thumbUrl as NSString).lastPathComponent)"
                 }
+                
                 
                 networkManager.downloadFile(thumbUrl, toPath: finalThumbURL) {
                     (status:AnyObject?, error:NSError?) -> () in
@@ -338,7 +358,7 @@ public class Asset: RLMObject {
                             }
                         }
                     }
-                }
+                }*/
                 
                 currentAsset.squareURL = "thumb-\((thumbUrl as NSString).lastPathComponent)"
                 
@@ -369,7 +389,11 @@ public class Asset: RLMObject {
                 } catch let error {
                     NSLog("Error writing volume asset: \(error)")
                 }
-                //realm.commitWriteTransaction()
+                //AFTER NUKE
+                if delegate != nil {
+                    //No change - not downloaded
+                    (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -397,50 +421,10 @@ public class Asset: RLMObject {
                 let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 let mediaFile: NSDictionary = allMedia.firstObject as! NSDictionary
                 
-                //Update Asset now
-                realm.beginWriteTransaction()
-
-                let currentAsset = Asset()
-                currentAsset.globalId = mediaFile.valueForKey("id") as! String
-                currentAsset.caption = mediaFile.valueForKey("caption") as! String
-                currentAsset.issue = issue
-                currentAsset.articleId = articleId
-                
                 let meta = mediaFile.objectForKey("meta") as! NSDictionary
-                let dataType = meta.objectForKey("type") as! NSString
-                if dataType.isEqualToString("image") {
-                    currentAsset.type = AssetType.Image.rawValue
-                }
-                else if dataType.isEqualToString("audio") {
-                    currentAsset.type = AssetType.Sound.rawValue
-                }
-                else if dataType.isEqualToString("video") {
-                    currentAsset.type = AssetType.Video.rawValue
-                }
-                else {
-                    currentAsset.type = dataType as String
-                }
-                currentAsset.placement = placement
                 
-                var isCdn = true
-                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
-                if Helper.isNilOrEmpty(fileUrl) {
-                    fileUrl = mediaFile.valueForKey("url") as! String
-                    isCdn = false
-                }
-                var finalURL: String
-                if issue.assetFolder.hasPrefix("/Documents") {
-                    var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                    let docsDir: NSString = docPaths[0] as NSString
-                    let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-                    finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
-                }
-                else {
-                    finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
-                }
-                
-                var toDownload = true //Define whether the image should be downloaded or not
-                if let existingAsset = Asset.getAsset(currentAsset.globalId) {
+                //var toDownload = true //Define whether the image should be downloaded or not
+                if let existingAsset = Asset.getAsset(mediaFile.objectForKey("id") as! String) {
                     //Asset exists already
                     if let updateDate: String = existingAsset.getValue("updateDate") as? String {
                         //Get date from this string
@@ -453,11 +437,24 @@ public class Asset: RLMObject {
                         }
                         //Compare the two dates - if newUpdated <= lastUpdated, don't download
                         if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
-                            toDownload = false //Don't download
+                            //toDownload = false //Don't download
+                            if delegate != nil {
+                                if !issue.globalId.isEmpty {
+                                    //This is an issue's asset or an article's (belonging to an issue) asset
+                                    //No change - not downloaded
+                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 3)
+                                }
+                                else {
+                                    //This is an independent article's asset
+                                    //No change - not downloaded
+                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 3)
+                                }
+                                return
+                            }
                         }
                     }
                     //Check if the image exists already
-                    if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
+                    /*if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
                         let dict = try? NSFileManager.defaultManager().attributesOfItemAtPath(finalURL)
                         if let fileSize: NSNumber = dict![NSFileSize] as? NSNumber {
                             if fileSize.longLongValue > 0 {
@@ -470,10 +467,11 @@ public class Asset: RLMObject {
                     }
                     else {
                         toDownload = true
-                    }
+                    }*/
                 }
 
-                if toDownload {
+                //TODO: NUKE
+                /*if toDownload {
                     networkManager.downloadFile(fileUrl, toPath: finalURL) {
                         (status:AnyObject?, error:NSError?) -> () in
                         if status != nil {
@@ -542,17 +540,66 @@ public class Asset: RLMObject {
                             (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 3)
                         }
                     }
+                }*/
+                
+                //Update Asset now
+                realm.beginWriteTransaction()
+                
+                let currentAsset = Asset()
+                currentAsset.globalId = mediaFile.valueForKey("id") as! String
+                currentAsset.caption = mediaFile.valueForKey("caption") as! String
+                currentAsset.issue = issue
+                currentAsset.articleId = articleId
+                
+                let dataType = meta.objectForKey("type") as! NSString
+                if dataType.isEqualToString("image") {
+                    currentAsset.type = AssetType.Image.rawValue
                 }
+                else if dataType.isEqualToString("audio") {
+                    currentAsset.type = AssetType.Sound.rawValue
+                }
+                else if dataType.isEqualToString("video") {
+                    currentAsset.type = AssetType.Video.rawValue
+                }
+                else {
+                    currentAsset.type = dataType as String
+                }
+                currentAsset.placement = placement
+                
+                //var isCdn = true
+                var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                currentAsset.cdnUrl = fileUrl
+                if Helper.isNilOrEmpty(fileUrl) {
+                    fileUrl = mediaFile.valueForKey("url") as! String
+                    currentAsset.imgUrl = fileUrl
+                    //isCdn = false
+                }
+                
+                //NUKE
+                /*var finalURL: String
+                 if issue.assetFolder.hasPrefix("/Documents") {
+                 var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+                 let docsDir: NSString = docPaths[0] as NSString
+                 let finalFolder = issue.assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
+                 finalURL = "\(finalFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                 }
+                 else {
+                 finalURL = "\(issue.assetFolder)/original-\((fileUrl as NSString).lastPathComponent)"
+                 }*/
+                
                 currentAsset.originalURL = "original-\((fileUrl as NSString).lastPathComponent)"
                 
-                var isCdnThumb = true
+                //var isCdnThumb = true
                 var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                currentAsset.cdnThumbUrl = thumbUrl
                 if Helper.isNilOrEmpty(thumbUrl) {
                     thumbUrl = mediaFile.valueForKey("urlThumb") as! String
-                    isCdnThumb = false
+                    currentAsset.imgThumbUrl = thumbUrl
+                    //isCdnThumb = false
                 }
                 
-                var finalThumbURL: String
+                //TODO: NUKE
+                /*var finalThumbURL: String
                 if issue.assetFolder.hasPrefix("/Documents") {
                     var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                     let docsDir: NSString = docPaths[0] as NSString
@@ -588,7 +635,7 @@ public class Asset: RLMObject {
                             }
                         }
                     }
-                }
+                }*/
                 currentAsset.squareURL = "thumb-\((thumbUrl as NSString).lastPathComponent)"
                 
                 if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -618,7 +665,19 @@ public class Asset: RLMObject {
                 } catch let error {
                     NSLog("Error creating asset: \(error)")
                 }
-                //realm.commitWriteTransaction()
+                //AFTER NUKE
+                if delegate != nil {
+                    if !issue.globalId.isEmpty {
+                        //This is an issue's asset or an article's (belonging to an issue) asset
+                        //No change - not downloaded
+                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 1)
+                    }
+                    else {
+                        //This is an independent article's asset
+                        //No change - not downloaded
+                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 1)
+                    }
+                }
             }
             else if let err = error {
                 print("Error: " + err.description)
@@ -651,40 +710,12 @@ public class Asset: RLMObject {
                 let allMedia: NSArray = response.valueForKey("media") as! NSArray
                 
                 for (index, mediaFile) in allMedia.enumerate() {
-                    //Update Asset now
-                    realm.beginWriteTransaction()
-                    
-                    let currentAsset = Asset()
-                    currentAsset.globalId = mediaFile.valueForKey("id") as! String
-                    currentAsset.caption = mediaFile.valueForKey("caption") as! String
-                    if let issue = issue {
-                        currentAsset.issue = issue
-                    }
-                    currentAsset.articleId = articleId
                     
                     let meta = mediaFile.objectForKey("meta") as! NSDictionary
-                    let dataType = meta.objectForKey("type") as! NSString
-                    if dataType.isEqualToString("image") {
-                        currentAsset.type = AssetType.Image.rawValue
-                    }
-                    else if dataType.isEqualToString("audio") {
-                        currentAsset.type = AssetType.Sound.rawValue
-                    }
-                    else if dataType.isEqualToString("video") {
-                        currentAsset.type = AssetType.Video.rawValue
-                    }
-                    else {
-                        currentAsset.type = dataType as String
-                    }
-                    currentAsset.placement = index + 1
+                    let assetId = mediaFile.objectForKey("id") as! String
                     
-                    var isCdn = true
-                    var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
-                    if Helper.isNilOrEmpty(fileUrl) {
-                        fileUrl = mediaFile.valueForKey("url") as! String
-                        isCdn = false
-                    }
-                    var finalURL: String = ""
+                    //NUKE
+                    /*var finalURL: String = ""
                     if let issue = issue {
                         if issue.assetFolder.hasPrefix("/Documents") {
                             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -700,10 +731,10 @@ public class Asset: RLMObject {
                         var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
                         let docsDir = docPaths[0]
                         finalURL = "\(docsDir)/original-\((fileUrl as NSString).lastPathComponent)"
-                    }
+                    }*/
                     
-                    var toDownload = true //Define whether the image should be downloaded or not
-                    if let existingAsset = Asset.getAsset(currentAsset.globalId) {
+                    //var toDownload = true //Define whether the image should be downloaded or not
+                    if let existingAsset = Asset.getAsset(assetId) {
                         //Asset exists already
                         if let updateDate: String = existingAsset.getValue("updateDate") as? String {
                             //Get date from this string
@@ -717,11 +748,30 @@ public class Asset: RLMObject {
                             //Compare the two dates - if newUpdated <= lastUpdated, don't download
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                                 //Check if the image exists or not
-                                toDownload = false //Don't download
+                                //toDownload = false //Don't download
+                                if delegate != nil {
+                                    if let issue = issue {
+                                        if !issue.globalId.isEmpty {
+                                            //This is an issue's asset or an article's (belonging to an issue) asset
+                                            //No change - not downloaded
+                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetId)", status: 3)
+                                        }
+                                        else {
+                                            //This is an independent article's asset
+                                            //No change - not downloaded
+                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: 3)
+                                        }
+                                    }
+                                    else {
+                                        //No change - not downloaded
+                                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: 3)
+                                    }
+                                }
+                                return
                             }
                         }
                         //Check if the image exists already
-                        if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
+                        /*if NSFileManager.defaultManager().fileExistsAtPath(finalURL) {
                             let dict = try? NSFileManager.defaultManager().attributesOfItemAtPath(finalURL)
                             if let fileSize: NSNumber = dict![NSFileSize] as? NSNumber {
                                 if fileSize.longLongValue > 0 {
@@ -734,10 +784,11 @@ public class Asset: RLMObject {
                         }
                         else {
                             toDownload = true
-                        }
+                        }*/
                     }
                     
-                    if toDownload {
+                    //TODO: NUKE
+                    /*if toDownload {
                         networkManager.downloadFile(fileUrl, toPath: finalURL) {
                             (status:AnyObject?, error:NSError?) -> () in
                             if status != nil {
@@ -828,17 +879,55 @@ public class Asset: RLMObject {
                                 (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 3)
                             }
                         }
+                    }*/
+                    //Update Asset now
+                    realm.beginWriteTransaction()
+                    
+                    let currentAsset = Asset()
+                    currentAsset.globalId = mediaFile.valueForKey("id") as! String
+                    currentAsset.caption = mediaFile.valueForKey("caption") as! String
+                    if let issue = issue {
+                        currentAsset.issue = issue
                     }
+                    currentAsset.articleId = articleId
+                    
+                    let dataType = meta.objectForKey("type") as! NSString
+                    if dataType.isEqualToString("image") {
+                        currentAsset.type = AssetType.Image.rawValue
+                    }
+                    else if dataType.isEqualToString("audio") {
+                        currentAsset.type = AssetType.Sound.rawValue
+                    }
+                    else if dataType.isEqualToString("video") {
+                        currentAsset.type = AssetType.Video.rawValue
+                    }
+                    else {
+                        currentAsset.type = dataType as String
+                    }
+                    currentAsset.placement = index + 1
+                    
+                    //var isCdn = true
+                    var fileUrl = mediaFile.valueForKey("cdnUrl") as! String
+                    currentAsset.cdnUrl = fileUrl
+                    if Helper.isNilOrEmpty(fileUrl) {
+                        fileUrl = mediaFile.valueForKey("url") as! String
+                        currentAsset.imgUrl = fileUrl
+                        //isCdn = false
+                    }
+                    
                     currentAsset.originalURL = "original-\((fileUrl as NSString).lastPathComponent)"
                     
-                    var isCdnThumb = true
+                    //var isCdnThumb = true
                     var thumbUrl = mediaFile.valueForKey("cdnUrlThumb") as! String
+                    currentAsset.cdnThumbUrl = thumbUrl
                     if Helper.isNilOrEmpty(thumbUrl) {
                         thumbUrl = mediaFile.valueForKey("urlThumb") as! String
-                        isCdnThumb = false
+                        currentAsset.imgThumbUrl = thumbUrl
+                        //isCdnThumb = false
                     }
                     
-                    var finalThumbURL: String
+                    //TODO: NUKE
+                    /*var finalThumbURL: String
                     if let issue = issue {
                         if issue.assetFolder.hasPrefix("/Documents") {
                             var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
@@ -881,7 +970,7 @@ public class Asset: RLMObject {
                                 }
                             }
                         }
-                    }
+                    }*/
                     currentAsset.squareURL = "thumb-\((thumbUrl as NSString).lastPathComponent)"
                     
                     if let metadata: AnyObject = mediaFile.objectForKey("customMeta") {
@@ -911,7 +1000,25 @@ public class Asset: RLMObject {
                     } catch let error {
                         NSLog("Error saving issue: \(error)")
                     }
-                    //realm.commitWriteTransaction()
+                    //AFTER NUKE
+                    if delegate != nil {
+                        if let issue = issue {
+                            if !issue.globalId.isEmpty {
+                                //This is an issue's asset or an article's (belonging to an issue) asset
+                                //No change - not downloaded
+                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                            }
+                            else {
+                                //This is an independent article's asset
+                                //No change - not downloaded
+                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                            }
+                        }
+                        else {
+                            //No change - not downloaded
+                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(currentAsset.globalId)", status: 1)
+                        }
+                    }
                 }
             }
             else if let err = error {
@@ -1420,43 +1527,23 @@ public class Asset: RLMObject {
      :return: Image or nil if not found
      */
     public func getAssetImage() -> UIImage? {
-        let fileURL = self.originalURL
-        if !Helper.isNilOrEmpty(fileURL) {
-            var assetFolder = ""
-            let issueId = Relation.getIssuesForAsset(self.globalId).first
-            if let issue = Issue.getIssue(issueId!) {
-                assetFolder = issue.assetFolder
-            }
-            if Helper.isNilOrEmpty(assetFolder) && !volumeId.isEmpty {
-                _ = RLMRealm.defaultRealm()
-                
-                let predicate = NSPredicate(format: "globalId = %@", volumeId)
-                let volumes = Volume.objectsWithPredicate(predicate)
-                
-                if volumes.count > 0 {
-                    let volume: Volume = volumes.firstObject() as! Volume
-                    assetFolder = volume.assetFolder
+        if let assetPath = self.getAssetPath() {
+            if NSFileManager.defaultManager().fileExistsAtPath(assetPath) {
+                if let img = UIImage(contentsOfFile: assetPath) {
+                    return img
                 }
             }
-            if Helper.isNilOrEmpty(assetFolder) {
-                assetFolder = "/Documents"
-            }
-            
-            //Found the asset folder. Get the file now
-            var folderPath = assetFolder
-            if assetFolder.hasPrefix("/Documents") {
-                var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
-                let docsDir: NSString = docPaths[0] as NSString
-                folderPath = assetFolder.stringByReplacingOccurrencesOfString("/Documents", withString: docsDir as String)
-            }
-            
-            if !folderPath.hasSuffix("/") {
-                //Add the trailing slash
-                folderPath = "\(folderPath)/"
-            }
-            let filePath = "\(folderPath)\(fileURL)"
-            if NSFileManager.defaultManager().fileExistsAtPath(filePath) {
-                return UIImage(contentsOfFile: filePath)
+        }
+        return nil
+    }
+    
+    public func getAssetThumbImage() -> UIImage? {
+        if let assetPath = self.getAssetPath() {
+            let thumbPath = assetPath.stringByReplacingOccurrencesOfString(self.originalURL, withString: self.squareURL)
+            if NSFileManager.defaultManager().fileExistsAtPath(thumbPath) {
+                if let img = UIImage(contentsOfFile: thumbPath) {
+                    return img
+                }
             }
         }
         return nil
@@ -1494,5 +1581,149 @@ public class Asset: RLMObject {
         }
         
         return nil
+    }
+    
+    public func getOriginalImageForAsset(article: String?, issue: String?) -> String? {
+        //If image exists, return its path
+        //If not, download image for asset if we have the URL in the asset object - return nil - will send notif
+        //If not, get the asset object from magnet, get the URL and download image - return nil - will send notif
+
+        if let assetPath = self.getAssetPath() {
+            if NSFileManager.defaultManager().fileExistsAtPath(assetPath) {
+                if let _ = UIImage(contentsOfFile: assetPath) {
+                    return assetPath
+                }
+            }
+            //Do we have URLs? Download then
+            if !self.cdnUrl.isEmpty {
+                //Download CDN image
+                let cdnDownload = taskWith(NSURL(string: self.cdnUrl)!) { response in
+                    switch response {
+                    case let .Success(image, info):
+                        if (!info.isFastResponse) {
+                            //Save image
+                            if let data = UIImagePNGRepresentation(image) {
+                                data.writeToFile(assetPath, atomically: true)
+                            }
+                            var userInfo = ["media":self.globalId, "type":"original"]
+                            //Check relation between issue, article and asset as well
+                            if let articleGlobalId = article {
+                                if let _ = Relation.getAssetsForArticle(articleGlobalId).indexOf(self.globalId) {
+                                    userInfo["article"] = articleGlobalId
+                                }
+                            }
+                            if let issueGlobalId = issue {
+                                if let _ = Relation.getAssetsForIssue(issueGlobalId).indexOf(self.globalId) {
+                                    userInfo["issue"] = issueGlobalId
+                                }
+                            }
+                            lLog("Pushing IMAGE_DOWNLOADED for M:\(self.globalId)")
+                            NSNotificationCenter.defaultCenter().postNotificationName(IMAGE_DOWNLOADED, object: nil, userInfo: userInfo)
+                        }
+                    case .Failure(_):
+                        //cdn url download failed, try downloading using self.imgUrl
+                        lLog("Error downloading \(self.cdnUrl)")
+                        self.downloadImage(self.imgUrl, toPath: assetPath, article: article, issue: issue)
+                    }
+                }
+                cdnDownload.resume()
+            }
+            else if !self.imgUrl.isEmpty {
+                self.downloadImage(self.imgUrl, toPath: assetPath, article: article, issue: issue)
+            }
+        }
+        
+        return nil
+    }
+    
+    public func getThumbImageForAsset(article: String?, issue: String?) -> String? {
+        //If image exists, return its path
+        //If not, download image for asset if we have the URL in the asset object - return nil - will send notif
+        //If not, get the asset object from magnet, get the URL and download image - return nil - will send notif
+        if let assetPath = self.getAssetPath() {
+            let thumbPath = assetPath.stringByReplacingOccurrencesOfString(self.originalURL, withString: self.squareURL)
+            if NSFileManager.defaultManager().fileExistsAtPath(thumbPath) {
+                if let _ = UIImage(contentsOfFile: thumbPath) {
+                    return thumbPath
+                }
+            }
+            if !self.cdnThumbUrl.isEmpty {
+                //Download CDN image
+                let cdnDownload = taskWith(NSURL(string: self.cdnThumbUrl)!) { response in
+                    switch response {
+                    case let .Success(image, info):
+                        if (!info.isFastResponse) {
+                            //Save image
+                            let thumbPath = assetPath.stringByReplacingOccurrencesOfString(self.originalURL, withString: self.squareURL)
+                            if let data = UIImagePNGRepresentation(image) {
+                                data.writeToFile(thumbPath, atomically: true)
+                            }
+                            var userInfo = ["media":self.globalId, "type":"thumb"]
+                            if let articleGlobalId = article {
+                                if let _ = Relation.getAssetsForArticle(articleGlobalId).indexOf(self.globalId) {
+                                    userInfo["article"] = articleGlobalId
+                                }
+                            }
+                            if let issueGlobalId = issue {
+                                if let _ = Relation.getAssetsForIssue(issueGlobalId).indexOf(self.globalId) {
+                                    userInfo["issue"] = issueGlobalId
+                                }
+                            }
+                            lLog("Pushing IMAGE_DOWNLOADED THUMB for M:\(self.globalId)")
+                            NSNotificationCenter.defaultCenter().postNotificationName(IMAGE_DOWNLOADED, object: nil, userInfo: userInfo)
+                        }
+                    case .Failure(_):
+                        //cdn url download failed, try downloading using self.imgUrl
+                        lLog("Error downloading \(self.cdnThumbUrl)")
+                        let thumbPath = assetPath.stringByReplacingOccurrencesOfString(self.originalURL, withString: self.squareURL)
+                        self.downloadImage(self.imgThumbUrl, toPath: thumbPath, article: article, issue: issue)
+                    }
+                }
+                cdnDownload.resume()
+            }
+            else if !self.imgThumbUrl.isEmpty {
+                let thumbPath = assetPath.stringByReplacingOccurrencesOfString(self.originalURL, withString: self.squareURL)
+                self.downloadImage(self.imgThumbUrl, toPath: thumbPath, article: article, issue: issue)
+            }
+        }
+        
+        return nil
+    }
+    
+    private func downloadImage(url: String, toPath: String, article: String?, issue: String?) {
+        if !url.isEmpty {
+            let imgDownload = taskWith(NSURL(string: url)!) { response in
+                switch response {
+                case let .Success(image, info):
+                    if (!info.isFastResponse) {
+                        //Save image
+                        if let data = UIImagePNGRepresentation(image) {
+                            data.writeToFile(toPath, atomically: true)
+                        }
+                        var userInfo = ["media":self.globalId, "type":"original"]
+                        if let articleGlobalId = article {
+                            if let _ = Relation.getAssetsForArticle(articleGlobalId).indexOf(self.globalId) {
+                                userInfo["article"] = articleGlobalId
+                            }
+                        }
+                        if let issueGlobalId = issue {
+                            if let _ = Relation.getAssetsForIssue(issueGlobalId).indexOf(self.globalId) {
+                                userInfo["issue"] = issueGlobalId
+                            }
+                        }
+                        lLog("Pushing IMAGE_DOWNLOADED for M:\(self.globalId)")
+                        NSNotificationCenter.defaultCenter().postNotificationName(IMAGE_DOWNLOADED, object: nil, userInfo: userInfo)
+                    }
+                case .Failure(_):
+                    //cdn url download failed, try downloading using self.imgUrl
+                    lLog("Error downloading \(self.cdnUrl)")
+                    
+                }
+            }
+            imgDownload.resume()
+        }
+        else {
+            
+        }
     }
 }

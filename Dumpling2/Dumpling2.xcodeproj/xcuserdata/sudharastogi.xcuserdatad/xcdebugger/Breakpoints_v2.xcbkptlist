@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Models/Article.swift"
-            timestampString = "485687114.222127"
+            filePath = "Dumpling2/Models/Issue.swift"
+            timestampString = "485790828.550602"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "484"
-            endingLineNumber = "484"
-            landmarkName = "addArticle(_:issue:placement:delegate:)"
+            startingLineNumber = "298"
+            endingLineNumber = "298"
+            landmarkName = "downloadIssueArticles(_:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,13 +25,93 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Dumpling2/Models/Article.swift"
-            timestampString = "485688144.704192"
+            filePath = "Dumpling2/Models/Asset.swift"
+            timestampString = "486991877.068262"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "516"
-            endingLineNumber = "516"
-            landmarkName = "addArticle(_:issue:placement:delegate:)"
+            startingLineNumber = "1601"
+            endingLineNumber = "1601"
+            landmarkName = "getOriginalImageForAsset(_:issue:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Models/Asset.swift"
+            timestampString = "486991877.068262"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1613"
+            endingLineNumber = "1613"
+            landmarkName = "getOriginalImageForAsset(_:issue:)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Models/Asset.swift"
+            timestampString = "486991877.068262"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1630"
+            endingLineNumber = "1630"
+            landmarkName = "getOriginalImageForAsset(_:issue:)"
+            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Dumpling2.Asset.(getOriginalImageForAsset (Swift.Optional&lt;Swift.String&gt;, issue : Swift.Optional&lt;Swift.String&gt;) -&gt; Swift.Optional&lt;Swift.String&gt;).(closure #1)"
+                  moduleName = "Dumpling2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sudharastogi/Project%20Docs/PowerToFly/29%20Street/git/D2Master_Latest_25Sept/Master/Dumpling2%20copy/Dumpling2/Dumpling2/Models/Asset.swift"
+                  timestampString = "486992489.016635"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1630"
+                  endingLineNumber = "1630"
+                  offsetFromSymbolStart = "3282">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Dumpling2.Asset.(getOriginalImageForAsset (Swift.Optional&lt;Swift.String&gt;, issue : Swift.Optional&lt;Swift.String&gt;) -&gt; Swift.Optional&lt;Swift.String&gt;).(closure #1).(implicit closure #2)"
+                  moduleName = "Dumpling2"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sudharastogi/Project%20Docs/PowerToFly/29%20Street/git/D2Master_Latest_25Sept/Master/Dumpling2%20copy/Dumpling2/Dumpling2/Models/Asset.swift"
+                  timestampString = "486992489.016838"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1630"
+                  endingLineNumber = "1630"
+                  offsetFromSymbolStart = "12">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Dumpling2/Models/Asset.swift"
+            timestampString = "486991927.859759"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1604"
+            endingLineNumber = "1604"
+            landmarkName = "getOriginalImageForAsset(_:issue:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -550,15 +550,12 @@ public class Article: RLMObject {
             }
         } //For Gothamist
 
-        if !publishDateSave {
+        //Download article again if its publish date is blank and this is not a preview app
+        if !publishDateSave && !LRNetworkManager.sharedInstance.preview && issue == nil {
             //Download the article again
             createArticleForId(gid, issue: issue, placement: placement, delegate: delegate)
             return
         }
-        /*var updated = meta.valueForKey("updated") as! NSDictionary
-        if let updateDate: String = updated.valueForKey("date") as? String {
-            currentArticle.date = Helper.publishedDateFromISO(updateDate)
-        }*/
         
         if let metadata: AnyObject = article.objectForKey("customMeta") {
             if metadata.isKindOfClass(NSDictionary) {
@@ -1186,29 +1183,29 @@ public class Article: RLMObject {
     }
     
     /**
-    This method deletes a stand-alone article and all assets for the given article
-    */
+     This method deletes a stand-alone article and all assets for the given article
+     */
     
-    public func deleteArticle() {
+    public class func deleteArticle(globalId: String) {
         let realm = RLMRealm.defaultRealm()
         
         //Delete all assets for the article
         let articleIds = NSMutableArray()
-        articleIds.addObject(self.globalId)
+        articleIds.addObject(globalId)
         Asset.deleteAssetsForArticles(articleIds)
         
         //Delete article
-        realm.beginWriteTransaction()
-        realm.deleteObject(self)
-        do {
-            try realm.commitWriteTransaction()
-            Relation.deleteRelations(nil, articleId: [self.globalId], assetId: nil)
-        } catch let error {
-            NSLog("Error deleting article: \(error)")
+        if let article = Article.getArticle(globalId, appleId: nil) {
+            realm.beginWriteTransaction()
+            realm.deleteObject(article)
+            do {
+                try realm.commitWriteTransaction()
+                Relation.deleteRelations(nil, articleId: [globalId], assetId: nil)
+            } catch let error {
+                NSLog("Error deleting article: \(error)")
+            }
         }
-        //realm.commitWriteTransaction()
     }
-    
     
     /**
     This method downloads assets for the article

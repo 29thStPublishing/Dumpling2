@@ -329,6 +329,8 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 9. **getNewerArticles(date: NSDate)** ```returns Array<Article>``` This method accepts a date and returns all articles whose publish date is after this date
 
+10. **deleteArticle(globalId: String)** This method deletes an article for the given global id
+
 ###Instance methods (public)
 1. **getValue(key:)** ```returns AnyObject/id or nil``` This method returns the value for a specific key from the custom metadata of the article
 
@@ -343,11 +345,9 @@ Realm object for Articles. Also has methods for directly dealing with articles
 
 6. **downloadArticleAssets()** This method downloads assets for the article
 
-7. **deleteArticle()** This method deletes all assets for the article and the article from the database
+7. **downloadArticleAssets(delegate: AnyObject?)** This method downloads the assets for the given article. Send the delegate as nil
 
-8. **downloadArticleAssets(delegate: AnyObject?)** This method downloads the assets for the given article. Send the delegate as nil
-
-9. **refreshArticle(delegate: IssueHandler?)** This method downloads an article again and saves its new values (if updated). The issue handler is needed if you wish to listen for notifications
+8. **refreshArticle(delegate: IssueHandler?)** This method downloads an article again and saves its new values (if updated). The issue handler is needed if you wish to listen for notifications
 
 
 ## Asset
@@ -403,6 +403,10 @@ Realm object for Assets. Also has methods for directly dealing with assets
 
 3. **getValue(key:)** ```returns AnyObject/id or nil``` This method returns the value for a specific key (from the custom metadata or any of the properties)
 
+4. **getOriginalImageForAsset(article: String?, issue: String?)** ```returns path of image or nil``` This method returns the path of an asset image if it has been downloaded already OR nil. If the image has not been downloaded, a download request for it will be initiated. Once download completes, an `imageDownloaded` notification is fired. The `article` and `issue` methods are optional and only used in the notification payload (to make refreshing content easier)
+
+5. **getThumbImageForAsset(article: String?, issue: String?)** ```returns path of thumbnail image or nil``` This method returns the path of an asset's thumbnail image if it has been downloaded already OR nil. If the image has not been downloaded, a download request for it will be initiated. Once download completes, an `imageDownloaded` notification is fired. The `article` and `issue` methods are optional and only used in the notification payload (to make refreshing content easier)
+
 
 ## ReaderHelper
 
@@ -454,7 +458,9 @@ Dumpling issues notifications at various stages of a download. This information 
 
 4. **allDownloadsComplete** This notification is fired when all articles/volumes added via the respective ArticleHandler/VolumeHandler methods are downloaded completely
 
-5. **mediaDownloaded** This notification is fired for each media file downloaded. It can be used for updating issue/article views in real time
+5. **mediaDownloaded** This notification is fired for each media object downloaded. It can be used for firing image downloads in real time
+
+6. **imageDownloaded** This notification is fired when an image file download is completed. The payload includes asset id, article id (optional), issue id (optional) and type of asset (thumb or original image)
 
 
 ## Usage

@@ -42,7 +42,7 @@ public class ArticleHandler: NSObject {
 
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -72,7 +72,7 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
         
         issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey, migration: false)
     }
@@ -104,7 +104,7 @@ public class ArticleHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(6)
+        self.checkAndMigrateData(7)
         
         issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
         
@@ -159,6 +159,11 @@ public class ArticleHandler: NSObject {
             }
             //Relation added
             if oldSchemeVersion < 6 {
+            }
+            
+            if oldSchemeVersion < 7 {
+                migration.enumerateObjects(Asset.className()) { oldObject, newObject in
+                }
             }
         }
         config.migrationBlock = migrationBlock

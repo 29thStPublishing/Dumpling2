@@ -16,7 +16,8 @@ let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
 let ARTICLES_DOWNLOAD_COMPLETE: String = "articlesDownloadComplete"
 let DOWNLOAD_COMPLETE: String = "downloadComplete" //Volume + Issues + Article + Volume assets + Issue assets + Article assets downloaded
 let ALL_DOWNLOADS_COMPLETE: String = "allDownloadsComplete" //all volumes or articles through the VolumeHandler or ArticleHandler
-let MEDIA_DOWNLOADED: String = "mediaDownloaded" //fired for each media download completed
+let MEDIA_DOWNLOADED: String = "mediaDownloaded" //fired for each media object download completed
+let IMAGE_DOWNLOADED: String = "imageDownloaded" //fired for each image download
 
 public class Helper {
     
