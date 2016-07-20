@@ -154,7 +154,7 @@ public class Article: RLMObject {
         realm.addOrUpdateObject(currentArticle)
         do {
             try realm.commitWriteTransaction()
-            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
+            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil, placement: placement)
         } catch let error {
             NSLog("Error creating article: \(error)")
         }
@@ -257,7 +257,7 @@ public class Article: RLMObject {
                                 }
                             }
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
-                                Relation.createRelation(existingArticle.issueId, articleId: existingArticle.globalId, assetId: nil)
+                                Relation.createRelation(existingArticle.issueId, articleId: existingArticle.globalId, assetId: nil, placement: index + 1)
                                 existingArticle.downloadArticleAssets(delegate as? IssueHandler)
                                 if delegate != nil {
                                     //Mark article as done
@@ -336,11 +336,11 @@ public class Article: RLMObject {
                         let assetid = assetDict!.valueForKey("id") as! String
                         if delegate != nil {
                             if let issue = issue {
-                                Relation.createRelation(issue.globalId, articleId: currentArticle.globalId, assetId: assetid)
+                                Relation.createRelation(issue.globalId, articleId: currentArticle.globalId, assetId: assetid, placement: 1)
                                 (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             }
                             else {
-                                Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid)
+                                Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid, placement: 1)
                                 (delegate as! IssueHandler).updateStatusDictionary("", issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                             }
                         }
@@ -352,7 +352,7 @@ public class Article: RLMObject {
                     realm.addOrUpdateObject(currentArticle)
                     do {
                         try realm.commitWriteTransaction()
-                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
+                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil, placement: index + 1)
                     } catch let error {
                         NSLog("Error saving issue: \(error)")
                     }
@@ -433,9 +433,11 @@ public class Article: RLMObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
-                let articleInfo: NSDictionary = allArticles.firstObject as! NSDictionary
-                self.addArticle(articleInfo, issue: nil, placement: 0, delegate: delegate)
+                if let allArticles: NSArray = response.valueForKey("articles") as? NSArray {
+                    if allArticles.count > 0, let articleInfo: NSDictionary = allArticles.firstObject as? NSDictionary {
+                        self.addArticle(articleInfo, issue: nil, placement: 0, delegate: delegate)
+                    }
+                }
                 
             }
             else if let err = error {
@@ -486,10 +488,10 @@ public class Article: RLMObject {
         let gid = article.valueForKey("id") as! String
         let meta = article.objectForKey("meta") as! NSDictionary
         
-        var finalPlacement = placement
+        let finalPlacement = placement
         
         if let existingArticle = Article.getArticle(gid, appleId: nil) {
-            finalPlacement = existingArticle.placement
+            //finalPlacement = existingArticle.placement
             
             if let updateDate: String = existingArticle.getValue("updateDate") as? String {
                 let lastUpdatedDate = Helper.publishedDateFromISO(updateDate)
@@ -499,8 +501,20 @@ public class Article: RLMObject {
                         newUpdatedDate = Helper.publishedDateFromISO(dt)
                     }
                 }
+                Relation.createRelation(existingArticle.issueId, articleId: gid, assetId: nil, placement: finalPlacement)
+                
+                realm.beginWriteTransaction()
+                if existingArticle.placement != finalPlacement {
+                    existingArticle.placement = finalPlacement
+                }
+                realm.addOrUpdateObject(existingArticle)
+                do {
+                    try realm.commitWriteTransaction()
+                } catch let error {
+                    NSLog("Error adding article: \(error)")
+                }
+                
                 if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
-                    Relation.createRelation(existingArticle.issueId, articleId: gid, assetId: nil)
                     //Check if the image is not downloaded - then download again
                     existingArticle.downloadArticleAssets(delegate as? IssueHandler)
                     if delegate != nil {
@@ -553,7 +567,7 @@ public class Article: RLMObject {
         //Download article again if its publish date is blank and this is not a preview app
         if !publishDateSave && !LRNetworkManager.sharedInstance.preview && issue == nil {
             //Download the article again
-            createArticleForId(gid, issue: issue, placement: placement, delegate: delegate)
+            createArticleForId(gid, issue: issue, placement: finalPlacement, delegate: delegate)
             return
         }
         
@@ -603,11 +617,11 @@ public class Article: RLMObject {
                 }
                 if delegate != nil {
                     if issue != nil {
-                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: assetid)
+                        Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: assetid, placement: index + 1)
                         (delegate as! IssueHandler).updateStatusDictionary(currIssue.volumeId, issueId: currIssue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                     }
                     else {
-                        Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid)
+                        Relation.createRelation(nil, articleId: currentArticle.globalId, assetId: assetid, placement: index + 1)
                         (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                     }
                 }
@@ -637,7 +651,7 @@ public class Article: RLMObject {
         realm.addOrUpdateObject(currentArticle)
         do {
             try realm.commitWriteTransaction()
-            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil)
+            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil, placement: finalPlacement)
         } catch let error {
             NSLog("Error adding article: \(error)")
         }
@@ -710,11 +724,11 @@ public class Article: RLMObject {
     :return: an array of articles fulfiling the conditions sorted by date
     */
     public class func getArticlesFor(issueId: NSString?, type: String?, excludeType: String?, count: Int, page: Int) -> Array<Article>? {
-        let relations = Relation.allObjects()
+        /*let relations = Relation.allObjects()
         if relations.count == 0 {
             Relation.addAllArticles()
             Relation.addAllAssets()
-        }
+        }*/
         
         _ = RLMRealm.defaultRealm()
         
@@ -1259,18 +1273,17 @@ public class Article: RLMObject {
                     for (index, assetDict) in articleMedia.enumerate() {
                         //Download images and create Asset object for issue
                         let assetid = assetDict.valueForKey("id") as! String
-                        Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
                         assetList += assetid
                         if index < (articleMedia.count - 1) {
                             assetList += ","
                         }
                         assetArray.append(assetid)
                         if delegate != nil {
-                            Relation.createRelation(issue.globalId, articleId: self.globalId, assetId: assetid)
+                            Relation.createRelation(issue.globalId, articleId: self.globalId, assetId: assetid, placement: index + 1)
                             issueHandler.updateStatusDictionary(nil, issueId: issue.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         else {
-                            Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
+                            Relation.createRelation(nil, articleId: self.globalId, assetId: assetid, placement: index + 1)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                     }
@@ -1358,7 +1371,7 @@ public class Article: RLMObject {
                 if articleMedia.count > 0 {
                     if let assetDict = articleMedia.firstObject {
                         let assetid = assetDict.valueForKey("id") as! String
-                        Relation.createRelation(nil, articleId: self.globalId, assetId: assetid)
+                        Relation.createRelation(nil, articleId: self.globalId, assetId: assetid, placement: 1)
                         if delegate != nil {
                             issueHandler.updateStatusDictionary(nil, issueId: self.issueId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }

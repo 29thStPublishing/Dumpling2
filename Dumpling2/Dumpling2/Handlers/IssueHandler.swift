@@ -46,7 +46,7 @@ public class IssueHandler: NSObject {
         let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
-        self.checkAndMigrateData(7)
+        self.checkAndMigrateData(8)
         
         let mainBundle = NSBundle.mainBundle()
         if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
@@ -78,7 +78,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(7)
+        self.checkAndMigrateData(8)
     }
     
     
@@ -113,7 +113,7 @@ public class IssueHandler: NSObject {
         realmConfiguration.path = defaultRealmPath
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
-        self.checkAndMigrateData(7)
+        self.checkAndMigrateData(8)
         
     }
     
@@ -139,7 +139,7 @@ public class IssueHandler: NSObject {
         RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
         
         if migration {
-            self.checkAndMigrateData(7)
+            self.checkAndMigrateData(8)
         }
         
     }
@@ -198,6 +198,11 @@ public class IssueHandler: NSObject {
             //URL params added to Asset class
             if oldSchemeVersion < 7 {
                 migration.enumerateObjects(Asset.className()) { oldObject, newObject in
+                }
+            }
+            //placement added to Relation class
+            if oldSchemeVersion < 8 {
+                migration.enumerateObjects(Relation.className()) { oldObject, newObject in
                 }
             }
         }
@@ -726,7 +731,7 @@ public class IssueHandler: NSObject {
                     //Insert article
                     //Add article and its assets to Issue dictionary
                     let articleId = articleDict.valueForKey("id") as! String
-                    Relation.createRelation(currentIssue.globalId, articleId: articleId, assetId: nil)
+                    Relation.createRelation(currentIssue.globalId, articleId: articleId, assetId: nil, placement: index + 1)
                     
                     if let existingArticle = Article.getArticle(articleId, appleId: nil) {
                         var lastUpdatedDate = NSDate()

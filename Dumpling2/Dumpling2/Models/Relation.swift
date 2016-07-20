@@ -9,23 +9,25 @@
 import UIKit
 
 /** A model object for Issue */
-class Relation: RLMObject {
+public class Relation: RLMObject {
     /// Global id of an issue
     dynamic var issueId = ""
     /// Global id of an article
     dynamic var articleId = ""
     /// Global id of an asset
     dynamic var assetId = ""
+    /// Placement of article in issue or asset in issue/article
+    dynamic var placement = 0
     
     
     // MARK: Get association
     
-    class func getArticlesForIssue(issueId: String) -> [String] {
+    public class func getArticlesForIssue(issueId: String) -> [String] {
         _ = RLMRealm.defaultRealm()
         
         var articles: RLMResults
         let predicate = NSPredicate(format: "issueId = %@ AND articleId != %@ AND assetId == %@", issueId, "", "")
-        articles = Relation.objectsWithPredicate(predicate)
+        articles = Relation.objectsWithPredicate(predicate).sortedResultsUsingProperty("placement", ascending: true)
         
         if articles.count > 0 {
             var array = [String]()
@@ -44,7 +46,7 @@ class Relation: RLMObject {
         
         var assets: RLMResults
         let predicate = NSPredicate(format: "issueId = %@ AND articleId == %@ AND assetId != %@", issueId, "", "")
-        assets = Relation.objectsWithPredicate(predicate)
+        assets = Relation.objectsWithPredicate(predicate).sortedResultsUsingProperty("placement", ascending: true)
         
         if assets.count > 0 {
             var array = [String]()
@@ -63,6 +65,25 @@ class Relation: RLMObject {
         
         var assets: RLMResults
         let predicate = NSPredicate(format: "issueId = %@ AND articleId = %@ AND assetId != %@", issueId, articleId, "")
+        assets = Relation.objectsWithPredicate(predicate).sortedResultsUsingProperty("placement", ascending: true)
+        
+        if assets.count > 0 {
+            var array = [String]()
+            for object in assets {
+                let obj: Relation = object as! Relation
+                array.append(obj.assetId)
+            }
+            return array
+        }
+        
+       return [String]()
+    }
+    
+    class func getAssetsForIssue(issueId: String, articleId: String, placement: Int) -> [String] {
+        _ = RLMRealm.defaultRealm()
+        
+        var assets: RLMResults
+        let predicate = NSPredicate(format: "issueId = %@ AND articleId = %@ AND assetId != %@ AND placement = %d", issueId, articleId, "", placement)
         assets = Relation.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -82,6 +103,25 @@ class Relation: RLMObject {
         
         var assets: RLMResults
         let predicate = NSPredicate(format: "articleId = %@ AND assetId != %@", articleId, "")
+        assets = Relation.objectsWithPredicate(predicate).sortedResultsUsingProperty("placement", ascending: true)
+        
+        if assets.count > 0 {
+            var array = [String]()
+            for object in assets {
+                let obj: Relation = object as! Relation
+                array.append(obj.assetId)
+            }
+            return array
+        }
+        
+        return [String]()
+    }
+    
+    class func getAssetForArticle(articleId: String, placement: Int) -> [String] {
+        _ = RLMRealm.defaultRealm()
+        
+        var assets: RLMResults
+        let predicate = NSPredicate(format: "articleId = %@ AND assetId != %@ AND placement = %d", articleId, "", placement)
         assets = Relation.objectsWithPredicate(predicate)
         
         if assets.count > 0 {
@@ -183,6 +223,7 @@ class Relation: RLMObject {
             let predicate = NSPredicate(format: "issueId == %@", "")
             subPredicates.append(predicate)
         }
+        
         if subPredicates.count > 0 {
             let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
             results = Relation.objectsWithPredicate(searchPredicate)
@@ -237,7 +278,12 @@ class Relation: RLMObject {
         return nil
     }
     
-    class func createRelation(issueId: String?, articleId: String?, assetId: String?) {
+    class func createRelation(issueId: String?, articleId: String?, assetId: String?, placement: Int) {
+        if let relation = findRelationFor(issueId, articleId: articleId, assetId: assetId) {
+            if relation.placement != placement {
+                removeRelation(issueId, articleId: articleId, assetId: assetId)
+            }
+        }
         if !relationExistsFor(issueId, articleId: articleId, assetId: assetId) {
             let realm = RLMRealm.defaultRealm()
             
@@ -251,6 +297,7 @@ class Relation: RLMObject {
             if let articleId = articleId {
                 relation.articleId = articleId
             }
+            relation.placement = placement
             
             realm.beginWriteTransaction()
             realm.addObject(relation)
@@ -319,6 +366,7 @@ class Relation: RLMObject {
             let relation = Relation()
             relation.articleId = article.globalId
             relation.issueId = article.issueId
+            relation.placement = article.placement
             relations.append(relation)
         }
         if relations.count > 0 {
@@ -342,6 +390,7 @@ class Relation: RLMObject {
             relation.articleId = asset.articleId
             relation.issueId = asset.issue.globalId
             relation.assetId = asset.globalId
+            relation.placement = asset.placement
             relations.append(relation)
         }
         if relations.count > 0 {

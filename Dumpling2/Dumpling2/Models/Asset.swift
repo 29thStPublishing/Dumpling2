@@ -158,7 +158,7 @@ public class Asset: RLMObject {
         realm.addOrUpdateObject(currentAsset)
         do {
             try realm.commitWriteTransaction()
-            Relation.createRelation(issue.globalId, articleId: articleId, assetId: currentAsset.globalId)
+            Relation.createRelation(issue.globalId, articleId: articleId, assetId: currentAsset.globalId, placement: placement)
         } catch let error {
             NSLog("Error creating asset: \(error)")
         }
@@ -199,11 +199,19 @@ public class Asset: RLMObject {
                         //Compare the two dates - if newUpdated <= lastUpdated, don't download
                         if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                             //toDownload = false //Don't download - this file is up-to-date (if present)
-                            if delegate != nil {
-                                //No change - not downloaded
-                                (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 3)
+                            //If cdnUrl and imgUrl are blank, save the asset again so we get them
+                            if !existingAsset.cdnUrl.isEmpty || !existingAsset.imgUrl.isEmpty {
+                                if delegate != nil {
+                                    //No change - not downloaded
+                                    if let _ = existingAsset.getAssetImage() {
+                                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 3)
+                                    }
+                                    else {
+                                        (delegate as! IssueHandler).updateStatusDictionary(volume.globalId, issueId:"", url: requestURL, status: 1)
+                                    }
+                                }
+                                return
                             }
-                            return
                         }
                     }
                     //Check if the image exists already
@@ -438,16 +446,23 @@ public class Asset: RLMObject {
                         //Compare the two dates - if newUpdated <= lastUpdated, don't download
                         if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                             //toDownload = false //Don't download
-                            if delegate != nil {
-                                if !issue.globalId.isEmpty {
-                                    //This is an issue's asset or an article's (belonging to an issue) asset
-                                    //No change - not downloaded
-                                    (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: 3)
-                                }
-                                else {
-                                    //This is an independent article's asset
-                                    //No change - not downloaded
-                                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: 3)
+                            //If cdnUrl and imgUrl are blank, save the asset again so we get them
+                            if !existingAsset.cdnUrl.isEmpty || !existingAsset.imgUrl.isEmpty {
+                                if delegate != nil {
+                                    var status = 1
+                                    if let _ = existingAsset.getAssetImage() {
+                                        status = 3
+                                    }
+                                    if !issue.globalId.isEmpty {
+                                        //This is an issue's asset or an article's (belonging to an issue) asset
+                                        //No change - not downloaded
+                                        (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: requestURL, status: status)
+                                    }
+                                    else {
+                                        //This is an independent article's asset
+                                        //No change - not downloaded
+                                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: requestURL, status: status)
+                                    }
                                 }
                                 return
                             }
@@ -749,25 +764,32 @@ public class Asset: RLMObject {
                             if newUpdatedDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                                 //Check if the image exists or not
                                 //toDownload = false //Don't download
-                                if delegate != nil {
-                                    if let issue = issue {
-                                        if !issue.globalId.isEmpty {
-                                            //This is an issue's asset or an article's (belonging to an issue) asset
-                                            //No change - not downloaded
-                                            (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetId)", status: 3)
+                                //If cdnUrl and imgUrl are blank, save the asset again so we get them
+                                if !existingAsset.cdnUrl.isEmpty || !existingAsset.imgUrl.isEmpty {
+                                    if delegate != nil {
+                                        var status = 1
+                                        if let _ = existingAsset.getAssetImage() {
+                                            status = 3
+                                        }
+                                        if let issue = issue {
+                                            if !issue.globalId.isEmpty {
+                                                //This is an issue's asset or an article's (belonging to an issue) asset
+                                                //No change - not downloaded
+                                                (delegate as! IssueHandler).updateStatusDictionary(issue.volumeId, issueId: issue.globalId, url: "\(baseURL)media/\(assetId)", status: status)
+                                            }
+                                            else {
+                                                //This is an independent article's asset
+                                                //No change - not downloaded
+                                                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: status)
+                                            }
                                         }
                                         else {
-                                            //This is an independent article's asset
                                             //No change - not downloaded
-                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: 3)
+                                            (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: status)
                                         }
                                     }
-                                    else {
-                                        //No change - not downloaded
-                                        (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: articleId, url: "\(baseURL)media/\(assetId)", status: 3)
-                                    }
+                                    return
                                 }
-                                return
                             }
                         }
                         //Check if the image exists already
@@ -1289,24 +1311,26 @@ public class Asset: RLMObject {
             }
         }
         
+        var assetIds = [String]()
         if issueId == "" {
-            let assetIds = Relation.getAssetsForArticle(articleId)
-            if assetIds.count > 0 {
-                let predicate = NSPredicate(format: "globalId IN %@ AND placement = 1 AND type = %@", assetIds, "image")
-                let assets = Asset.objectsWithPredicate(predicate)
-                
-                if assets.count > 0 {
-                    return assets.firstObject() as? Asset
-                }
-            }
+            assetIds = Relation.getAssetForArticle(articleId, placement: 1)
+            //assetIds = Relation.getAssetsForArticle(articleId)
         }
         else {
-            let assetIds = Relation.getAssetsForIssue(issueId, articleId: articleId)
-            if assetIds.count > 0 {
-                let predicate = NSPredicate(format: "globalId IN %@ AND placement = 1 AND type = %@", assetIds, "image")
+            assetIds = Relation.getAssetsForIssue(issueId, articleId: articleId, placement: 1)
+            //assetIds = Relation.getAssetsForIssue(issueId, articleId: articleId)
+        }
+        if assetIds.count > 0 {
+            let predicate = NSPredicate(format: "globalId IN %@ AND placement = 1 AND type = %@", assetIds, "image")
+            let assets = Asset.objectsWithPredicate(predicate)
+            
+            if assets.count > 0 {
+                return assets.firstObject() as? Asset
+            }
+            else {
+                let predicate = NSPredicate(format: "globalId IN %@ AND type = %@", assetIds, "image")
                 let assets = Asset.objectsWithPredicate(predicate)
-                
-                if assets.count > 0 {
+                if assets.count == 1 {
                     return assets.firstObject() as? Asset
                 }
             }

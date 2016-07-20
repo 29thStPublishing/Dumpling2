@@ -259,7 +259,7 @@ public class Issue: RLMObject {
                             //Insert article
                             //Add article and its assets to Issue dictionary
                             let articleId = articleDict.valueForKey("id") as! String
-                            Relation.createRelation(self.globalId, articleId: articleId, assetId: nil)
+                            Relation.createRelation(self.globalId, articleId: articleId, assetId: nil, placement: index + 1)
                             if let existingArticle = Article.getArticle(articleId, appleId: nil) {
                                 var lastUpdatedDate = NSDate()
                                 if let updateDate: String = existingArticle.getValue("updateDate") as? String {
@@ -271,24 +271,15 @@ public class Issue: RLMObject {
                                         newUpdateDate = Helper.publishedDateFromISO(date)
                                     }
                                 }
-                                if newUpdateDate.compare(lastUpdatedDate) == NSComparisonResult.OrderedDescending {
-                                    articleList += articleId
-                                    if index < (articles.count - 1) {
-                                        articleList += ","
-                                    }
-                                    issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
-                                }
-                                else {
+                                if newUpdateDate.compare(lastUpdatedDate) != NSComparisonResult.OrderedDescending {
                                     existingArticle.downloadArticleAssets(issueHandler)
                                 }
                             }
-                            else {
-                                articleList += articleId
-                                if index < (articles.count - 1) {
-                                    articleList += ","
-                                }
-                                issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
+                            articleList += articleId
+                            if index < (articles.count - 1) {
+                                articleList += ","
                             }
+                            issueHandler.updateStatusDictionary(self.volumeId, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
                         }
                         //Send request to get all articles info in 1 call
                         if articleList.hasSuffix(",") {
@@ -345,13 +336,12 @@ public class Issue: RLMObject {
                         
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
-                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid, placement: index + 1)
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
                             assetArray.append(assetid)
-                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         var deleteAssets = [String]()
@@ -415,13 +405,12 @@ public class Issue: RLMObject {
                         var assetArray = [String]()
                         for (index, assetDict) in issueMedia.enumerate() {
                             let assetid = assetDict.valueForKey("id") as! String
-                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
+                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid, placement: index + 1)
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
                             }
                             assetArray.append(assetid)
-                            Relation.createRelation(self.globalId, articleId: nil, assetId: assetid)
                             issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)media/\(assetid)", status: 0)
                         }
                         var deleteAssets = [String]()
