@@ -164,7 +164,7 @@ public class PurchaseHandler: NSObject {
     
     :return: an array of purchases fulfiling the conditions
     */
-    public class func getPurchasesFor(key: String, value: String, userId: String?) -> Array<Purchase>? {
+    public func getPurchasesFor(key: String, value: String, userId: String?) -> Array<Purchase>? {
         _ = RLMRealm.defaultRealm()
         
         var subPredicates = Array<NSPredicate>()
