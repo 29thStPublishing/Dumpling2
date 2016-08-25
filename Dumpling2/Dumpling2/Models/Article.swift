@@ -1236,7 +1236,9 @@ public class Article: RLMObject {
             issue.assetFolder = "/Documents"
         }
         else {
-            issue = Issue.getIssue(issueIds.first!)!
+            if let newIssue = Issue.getIssue(issueIds.first!) {
+                issue = newIssue
+            }
             let folder = issue.assetFolder
             if folder.hasPrefix("/Documents") {
             }
