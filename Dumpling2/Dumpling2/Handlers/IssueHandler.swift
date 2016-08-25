@@ -416,10 +416,17 @@ public class IssueHandler: NSObject {
      The method gets all issues from the Magnet API for the client key and adds them to the database without articles
      */
     public func addOnlyIssuesWithoutArticles() {
-        self.addOnlyIssuesWithoutArticles(nil)
+        self.addOnlyIssuesWithoutArticles(nil, page: nil)
     }
     
-    public func addOnlyIssuesWithoutArticles(timestamp: String?) {
+    /**
+     The method gets all issues from the Magnet API for the client key and adds them to the database without articles. Page starts at 0
+     */
+    public func addOnlyIssuesWithoutArticles(page: Int) {
+        self.addOnlyIssuesWithoutArticles(nil, page: page + 1)
+    }
+    
+    public func addOnlyIssuesWithoutArticles(timestamp: String?, page: Int?) {
         let relations = Relation.allObjects()
         if relations.count == 0 {
             Relation.addAllArticles()
@@ -433,6 +440,10 @@ public class IssueHandler: NSObject {
         }
         
         requestURL += "?limit=20"
+        
+        if let pageNum = page where pageNum > 0 {
+            requestURL += "&page=\(pageNum)"
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -464,36 +475,17 @@ public class IssueHandler: NSObject {
     The method gets preview issues from the Magnet API for the client key and adds them to the database
     */
     public func addPreviewIssues() {
-        self.addPreviewIssues(nil)
-        /*let requestURL = "\(baseURL)issues/preview"
-        
-        let networkManager = LRNetworkManager.sharedInstance
-        
-        networkManager.requestData("GET", urlString: requestURL) {
-            (data:AnyObject?, error:NSError?) -> () in
-            if data != nil {
-                let response: NSDictionary = data as! NSDictionary
-                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
-                if allIssues.count > 0 {
-                    for (_, issueDict) in allIssues.enumerate() {
-                        let issueId = issueDict.valueForKey("id") as! String
-                        self.addIssueFromAPI(issueId, volumeId: nil, withArticles: false)
-                    }
-                }
-                else {
-                    //No issues, send allDownloadsComplete notif
-                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
-                }
-            }
-            else if let err = error {
-                print("Error: " + err.description)
-                //Error
-                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
-            }
-        }*/
+        self.addPreviewIssues(nil, page: nil)
     }
     
-    public func addPreviewIssues(timestamp: String?) {
+    /**
+     The method gets preview issues from the Magnet API for the client key and adds them to the database. Page starts at 0
+     */
+    public func addPreviewIssues(page: Int) {
+        self.addPreviewIssues(nil, page: page + 1)
+    }
+    
+    public func addPreviewIssues(timestamp: String?, page: Int?) {
         let relations = Relation.allObjects()
         if relations.count == 0 {
             Relation.addAllArticles()
@@ -507,6 +499,9 @@ public class IssueHandler: NSObject {
         }
         
         requestURL += "?limit=20"
+        if let pageNum = page where pageNum > 0 {
+            requestURL += "&page=\(pageNum)"
+        }
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -645,7 +640,7 @@ public class IssueHandler: NSObject {
             currentIssue.lastUpdateDate = updatedInfo.valueForKey("date") as! String
         }
         currentIssue.displayDate = meta.valueForKey("displayDate") as! String
-        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("created") as? String)
+        currentIssue.publishedDate = Helper.publishedDateFromISO(meta.valueForKey("publishedDate") as? String)
         currentIssue.appleId = issue.valueForKey("sku") as! String
         
         currentIssue.assetFolder = "\(self.defaultFolder)" ///\(currentIssue.appleId)"
