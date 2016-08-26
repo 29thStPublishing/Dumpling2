@@ -76,9 +76,9 @@ public class Helper {
                 return date
             }
             
-            if let date = Helper.publishedDateFromISO(string) as NSDate? {
+            /*if let date = Helper.publishedDateFromISO(string) as NSDate? {
                 return date
-            }
+            }*/
         }
         return NSDate()
     }

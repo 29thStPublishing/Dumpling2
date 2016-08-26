@@ -312,7 +312,7 @@ public class Article: RLMObject {
                     }
                     
                     if let publishedDate = meta.valueForKey("publishedDate") as? String {
-                        currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+                        currentArticle.date = Helper.publishedDateFromISO(publishedDate)
                     }
                     
                     if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
@@ -559,7 +559,7 @@ public class Article: RLMObject {
         var publishDateSave = false
         if let publishedDate = meta.valueForKey("publishedDate") as? String {
             if !publishedDate.isEmpty {
-                currentArticle.date = Helper.publishedDateFromISO2(publishedDate)
+                currentArticle.date = Helper.publishedDateFromISO(publishedDate)
                 publishDateSave = true
             }
         } //For Gothamist
@@ -1137,7 +1137,7 @@ public class Article: RLMObject {
                 }
                 
                 if let publishedDate = meta.valueForKey("publishedDate") as? String {
-                    self.date = Helper.publishedDateFromISO2(publishedDate)
+                    self.date = Helper.publishedDateFromISO(publishedDate)
                 }
                 
                 if let metadata: AnyObject = articleInfo.objectForKey("customMeta") {
