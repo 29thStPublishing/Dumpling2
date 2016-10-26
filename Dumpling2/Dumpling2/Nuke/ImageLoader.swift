@@ -312,9 +312,10 @@ public class ImageLoader: ImageLoading {
     private func processImage(image: Image, processor: ImageProcessing, task: ImageTask) {
         guard loadStates[task] != nil else { /* no longer registered */ return }
         loadStates[task] = .Processing(conf.processingQueue.addBlock { [weak self] in
-            let image = processor.process(image)
+            //let image = processor.process(image)
             self?.queue.async {
-                self?.complete(task, image: image, error: (image == nil ? errorWithCode(.ProcessingFailed) : nil))
+                //self?.complete(task, image: image, error: (image == nil ? errorWithCode(.ProcessingFailed) : nil))
+                self?.complete(task, image: image, error: nil)
             }
         })
     }

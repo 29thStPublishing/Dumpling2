@@ -19,6 +19,8 @@ FOUNDATION_EXPORT const unsigned char Dumpling2VersionString[];
 //Issue 46 #import "ZipArchive.h"
 #import "AFNetworking.h"
 #import "Realm.h"
+#import "SDWebImageManager.h"
+#import "SDImageCache.h"
 
 #import "GTMNSString+HTML.h"
 #import "NSString+HTML.h"

@@ -22,14 +22,22 @@ import Foundation
  :param: line     The line number, defaults to the line number within the file that the call is made.
  */
 
-func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: String = #function, _ line: Int = #line) {
+var logging: Bool = {
     //If LLOG is present and != 1, return - no logging
     let environmentVars = NSProcessInfo.processInfo().environment
     if let logging = environmentVars["LLOG"] {
-        if logging != "1" {
-            return
+        if logging == "1" {
+            return true
         }
     }
+    return false
+}()
+
+func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: String = #function, _ line: Int = #line) {
+    if !logging {
+        return
+    }
+    
     #if DEBUG
         let value = object()
         let stringRepresentation: String
@@ -42,9 +50,10 @@ func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: Str
             fatalError("lLog only works for values that conform to CustomDebugStringConvertible or CustomStringConvertible")
         }
         
-        let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"
+        //let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"
         let queue = NSThread.isMainThread() ? "UI" : "BG"
         
-        print("\(NSDate())::##DUMPLING##<\(queue)> \(fileURL) \(function)[\(line)]: " + stringRepresentation)
+        //print("\(NSDate())::##DUMPLING##<\(queue)> \(fileURL) \(function)[\(line)]: " + stringRepresentation)
+        NSLog("##DUMPLING##<\(queue)> \(function)[\(line)]: " + stringRepresentation)
     #endif
 }

@@ -19,7 +19,29 @@ let ALL_DOWNLOADS_COMPLETE: String = "allDownloadsComplete" //all volumes or art
 let MEDIA_DOWNLOADED: String = "mediaDownloaded" //fired for each media object download completed
 let IMAGE_DOWNLOADED: String = "imageDownloaded" //fired for each image download
 
+public extension UIImage {
+    public var hasContent: Bool {
+        return CGImage != nil || CIImage != nil
+    }
+}
+
 public class Helper {
+    
+    static var isoDateFormatter: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let posix = NSLocale(localeIdentifier: "en_US_POSIX")
+        formatter.locale = posix
+        return formatter
+    }()
+    
+    static var isoDateFormatter2: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        let posix = NSLocale(localeIdentifier: "en_US_POSIX")
+        formatter.locale = posix
+        return formatter
+    }()
     
     //Date from string of format MM/dd/yyyy
     class func publishedDateFrom(string: String) -> NSDate {
@@ -48,12 +70,8 @@ public class Helper {
     //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00 (length = 32 chars)
     class func publishedDateFromISO(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
-            let dateFormatter = NSDateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-            let posix = NSLocale(localeIdentifier: "en_US_POSIX")
-            dateFormatter.locale = posix
-        
-            if let date = dateFormatter.dateFromString(string!) {
+            
+            if let date = isoDateFormatter.dateFromString(string!) {
                 return date
             }
             
@@ -67,12 +85,8 @@ public class Helper {
     //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00 (length = 25 chars)
     class func publishedDateFromISO2(string: String?) -> NSDate {
         if !isNilOrEmpty(string) {
-            let dateFormatter = NSDateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-            let posix = NSLocale(localeIdentifier: "en_US_POSIX")
-            dateFormatter.locale = posix
             
-            if let date = dateFormatter.dateFromString(string!) {
+            if let date = isoDateFormatter2.dateFromString(string!) {
                 return date
             }
             

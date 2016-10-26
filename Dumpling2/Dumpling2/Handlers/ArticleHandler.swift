@@ -232,8 +232,27 @@ public class ArticleHandler: NSObject {
         let requestURL = "\(baseURL)articles/\(globalId)"
 
         self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
-        
-        Article.createIndependentArticle(globalId, delegate: self.issueHandler)
+        Article.createArticlesForIds(globalId, issue: nil, delegate: self.issueHandler)
+        //Article.createIndependentArticle(globalId, delegate: self.issueHandler)
+    }
+    
+    /**
+     The method uses the global id of an article, gets its content from the Magnet API and updates it in the database
+     
+     :brief: Update article from API
+     
+     - parameter globalId: The global id for the article
+     */
+    public func updateArticleFromAPI(globalId: String, delegate: IssueHandler?) {
+        let requestURL = "\(baseURL)articles/\(globalId)"
+        if let issHandler = delegate {
+            issHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
+            Article.createIndependentArticle(globalId, delegate: issHandler, withAssets: false)
+        }
+        else {
+            self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
+            Article.createIndependentArticle(globalId, delegate: self.issueHandler, withAssets: false)
+        }
     }
     
     /**

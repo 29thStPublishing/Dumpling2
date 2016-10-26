@@ -424,7 +424,7 @@ public class Article: RLMObject {
     
     - parameter delegate: Used to update the status of article download
     */
-    class func createIndependentArticle(articleId: String, delegate: AnyObject?) {
+    class func createIndependentArticle(articleId: String, delegate: AnyObject?, withAssets: Bool = true) {
         let requestURL = "\(baseURL)articles/\(articleId)"
         lLog("Create independent article")
         let networkManager = LRNetworkManager.sharedInstance
@@ -435,7 +435,7 @@ public class Article: RLMObject {
                 let response: NSDictionary = data as! NSDictionary
                 if let allArticles: NSArray = response.valueForKey("articles") as? NSArray {
                     if allArticles.count > 0, let articleInfo: NSDictionary = allArticles.firstObject as? NSDictionary {
-                        self.addArticle(articleInfo, issue: nil, placement: 0, delegate: delegate)
+                        self.addArticle(articleInfo, issue: nil, placement: 0, delegate: delegate, withAssets: withAssets)
                     }
                 }
                 
@@ -482,7 +482,7 @@ public class Article: RLMObject {
     //Create article not associated with any issue
     //The structure expected for the dictionary is the same as currently used in Magnet
     //Images will be stored in Documents folder by default for such articles
-    class func addArticle(article: NSDictionary, issue: Issue?, placement: Int, delegate: AnyObject?) {
+    class func addArticle(article: NSDictionary, issue: Issue?, placement: Int, delegate: AnyObject?, withAssets: Bool = true) {
         let realm = RLMRealm.defaultRealm()
         
         let gid = article.valueForKey("id") as! String
@@ -631,7 +631,28 @@ public class Article: RLMObject {
                     currentArticle.thumbImageURL = assetid
                 }
             }
-            var deleteAssets = [String]()
+            
+            realm.beginWriteTransaction()
+            realm.addOrUpdateObject(currentArticle)
+            do {
+                try realm.commitWriteTransaction()
+                Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil, placement: finalPlacement)
+            } catch let error {
+                NSLog("Error adding article: \(error)")
+            }
+            //realm.commitWriteTransaction()
+            
+            //Article downloaded (not necessarily assets)
+            if delegate != nil {
+                if issue != nil {
+                    (delegate as! IssueHandler).updateStatusDictionary(currIssue.volumeId, issueId: currIssue.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                }
+                else {
+                    (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+                }
+            }
+            
+            /*var deleteAssets = [String]()
             if let assets = Asset.getAssetsFor(currIssue.globalId, articleId: currentArticle.globalId, volumeId: nil, type: nil) {
                 for asset in assets {
                     if let _ = assetArray.indexOf(asset.globalId) {}
@@ -642,28 +663,10 @@ public class Article: RLMObject {
             }
             if deleteAssets.count > 0 {
                 Asset.deleteAssets(deleteAssets)
-            }
+            }*/
             
-            Asset.downloadAndCreateAssetsForIds(assetList, issue: currIssue, articleId: currentArticle.globalId, delegate: delegate)
-        }
-        
-        realm.beginWriteTransaction()
-        realm.addOrUpdateObject(currentArticle)
-        do {
-            try realm.commitWriteTransaction()
-            Relation.createRelation(currentArticle.issueId, articleId: currentArticle.globalId, assetId: nil, placement: finalPlacement)
-        } catch let error {
-            NSLog("Error adding article: \(error)")
-        }
-        //realm.commitWriteTransaction()
-        
-        //Article downloaded (not necessarily assets)
-        if delegate != nil {
-            if issue != nil {
-                (delegate as! IssueHandler).updateStatusDictionary(currIssue.volumeId, issueId: currIssue.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
-            }
-            else {
-                (delegate as! IssueHandler).updateStatusDictionary(nil, issueId: currentArticle.globalId, url: "\(baseURL)articles/\(currentArticle.globalId)", status: 1)
+            if withAssets {
+                Asset.downloadAndCreateAssetsForIds(assetList, issue: currIssue, articleId: currentArticle.globalId, delegate: delegate)
             }
         }
     }
