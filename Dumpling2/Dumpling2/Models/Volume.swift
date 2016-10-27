@@ -9,38 +9,38 @@
 import UIKit
 
 /** A model object for Volumes */
-public class Volume: RLMObject {
+open class Volume: RLMObject {
     /// Global id of a volume - this is unique for each volume
-    dynamic public var globalId = ""
+    dynamic open var globalId = ""
     /// Title of the volume
-    dynamic public var title = ""
+    dynamic open var title = ""
     /// Subtitle of the volume
-    dynamic public var subtitle = ""
+    dynamic open var subtitle = ""
     /// Description of the volume
-    dynamic public var volumeDesc = ""
+    dynamic open var volumeDesc = ""
     /// Folder saving all the assets for the issue
-    dynamic public var assetFolder = ""
+    dynamic open var assetFolder = ""
     /// Global id of the asset which is the cover image of the issue
-    dynamic public var coverImageId = "" //globalId of asset
+    dynamic open var coverImageId = "" //globalId of asset
     /// Publisher of the volume
-    dynamic public var publisher = ""
+    dynamic open var publisher = ""
     /// Published date for the volume
-    dynamic public var publishedDate = NSDate()
+    dynamic open var publishedDate = Date()
     /// Release date for the volume
-    dynamic public var releaseDate = ""
+    dynamic open var releaseDate = ""
     /// Custom metadata of the volume
-    dynamic public var metadata = ""
+    dynamic open var metadata = ""
     /// Keywords for the volume
-    dynamic public var keywords = ""
+    dynamic open var keywords = ""
     /// Whether the volume is published or not
-    dynamic public var published = false
+    dynamic open var published = false
     
-    override public class func primaryKey() -> String {
+    override open class func primaryKey() -> String {
         return "globalId"
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<String> {
+    override open class func requiredProperties() -> Array<String> {
         return ["globalId", "title", "subtitle", "volumeDesc", "assetFolder", "coverImageId", "publisher", "publishedDate", "releaseDate", "metadata", "keywords", "published"]
     }
     
@@ -55,11 +55,11 @@ public class Volume: RLMObject {
     
     - parameter  globalId: The global id for the volume
     */
-    public class func deleteVolume(globalId: NSString) {
-        let realm = RLMRealm.defaultRealm()
+    open class func deleteVolume(_ globalId: NSString) {
+        let realm = RLMRealm.default()
         
         let predicate = NSPredicate(format: "globalId = %@", globalId)
-        let volume = Volume.objectsWithPredicate(predicate)
+        let volume = Volume.objects(with: predicate)
         
         //Delete all issues, assets and articles for the volume
         if volume.count == 1 {
@@ -87,10 +87,10 @@ public class Volume: RLMObject {
     
     :return:  Object for most recent volume
     */
-    public class func getNewestVolume() -> Volume? {
-        _ = RLMRealm.defaultRealm()
+    open class func getNewestVolume() -> Volume? {
+        _ = RLMRealm.default()
         
-        let results = Volume.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
+        let results = Volume.allObjects().sortedResults(usingProperty: "publishedDate", ascending: false)
         
         if results.count > 0 {
             let newestVolume = results.firstObject() as! Volume
@@ -107,8 +107,8 @@ public class Volume: RLMObject {
     
     :return: an array of volumes fulfiling the conditions
     */
-    public class func searchVolumesWith(keywords: [String]) -> Array<Volume>? {
-        _ = RLMRealm.defaultRealm()
+    open class func searchVolumesWith(_ keywords: [String]) -> Array<Volume>? {
+        _ = RLMRealm.default()
         
         var subPredicates = Array<NSPredicate>()
         
@@ -119,7 +119,7 @@ public class Volume: RLMObject {
         
         if subPredicates.count > 0 {
             let searchPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: subPredicates)
-            let volumes: RLMResults = Volume.objectsWithPredicate(searchPredicate) as RLMResults
+            let volumes: RLMResults = Volume.objects(with: searchPredicate) as RLMResults
             
             if volumes.count > 0 {
                 var array = Array<Volume>()
@@ -139,12 +139,12 @@ public class Volume: RLMObject {
     
     :return: an array of volumes
     */
-    public class func getVolumes() -> Array<Volume>? {
-        _ = RLMRealm.defaultRealm()
+    open class func getVolumes() -> Array<Volume>? {
+        _ = RLMRealm.default()
         
-        let predicate = NSPredicate(format: "published = %@", NSNumber(bool: true))
+        let predicate = NSPredicate(format: "published = %@", NSNumber(value: true as Bool))
         
-        let volumes: RLMResults = Volume.objectsWithPredicate(predicate)
+        let volumes: RLMResults = Volume.objects(with: predicate)
         
         if volumes.count > 0 {
             var array = Array<Volume>()
@@ -165,11 +165,11 @@ public class Volume: RLMObject {
     
     :return: Volume object for the global id. Returns nil if the volume is not found
     */
-    public class func getVolume(volumeId: String) -> Volume? {
-        _ = RLMRealm.defaultRealm()
+    open class func getVolume(_ volumeId: String) -> Volume? {
+        _ = RLMRealm.default()
         
         let predicate = NSPredicate(format: "globalId = %@", volumeId)
-        let vols = Volume.objectsWithPredicate(predicate)
+        let vols = Volume.objects(with: predicate)
         
         if vols.count > 0 {
             return vols.firstObject() as? Volume
@@ -185,11 +185,11 @@ public class Volume: RLMObject {
     
     :brief: Save a volume to the database
     */
-    public func saveVolume() {
-        let realm = RLMRealm.defaultRealm()
+    open func saveVolume() {
+        let realm = RLMRealm.default()
         
         realm.beginWriteTransaction()
-        realm.addOrUpdateObject(self)
+        realm.addOrUpdate(self)
         do {
             try realm.commitWriteTransaction()
         } catch let error {
@@ -205,11 +205,11 @@ public class Volume: RLMObject {
     
     :return: an object for the key from the custom metadata (or nil)
     */
-    public func getValue(key: NSString) -> AnyObject? {
+    open func getValue(_ key: NSString) -> AnyObject? {
         
         let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key as String)
+            return metadataDict.value(forKey: key as String) as AnyObject?
         }
         
         return nil
@@ -222,11 +222,11 @@ public class Volume: RLMObject {
     
     :return: an array of volumes older than the current volume
     */
-    public func getOlderVolumes() -> Array<Volume>? {
-        _ = RLMRealm.defaultRealm()
+    open func getOlderVolumes() -> Array<Volume>? {
+        _ = RLMRealm.default()
         
-        let predicate = NSPredicate(format: "publishedDate < %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
-        let volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
+        let predicate = NSPredicate(format: "publishedDate < %@ AND published = %@", self.publishedDate as CVarArg, NSNumber(value: true as Bool))
+        let volumes: RLMResults = Volume.objects(with: predicate) as RLMResults
         
         if volumes.count > 0 {
             var array = Array<Volume>()
@@ -247,11 +247,11 @@ public class Volume: RLMObject {
     
     :return: an array of volumes newer than the current volume
     */
-    public func getNewerVolumes() -> Array<Volume>? {
-        _ = RLMRealm.defaultRealm()
+    open func getNewerVolumes() -> Array<Volume>? {
+        _ = RLMRealm.default()
         
-        let predicate = NSPredicate(format: "publishedDate > %@ AND published = %@", self.publishedDate, NSNumber(bool: true))
-        let volumes: RLMResults = Volume.objectsWithPredicate(predicate) as RLMResults
+        let predicate = NSPredicate(format: "publishedDate > %@ AND published = %@", self.publishedDate as CVarArg, NSNumber(value: true as Bool))
+        let volumes: RLMResults = Volume.objects(with: predicate) as RLMResults
         
         if volumes.count > 0 {
             var array = Array<Volume>()

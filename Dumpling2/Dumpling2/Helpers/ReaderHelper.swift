@@ -9,19 +9,19 @@
 import UIKit
 
 /** Class which helps store and retrieve user reading status */
-public class ReaderHelper: NSObject {
+open class ReaderHelper: NSObject {
 
     /**
     Save current active volume
     
     - parameter volumeId: Global id of the volume which is currently being viewed. If nil, will remove saved volume
     */
-    public class func saveVolume(volumeId: String?) {
+    open class func saveVolume(_ volumeId: String?) {
         if volumeId == nil {
-            NSUserDefaults.standardUserDefaults().removeObjectForKey("CurrentVolume")
+            UserDefaults.standard.removeObject(forKey: "CurrentVolume")
             return
         }
-        NSUserDefaults.standardUserDefaults().setValue(volumeId, forKey: "CurrentVolume")
+        UserDefaults.standard.setValue(volumeId, forKey: "CurrentVolume")
     }
     
     /**
@@ -29,12 +29,12 @@ public class ReaderHelper: NSObject {
     
     - parameter issueId: Global id of the issue which is currently being viewed. If nil, will remove saved issue
     */
-    public class func saveIssue(issueId: String?) {
+    open class func saveIssue(_ issueId: String?) {
         if issueId == nil {
-            NSUserDefaults.standardUserDefaults().removeObjectForKey("CurrentIssue")
+            UserDefaults.standard.removeObject(forKey: "CurrentIssue")
             return
         }
-        NSUserDefaults.standardUserDefaults().setValue(issueId, forKey: "CurrentIssue")
+        UserDefaults.standard.setValue(issueId, forKey: "CurrentIssue")
     }
     
     /**
@@ -42,12 +42,12 @@ public class ReaderHelper: NSObject {
     
     - parameter articleId: Global id of the article which is currently being viewed. If nil, will remove saved article
     */
-    public class func saveArticle(articleId: String?) {
+    open class func saveArticle(_ articleId: String?) {
         if articleId == nil {
-            NSUserDefaults.standardUserDefaults().removeObjectForKey("CurrentArticle")
+            UserDefaults.standard.removeObject(forKey: "CurrentArticle")
             return
         }
-        NSUserDefaults.standardUserDefaults().setValue(articleId, forKey: "CurrentArticle")
+        UserDefaults.standard.setValue(articleId, forKey: "CurrentArticle")
     }
     
     /**
@@ -55,12 +55,12 @@ public class ReaderHelper: NSObject {
     
     - parameter assetId: Global id of the asset which is currently being viewed. If nil, will remove saved asset
     */
-    public class func saveAsset(assetId: String?) {
+    open class func saveAsset(_ assetId: String?) {
         if assetId == nil {
-            NSUserDefaults.standardUserDefaults().removeObjectForKey("CurrentAsset")
+            UserDefaults.standard.removeObject(forKey: "CurrentAsset")
             return
         }
-        NSUserDefaults.standardUserDefaults().setValue(assetId, forKey: "CurrentAsset")
+        UserDefaults.standard.setValue(assetId, forKey: "CurrentAsset")
     }
     
     /**
@@ -70,13 +70,13 @@ public class ReaderHelper: NSObject {
     
     - parameter readingPercentage: Current position of user in the article in percentage
     */
-    public class func saveReadingPercentageFor(articleId: String, readingPercentage: Float) {
+    open class func saveReadingPercentageFor(_ articleId: String, readingPercentage: Float) {
         let articleKey = "ArticlePercent-" + articleId
         var percentValue = readingPercentage
         if (percentValue < 0) {
             percentValue = 0.0
         }
-        NSUserDefaults.standardUserDefaults().setValue(NSString(format: "%.2f", percentValue), forKey: articleKey)
+        UserDefaults.standard.setValue(NSString(format: "%.2f", percentValue), forKey: articleKey)
     }
     
     /**
@@ -84,8 +84,8 @@ public class ReaderHelper: NSObject {
     
     :return: global id of active volume or nil
     */
-    public class func retrieveCurrentVolume() -> String? {
-        if let volumeId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentVolume") as? String {
+    open class func retrieveCurrentVolume() -> String? {
+        if let volumeId: String = UserDefaults.standard.value(forKey: "CurrentVolume") as? String {
             return volumeId
         }
         return nil
@@ -96,8 +96,8 @@ public class ReaderHelper: NSObject {
     
     :return: global id of active issue or nil
     */
-    public class func retrieveCurrentIssue() -> String? {
-        if let issueId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentIssue") as? String {
+    open class func retrieveCurrentIssue() -> String? {
+        if let issueId: String = UserDefaults.standard.value(forKey: "CurrentIssue") as? String {
             return issueId
         }
         return nil
@@ -108,8 +108,8 @@ public class ReaderHelper: NSObject {
     
     :return: global id of active article or nil
     */
-    public class func retrieveCurrentArticle() -> String? {
-        if let articleId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentArticle") as? String {
+    open class func retrieveCurrentArticle() -> String? {
+        if let articleId: String = UserDefaults.standard.value(forKey: "CurrentArticle") as? String {
             return articleId
         }
         return nil
@@ -120,8 +120,8 @@ public class ReaderHelper: NSObject {
     
     :return: global id of active asset or nil
     */
-    public class func retrieveCurrentAsset() -> String? {
-        if let assetId: String = NSUserDefaults.standardUserDefaults().valueForKey("CurrentAsset") as? String {
+    open class func retrieveCurrentAsset() -> String? {
+        if let assetId: String = UserDefaults.standard.value(forKey: "CurrentAsset") as? String {
             return assetId
         }
         return nil
@@ -134,9 +134,9 @@ public class ReaderHelper: NSObject {
     
     :return: progress of given article's reading in percentage
     */
-    public class func getReadingPercentageFor(articleId: String) -> Float {
+    open class func getReadingPercentageFor(_ articleId: String) -> Float {
         let articleKey = "ArticlePercent-" + articleId
-        if let percentValue: String = NSUserDefaults.standardUserDefaults().valueForKey(articleKey) as? String {
+        if let percentValue: String = UserDefaults.standard.value(forKey: articleKey) as? String {
             let percentage = NSString(string: percentValue).floatValue
             return percentage
         }
@@ -154,26 +154,26 @@ public class ReaderHelper: NSObject {
     
     :return: a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
-    public class func getDictionaryForCloud() -> Dictionary<String, AnyObject> {
+    open class func getDictionaryForCloud() -> Dictionary<String, AnyObject> {
         //Get CurrentIssue, CurrentArticle, CurrentAsset, Reading% from NSUserDefaults and save to iCloud
         var values = Dictionary<String, AnyObject>()
         
         if let volumeId = retrieveCurrentVolume() {
-            values["CurrentVolume"] = volumeId
+            values["CurrentVolume"] = volumeId as AnyObject?
         }
         
         if let issueId = retrieveCurrentIssue() {
-            values["CurrentIssue"] = issueId
+            values["CurrentIssue"] = issueId as AnyObject?
         }
         
         if let articleId = retrieveCurrentArticle() {
-            values["CurrentArticle"] = articleId
+            values["CurrentArticle"] = articleId as AnyObject?
             let key = "ArticlePercent-" + articleId
             values[key] = NSString(format: "%.2f", getReadingPercentageFor(articleId))
         }
         
         if let assetId = retrieveCurrentAsset() {
-            values["CurrentAsset"] = assetId
+            values["CurrentAsset"] = assetId as AnyObject?
         }
         return values
     }
@@ -187,7 +187,7 @@ public class ReaderHelper: NSObject {
     
     - parameter savedValues: a dictionary containing saved values for current issue, article, asset and reading percentage for an article
     */
-    public class func saveDictionaryToUserDefaults(savedValues: Dictionary<String, AnyObject>) {
+    open class func saveDictionaryToUserDefaults(_ savedValues: Dictionary<String, AnyObject>) {
         //If CurrentVolume, CurrentIssue, CurrentArticle, CurrentAsset, Reading% are on iCloud, retrieve and save to user defaults
         if let volumeId: String = savedValues["CurrentVolume"] as? String {
             saveVolume(volumeId)

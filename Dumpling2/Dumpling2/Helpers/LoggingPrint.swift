@@ -24,7 +24,7 @@ import Foundation
 
 var logging: Bool = {
     //If LLOG is present and != 1, return - no logging
-    let environmentVars = NSProcessInfo.processInfo().environment
+    let environmentVars = ProcessInfo.processInfo.environment
     if let logging = environmentVars["LLOG"] {
         if logging == "1" {
             return true
@@ -33,7 +33,7 @@ var logging: Bool = {
     return false
 }()
 
-func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: String = #function, _ line: Int = #line) {
+func lLog<T>(_ object: @autoclosure () -> T, _ file: String = #file, function: String = #function, _ line: Int = #line) {
     if !logging {
         return
     }
@@ -51,7 +51,7 @@ func lLog<T>(@autoclosure object: () -> T, _ file: String = #file, function: Str
         }
         
         //let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"
-        let queue = NSThread.isMainThread() ? "UI" : "BG"
+        let queue = Thread.isMainThread ? "UI" : "BG"
         
         //print("\(NSDate())::##DUMPLING##<\(queue)> \(fileURL) \(function)[\(line)]: " + stringRepresentation)
         NSLog("##DUMPLING##<\(queue)> \(function)[\(line)]: " + stringRepresentation)

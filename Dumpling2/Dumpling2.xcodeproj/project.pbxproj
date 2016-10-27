@@ -69,7 +69,6 @@
 		639B4EA01BB564E3001DC8CE /* RLMArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E7E1BB564E3001DC8CE /* RLMArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EA11BB564E3001DC8CE /* RLMCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E7F1BB564E3001DC8CE /* RLMCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EA21BB564E3001DC8CE /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E801BB564E3001DC8CE /* RLMConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		639B4EA31BB564E3001DC8CE /* RLMDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E811BB564E3001DC8CE /* RLMDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EA41BB564E3001DC8CE /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E821BB564E3001DC8CE /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EA51BB564E3001DC8CE /* RLMObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E831BB564E3001DC8CE /* RLMObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EA61BB564E3001DC8CE /* RLMObjectBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E841BB564E3001DC8CE /* RLMObjectBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -95,21 +94,6 @@
 		639B4EBB1BB564E3001DC8CE /* RLMResults_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4EBC1BB564E3001DC8CE /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 639B4D341BB416B4001DC8CE /* libc++.tbd */; };
-		639FD2401D06CFE900074003 /* ImageDataLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2321D06CFE900074003 /* ImageDataLoader.swift */; };
-		639FD2411D06CFE900074003 /* ImageDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2331D06CFE900074003 /* ImageDecoder.swift */; };
-		639FD2421D06CFE900074003 /* ImageDiskCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2341D06CFE900074003 /* ImageDiskCache.swift */; };
-		639FD2431D06CFE900074003 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2351D06CFE900074003 /* ImageLoader.swift */; };
-		639FD2441D06CFE900074003 /* ImageLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2361D06CFE900074003 /* ImageLoadingView.swift */; };
-		639FD2451D06CFE900074003 /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2371D06CFE900074003 /* ImageManager.swift */; };
-		639FD2461D06CFE900074003 /* ImageMemoryCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2381D06CFE900074003 /* ImageMemoryCache.swift */; };
-		639FD2471D06CFE900074003 /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD2391D06CFE900074003 /* ImageProcessor.swift */; };
-		639FD2481D06CFE900074003 /* ImageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23A1D06CFE900074003 /* ImageRequest.swift */; };
-		639FD2491D06CFE900074003 /* ImageRequestKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23B1D06CFE900074003 /* ImageRequestKey.swift */; };
-		639FD24A1D06CFE900074003 /* ImageResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23C1D06CFE900074003 /* ImageResponse.swift */; };
-		639FD24B1D06CFE900074003 /* ImageTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23D1D06CFE900074003 /* ImageTask.swift */; };
-		639FD24C1D06CFE900074003 /* Internal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23E1D06CFE900074003 /* Internal.swift */; };
-		639FD24D1D06CFE900074003 /* Nuke.swift in Sources */ = {isa = PBXBuildFile; fileRef = 639FD23F1D06CFE900074003 /* Nuke.swift */; };
-		63AF689A1BE8807E00405D53 /* Realm in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AF68991BE8807E00405D53 /* Realm */; };
 		63BA55F91CD7051C006A784B /* Relation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63BA55F81CD7051C006A784B /* Relation.swift */; };
 		63C3FA441BCCCD31006A05AE /* strip-frameworks.sh in Resources */ = {isa = PBXBuildFile; fileRef = 63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */; };
 		63CED84F1B1300A100C4200C /* Volume.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CED84E1B1300A100C4200C /* Volume.swift */; };
@@ -236,7 +220,6 @@
 		639B4E7E1BB564E3001DC8CE /* RLMArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMArray.h; sourceTree = "<group>"; };
 		639B4E7F1BB564E3001DC8CE /* RLMCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMCollection.h; sourceTree = "<group>"; };
 		639B4E801BB564E3001DC8CE /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMConstants.h; sourceTree = "<group>"; };
-		639B4E811BB564E3001DC8CE /* RLMDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMDefines.h; sourceTree = "<group>"; };
 		639B4E821BB564E3001DC8CE /* RLMMigration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMigration.h; sourceTree = "<group>"; };
 		639B4E831BB564E3001DC8CE /* RLMObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObject.h; sourceTree = "<group>"; };
 		639B4E841BB564E3001DC8CE /* RLMObjectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase.h; sourceTree = "<group>"; };
@@ -261,21 +244,6 @@
 		639B4E9A1BB564E3001DC8CE /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		639B4E9C1BB564E3001DC8CE /* RLMResults_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMResults_Private.h; sourceTree = "<group>"; };
 		639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSchema_Private.h; sourceTree = "<group>"; };
-		639FD2321D06CFE900074003 /* ImageDataLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDataLoader.swift; sourceTree = "<group>"; };
-		639FD2331D06CFE900074003 /* ImageDecoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDecoder.swift; sourceTree = "<group>"; };
-		639FD2341D06CFE900074003 /* ImageDiskCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageDiskCache.swift; sourceTree = "<group>"; };
-		639FD2351D06CFE900074003 /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
-		639FD2361D06CFE900074003 /* ImageLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoadingView.swift; sourceTree = "<group>"; };
-		639FD2371D06CFE900074003 /* ImageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
-		639FD2381D06CFE900074003 /* ImageMemoryCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageMemoryCache.swift; sourceTree = "<group>"; };
-		639FD2391D06CFE900074003 /* ImageProcessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
-		639FD23A1D06CFE900074003 /* ImageRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageRequest.swift; sourceTree = "<group>"; };
-		639FD23B1D06CFE900074003 /* ImageRequestKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageRequestKey.swift; sourceTree = "<group>"; };
-		639FD23C1D06CFE900074003 /* ImageResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageResponse.swift; sourceTree = "<group>"; };
-		639FD23D1D06CFE900074003 /* ImageTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageTask.swift; sourceTree = "<group>"; };
-		639FD23E1D06CFE900074003 /* Internal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Internal.swift; sourceTree = "<group>"; };
-		639FD23F1D06CFE900074003 /* Nuke.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nuke.swift; sourceTree = "<group>"; };
-		63AF68991BE8807E00405D53 /* Realm */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = Realm; sourceTree = "<group>"; };
 		63BA55F81CD7051C006A784B /* Relation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relation.swift; sourceTree = "<group>"; };
 		63C3FA431BCCCD31006A05AE /* strip-frameworks.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = "strip-frameworks.sh"; path = "Helpers/strip-frameworks.sh"; sourceTree = "<group>"; };
 		63CED84E1B1300A100C4200C /* Volume.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Volume.swift; sourceTree = "<group>"; };
@@ -330,7 +298,6 @@
 				6307D5521D8680E400B2509A /* ImageIO.framework in Frameworks */,
 				639B4F681BB57512001DC8CE /* libc++.tbd in Frameworks */,
 				FFD0EDB01AFCA8F00055A102 /* StoreKit.framework in Frameworks */,
-				63AF689A1BE8807E00405D53 /* Realm in Frameworks */,
 				FF2B7D181AB1A32900263FF3 /* NewsstandKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -406,7 +373,6 @@
 				639B4E7E1BB564E3001DC8CE /* RLMArray.h */,
 				639B4E7F1BB564E3001DC8CE /* RLMCollection.h */,
 				639B4E801BB564E3001DC8CE /* RLMConstants.h */,
-				639B4E811BB564E3001DC8CE /* RLMDefines.h */,
 				639B4E821BB564E3001DC8CE /* RLMMigration.h */,
 				639B4E831BB564E3001DC8CE /* RLMObject.h */,
 				639B4E841BB564E3001DC8CE /* RLMObjectBase.h */,
@@ -450,28 +416,6 @@
 				639B4E9D1BB564E3001DC8CE /* RLMSchema_Private.h */,
 			);
 			path = PrivateHeaders;
-			sourceTree = "<group>";
-		};
-		639FD2311D06CFE900074003 /* Nuke */ = {
-			isa = PBXGroup;
-			children = (
-				639FD2321D06CFE900074003 /* ImageDataLoader.swift */,
-				639FD2331D06CFE900074003 /* ImageDecoder.swift */,
-				639FD2341D06CFE900074003 /* ImageDiskCache.swift */,
-				639FD2351D06CFE900074003 /* ImageLoader.swift */,
-				639FD2361D06CFE900074003 /* ImageLoadingView.swift */,
-				639FD2371D06CFE900074003 /* ImageManager.swift */,
-				639FD2381D06CFE900074003 /* ImageMemoryCache.swift */,
-				639FD2391D06CFE900074003 /* ImageProcessor.swift */,
-				639FD23A1D06CFE900074003 /* ImageRequest.swift */,
-				639FD23B1D06CFE900074003 /* ImageRequestKey.swift */,
-				639FD23C1D06CFE900074003 /* ImageResponse.swift */,
-				639FD23D1D06CFE900074003 /* ImageTask.swift */,
-				639FD23E1D06CFE900074003 /* Internal.swift */,
-				639FD23F1D06CFE900074003 /* Nuke.swift */,
-			);
-			name = Nuke;
-			path = Dumpling2/Nuke;
 			sourceTree = "<group>";
 		};
 		B25D1594AB7604ED24C902E7 /* Pods */ = {
@@ -522,7 +466,6 @@
 			isa = PBXGroup;
 			children = (
 				6307D5531D8683C400B2509A /* SDWebImage */,
-				639FD2311D06CFE900074003 /* Nuke */,
 				FFCA0FC01A80DBF1000C9AFD /* AFNetworking */,
 				FFCF423A1A7A582B00E847E8 /* RHeaders */,
 				FFCB3B131A78E42600F52BC6 /* Resources */,
@@ -633,7 +576,6 @@
 		FFCF423A1A7A582B00E847E8 /* RHeaders */ = {
 			isa = PBXGroup;
 			children = (
-				63AF68991BE8807E00405D53 /* Realm */,
 				639B4E7C1BB564E3001DC8CE /* Headers */,
 				639B4E8E1BB564E3001DC8CE /* Modules */,
 				639B4E901BB564E3001DC8CE /* PrivateHeaders */,
@@ -700,7 +642,6 @@
 				639B4EB71BB564E3001DC8CE /* RLMProperty_Private.h in Headers */,
 				639B4EAA1BB564E3001DC8CE /* RLMProperty.h in Headers */,
 				639B4EAC1BB564E3001DC8CE /* RLMRealm_Dynamic.h in Headers */,
-				639B4EA31BB564E3001DC8CE /* RLMDefines.h in Headers */,
 				FFCA0FDB1A80DBF1000C9AFD /* AFNetworkReachabilityManager.h in Headers */,
 				6307D5881D8683C400B2509A /* UIButton+WebCache.h in Headers */,
 				639B4EA61BB564E3001DC8CE /* RLMObjectBase.h in Headers */,
@@ -777,9 +718,11 @@
 					};
 					FFCB3AF61A78A12700F52BC6 = {
 						CreatedOnToolsVersion = 6.1;
+						LastSwiftMigration = 0800;
 					};
 					FFCB3B6D1A78EE6400F52BC6 = {
 						CreatedOnToolsVersion = 6.1;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -850,28 +793,18 @@
 				6307D5871D8683C400B2509A /* SDWebImagePrefetcher.m in Sources */,
 				FFCB3B421A78E5F600F52BC6 /* Issue.swift in Sources */,
 				6307D5911D8683C400B2509A /* UIImageView+HighlightedWebCache.m in Sources */,
-				639FD2471D06CFE900074003 /* ImageProcessor.swift in Sources */,
-				639FD2461D06CFE900074003 /* ImageMemoryCache.swift in Sources */,
 				63BA55F91CD7051C006A784B /* Relation.swift in Sources */,
-				639FD2451D06CFE900074003 /* ImageManager.swift in Sources */,
 				6307D58F1D8683C400B2509A /* UIImage+WebP.m in Sources */,
 				635F0AC41C27E3C7000524F8 /* LoggingPrint.swift in Sources */,
-				639FD2431D06CFE900074003 /* ImageLoader.swift in Sources */,
 				FFCB3B371A78E5E400F52BC6 /* Helper.swift in Sources */,
-				639FD24A1D06CFE900074003 /* ImageResponse.swift in Sources */,
-				639FD24D1D06CFE900074003 /* Nuke.swift in Sources */,
 				6307D5931D8683C400B2509A /* UIImageView+WebCache.m in Sources */,
-				639FD2401D06CFE900074003 /* ImageDataLoader.swift in Sources */,
 				6307D5841D8683C400B2509A /* SDWebImageManager.m in Sources */,
 				6307D5781D8683C400B2509A /* NSData+ImageContentType.m in Sources */,
-				639FD2491D06CFE900074003 /* ImageRequestKey.swift in Sources */,
 				FFCB3B411A78E5F600F52BC6 /* Asset.swift in Sources */,
 				FFCA0FE41A80DBF1000C9AFD /* AFURLResponseSerialization.m in Sources */,
 				FFCB3B401A78E5F500F52BC6 /* Article.swift in Sources */,
-				639FD2441D06CFE900074003 /* ImageLoadingView.swift in Sources */,
 				6307D5761D8683C400B2509A /* MKAnnotationView+WebCache.m in Sources */,
 				634BA6131B17230A007B2630 /* ArticleHandler.swift in Sources */,
-				639FD2421D06CFE900074003 /* ImageDiskCache.swift in Sources */,
 				FFCA0FE21A80DBF1000C9AFD /* AFURLRequestSerialization.m in Sources */,
 				FFCA0FDE1A80DBF1000C9AFD /* AFSecurityPolicy.m in Sources */,
 				FFCA0FE61A80DBF1000C9AFD /* AFURLSessionManager.m in Sources */,
@@ -879,8 +812,6 @@
 				6307D5891D8683C400B2509A /* UIButton+WebCache.m in Sources */,
 				6307D57C1D8683C400B2509A /* SDWebImageCompat.m in Sources */,
 				630F20301BD76F5100A0B2DE /* GTMNSString+HTML.m in Sources */,
-				639FD24C1D06CFE900074003 /* Internal.swift in Sources */,
-				639FD24B1D06CFE900074003 /* ImageTask.swift in Sources */,
 				FFCB3B3A1A78E5ED00F52BC6 /* IssueHandler.swift in Sources */,
 				63CED8511B130B0A00C4200C /* VolumeHandler.swift in Sources */,
 				63CED84F1B1300A100C4200C /* Volume.swift in Sources */,
@@ -895,9 +826,7 @@
 				6307D58D1D8683C400B2509A /* UIImage+MultiFormat.m in Sources */,
 				6307D5951D8683C400B2509A /* UIView+WebCacheOperation.m in Sources */,
 				FFCA0FDC1A80DBF1000C9AFD /* AFNetworkReachabilityManager.m in Sources */,
-				639FD2411D06CFE900074003 /* ImageDecoder.swift in Sources */,
 				FFD86B831AE7B352003E357B /* ReaderHelper.swift in Sources */,
-				639FD2481D06CFE900074003 /* ImageRequest.swift in Sources */,
 				636FF7BE1B0097D7006FF05A /* AccessControl.swift in Sources */,
 				FFD0EDAE1AFC9C500055A102 /* Purchase.swift in Sources */,
 				6307D57A1D8683C400B2509A /* SDImageCache.m in Sources */,
@@ -1091,6 +1020,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -1131,6 +1061,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -1157,6 +1088,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.29.D2consumer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
@@ -1180,6 +1112,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.29.D2consumer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;

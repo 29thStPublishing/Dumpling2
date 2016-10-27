@@ -34,22 +34,22 @@ class LRNetworkManager: AFHTTPSessionManager {
         super.init(baseURL: nil, sessionConfiguration: nil)
     }
     
-    override init(baseURL url: NSURL?, sessionConfiguration configuration: NSURLSessionConfiguration?) {
+    override init(baseURL url: URL?, sessionConfiguration configuration: URLSessionConfiguration?) {
         super.init(baseURL: url, sessionConfiguration: configuration)
         
-        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+        if let previewApp = Bundle.main.object(forInfoDictionaryKey: "Preview") as? NSNumber {
             self.preview = previewApp.boolValue
         }
     }
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
-        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+        if let previewApp = Bundle.main.object(forInfoDictionaryKey: "Preview") as? NSNumber {
             self.preview = previewApp.boolValue
         }
     }
 
-    func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
+    func requestData(_ methodType: String, urlString:String, completion:@escaping (_ data:Any?, _ error:Error?) -> ()) {
         lLog("URL String:\(urlString)")
         //let authorization = "method=apikey,token=\(apiKey)"
         let authorization = "method=clientkey,token=\(clientKey)"
@@ -59,13 +59,13 @@ class LRNetworkManager: AFHTTPSessionManager {
         }
         
         if methodType == "GET" {
-            _ = self.GET(urlString, parameters: nil, progress: nil,
-                success: { (operation, responseObject) -> Void in
-                    completion(data: responseObject, error: nil)
+            _ = self.get(urlString, parameters: nil, progress: nil,
+                success: { (dataTask, responseObject) in
+                    completion(responseObject, nil)
                 },
-                failure: { (operation, error) in
-                    completion(data: nil, error: error)
-            })
+                failure: { (dataTask, error) in
+                    completion(nil, error)
+                })
             /*_ = self.GET(urlString,
                 parameters: nil,
                 success: { (operation, responseObject) -> Void in
@@ -76,31 +76,30 @@ class LRNetworkManager: AFHTTPSessionManager {
             })*/
         }
         else if methodType == "POST" {
-            
-            _ = self.POST(urlString, parameters: nil, progress: nil,
-                success: { (operation, responseObject) -> Void in
-                    completion(data: responseObject, error: nil)
+            _ = self.post(urlString, parameters: nil, progress: nil,
+                success: { (dataTask, responseObject) in
+                    completion(responseObject, nil)
                 },
-                failure: { (operation, error) in
-                    completion(data: nil, error: error)
-            })
+                failure: { (dataTask, error) in
+                    completion(nil, error)
+                })
         }
     }
     
-    func downloadFile(fromPath: String, toPath: String, completion:(status:AnyObject?, error:NSError?) -> ()) {
+    func downloadFile(_ fromPath: String, toPath: String, completion:@escaping (_ status:AnyObject?, _ error:NSError?) -> ()) {
         lLog("Download file:\(fromPath)")
-        let url = NSURL(string: fromPath)
-        let urlRequest = NSURLRequest(URL: url!)
+        let url = URL(string: fromPath)
+        let urlRequest = URLRequest(url: url!)
         
-        let downloadTask = self.downloadTaskWithRequest(urlRequest, progress: nil, destination: {(file, responce) in
-                let url = NSURL(fileURLWithPath: toPath)
+        let downloadTask = self.downloadTask(with: urlRequest, progress: nil, destination: {(file, responce) in
+                let url = URL(fileURLWithPath: toPath)
                 return url
             }, completionHandler: { response, localfile, error in
                 if (error != nil) {
-                    completion(status: nil, error: error)
+                    completion(nil, error as NSError?)
                 }
                 else {
-                    completion(status: NSNumber(bool: true), error: nil)
+                    completion(NSNumber(value: true as Bool), nil)
                 }
         })
         downloadTask.resume()

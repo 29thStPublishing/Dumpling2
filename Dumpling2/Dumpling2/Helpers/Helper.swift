@@ -21,41 +21,41 @@ let IMAGE_DOWNLOADED: String = "imageDownloaded" //fired for each image download
 
 public extension UIImage {
     public var hasContent: Bool {
-        return CGImage != nil || CIImage != nil
+        return cgImage != nil || ciImage != nil
     }
 }
 
-public class Helper {
+open class Helper {
     
-    static var isoDateFormatter: NSDateFormatter = {
-        let formatter = NSDateFormatter()
+    static var isoDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let posix = NSLocale(localeIdentifier: "en_US_POSIX")
+        let posix = Locale(identifier: "en_US_POSIX")
         formatter.locale = posix
         return formatter
     }()
     
-    static var isoDateFormatter2: NSDateFormatter = {
-        let formatter = NSDateFormatter()
+    static var isoDateFormatter2: DateFormatter = {
+        let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        let posix = NSLocale(localeIdentifier: "en_US_POSIX")
+        let posix = Locale(identifier: "en_US_POSIX")
         formatter.locale = posix
         return formatter
     }()
     
     //Date from string of format MM/dd/yyyy
-    class func publishedDateFrom(string: String) -> NSDate {
-        let dummyDate = NSDate()
+    class func publishedDateFrom(_ string: String) -> Date {
+        let dummyDate = Date()
         
-        let calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierGregorian)
-        let unitFlags : NSCalendarUnit = [NSCalendarUnit.Year, NSCalendarUnit.Month, NSCalendarUnit.Day]
+        let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
+        let unitFlags : NSCalendar.Unit = [NSCalendar.Unit.year, NSCalendar.Unit.month, NSCalendar.Unit.day]
         
-        let comps = calendar?.components(unitFlags, fromDate: dummyDate)
+        var comps = (calendar as NSCalendar?)?.components(unitFlags, from: dummyDate)
         comps?.hour = 0
         comps?.minute = 0
         comps?.second = 0
 
-        var parts = string.componentsSeparatedByString("/")
+        var parts = string.components(separatedBy: "/")
         
         if parts.count == 3 {
             comps?.month = Int(parts[0])!
@@ -63,30 +63,30 @@ public class Helper {
             comps?.year = Int(parts[2])!
         }
         
-        let date = calendar?.dateFromComponents(comps!)
+        let date = calendar.date(from: comps!)
         return date!
     }
 
     //Date from string of ISO format with milliseconds e.g. 2015-08-11T00:58:11.059998+00:00 (length = 32 chars)
-    class func publishedDateFromISO(string: String?) -> NSDate {
+    class func publishedDateFromISO(_ string: String?) -> Date {
         if !isNilOrEmpty(string) {
             
-            if let date = isoDateFormatter.dateFromString(string!) {
+            if let date = isoDateFormatter.date(from: string!) {
                 return date
             }
             
-            if let date = Helper.publishedDateFromISO2(string) as NSDate? {
+            if let date = Helper.publishedDateFromISO2(string) as Date? {
                 return date
             }
         }
-        return NSDate()
+        return Date()
     }
     
     //Date from string of ISO format e.g. 2015-08-11T00:20:07+00:00 (length = 25 chars)
-    class func publishedDateFromISO2(string: String?) -> NSDate {
+    class func publishedDateFromISO2(_ string: String?) -> Date {
         if !isNilOrEmpty(string) {
             
-            if let date = isoDateFormatter2.dateFromString(string!) {
+            if let date = isoDateFormatter2.date(from: string!) {
                 return date
             }
             
@@ -94,31 +94,30 @@ public class Helper {
                 return date
             }*/
         }
-        return NSDate()
+        return Date()
     }
     
     class func isiPhone() -> Bool {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+        if UIDevice.current.userInterfaceIdiom == .pad {
             return false
         }
         return true
     }
     
     class func isRetinaDevice() -> Bool {
-        let mainScreen = UIScreen.mainScreen()
-        if mainScreen.respondsToSelector(#selector(UIScreen.displayLinkWithTarget(_:selector:))) && mainScreen.scale >= 2.0 {
+        let mainScreen = UIScreen.main
+        if mainScreen.responds(to: #selector(UIScreen.displayLink(withTarget:selector:))) && mainScreen.scale >= 2.0 {
             return true
         }
-        
         return false
     }
     
     //JSON to string
-    class func stringFromJSON(object: AnyObject) -> String? {
+    class func stringFromJSON(_ object: Any) -> String? {
         
-        if NSJSONSerialization.isValidJSONObject(object) {
-            if let data = try? NSJSONSerialization.dataWithJSONObject(object, options: []) {
-                if let string = NSString(data: data, encoding: NSUTF8StringEncoding) {
+        if JSONSerialization.isValidJSONObject(object) {
+            if let data = try? JSONSerialization.data(withJSONObject: object, options: []) {
+                if let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue) {
                     return string as String
                 }
             }
@@ -128,16 +127,16 @@ public class Helper {
     }
     
     //String to JSON
-    class func jsonFromString(string: String) -> AnyObject? {
-        if let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
-            if let jsonData: AnyObject = try? NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0)) {
+    class func jsonFromString(_ string: String) -> AnyObject? {
+        if let data = string.data(using: String.Encoding.utf8) {
+            if let jsonData: AnyObject = try! JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0)) as AnyObject? {
                 return jsonData
             }
         }
         return nil
     }
     
-    class func isNilOrEmpty(string: String?) -> Bool {
+    class func isNilOrEmpty(_ string: String?) -> Bool {
         if let str = string {
             if str.isEmpty {
                 //Not nil but empty
@@ -152,13 +151,13 @@ public class Helper {
         return false
     }
     
-    public class func decodeHTMLEntitiesIn(string: String) -> String {
-        if string.rangeOfString("&") == nil {
+    open class func decodeHTMLEntitiesIn(_ string: String) -> String {
+        if string.range(of: "&") == nil {
             return string
         }
         let str: NSString = NSString(string: string)
-        let decodedStr = str.stringByDecodingHTMLEntities()
-        return decodedStr
+        let decodedStr = str.decodingHTMLEntities()
+        return decodedStr!
     }
     
     //Unpack a zip file

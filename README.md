@@ -27,12 +27,12 @@ Use this version of Dumpling2 **ONLY** for projects which are using Dumpling2 fo
 1. The Dumpling2 framework looks for **AFNetworking** libraries for making calls to the Magnet API. We had initially intended to use Cocoapods, but they don't work with frameworks. So have included AFNetworking source files into the framework. The current Dumpling2 version as of September 2015 uses [AFNetworking v2.6.0](https://github.com/AFNetworking/AFNetworking/releases/tag/2.6.0)
 
 2. Dumpling2 uses Realm as the database. The Realm library and headers are included directly inside the framework so publishers do not have to include it separately.
-The current Dumpling2 version as of September 2015 uses [Realm v0.98.2](https://github.com/realm/realm-cocoa/releases/download/v0.98.2/realm-objc-0.98.2.zip)
+The current Dumpling2 version as of October 2016 uses [Realm v1.1.0](https://github.com/realm/realm-cocoa/releases/download/v1.1.0/realm-objc-1.1.0.zip)
 
 3. Dumpling2 uses ZipArchive for unarchiving zip files. The ZipArchive .a and header file are included in the project
 
 ###Updating Realm in Dumpling2
-1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases/download/v0.98.2/realm-objc-0.98.2.zip)
+1. To update Realm in Dumpling 2, download the relevant Obj-c package from the [Realm git repo](https://github.com/realm/realm-cocoa/releases/download/v1.1.0/realm-objc-1.1.0.zip)
 
 2. From the Realm.framework **ios/static** folder, copy the `Headers`, `Modules`, `PrivateHeaders` and `Realm` executable in *Dumpling2/Dumpling2/Headers*. You must use the static directory, you cannot have one dynamic framework inside another.
 
