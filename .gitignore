@@ -4,6 +4,7 @@ Dumpling2/.DS_Store
 # Xcode
 #
 build/
+Dumpling2/Output/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
