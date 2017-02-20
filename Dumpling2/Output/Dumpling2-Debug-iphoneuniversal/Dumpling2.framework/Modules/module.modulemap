@@ -1,0 +1,10 @@
+framework module Dumpling2 {
+  umbrella header "Dumpling2.h"
+
+  export *
+  module * { export * }
+}
+
+module Dumpling2.Swift {
+    header "Dumpling2-Swift.h"
+}

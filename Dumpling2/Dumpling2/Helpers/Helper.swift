@@ -9,7 +9,7 @@
 import UIKit
 
 //let baseURL: String = "https://magnet-dev.29.io/"
-let baseURL: String = "https://api.29.io/"
+let baseURL: String = "https://magnet.serialbox.com/"
 var clientKey: String = "jwzLDfjKQD64oHvQyGEZnmximHaJqp"
 
 let ISSUE_DOWNLOAD_COMPLETE: String = "issueDownloadComplete"
