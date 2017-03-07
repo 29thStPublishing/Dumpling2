@@ -28,5 +28,3 @@
 #import "RLMRealmConfiguration.h"
 #import "RLMResults.h"
 #import "RLMSchema.h"
-
-#import "RLMObject_Private.h"

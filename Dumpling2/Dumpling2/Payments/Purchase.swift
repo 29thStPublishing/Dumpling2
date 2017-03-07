@@ -9,28 +9,28 @@
 import UIKit
 
 /** A model object for Purchases */
-public class Purchase: RLMObject {
+open class Purchase: RLMObject {
     /// Apple id/SKU of the purchase made - article or issue
-    dynamic public var appleId = ""
+    dynamic open var appleId = ""
     /// Global id of the purchase made - article, issue or volume
-    dynamic public var globalId = ""
+    dynamic open var globalId = ""
     /// Mode of purchase - Web (could be any - Stripe or any other), IAP
-    dynamic public var mode = ""
+    dynamic open var mode = ""
     /// Type of purchase - article, issue or volume
-    dynamic public var type = ""
+    dynamic open var type = ""
     /// Purchase date
-    dynamic public var purchaseDate = NSDate()
+    dynamic open var purchaseDate = Date()
     /// Expiration date
-    dynamic public var expirationDate = "" //Only used for subscriptions
+    dynamic open var expirationDate = "" //Only used for subscriptions
     /// Identity used for syncing web purchases
-    dynamic public var userIdentity = ""
+    dynamic open var userIdentity = ""
     
-    override public class func primaryKey() -> String {
+    override open class func primaryKey() -> String {
         return "appleId"
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<String> {
+    override open class func requiredProperties() -> Array<String> {
         return ["appleId", "globalId", "mode", "type", "purchaseDate", "expirationDate", "userIdentity"]
     }
     

@@ -9,7 +9,7 @@
 import Foundation
 
 /** Starter class which adds independent articles to the database */
-public class ArticleHandler: NSObject {
+open class ArticleHandler: NSObject {
     
     var defaultFolder: NSString!
     var issueHandler: IssueHandler!
@@ -24,30 +24,30 @@ public class ArticleHandler: NSObject {
     public init?(folder: NSString){
         super.init()
         
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
-            self.defaultFolder = folderPath
+            let folderPath = folder.replacingOccurrences(of: docsDir as String, with: "/Documents")
+            self.defaultFolder = folderPath as NSString!
         }
         else {
             self.defaultFolder = folder
         }
         
         let defaultRealmPath = "\(folder)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
 
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         
         self.checkAndMigrateData(5)
         
-        let mainBundle = NSBundle.mainBundle()
-        if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
+        let mainBundle = Bundle.main
+        if let key: String = mainBundle.object(forInfoDictionaryKey: "ClientKey") as? String {
             clientKey = key
-            issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
+            issueHandler = IssueHandler(folder: folder, clientkey: clientKey as NSString, migration: false)
         }
         else {
             return nil
@@ -61,20 +61,20 @@ public class ArticleHandler: NSObject {
     */
     public init(clientkey: NSString) {
         super.init()
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents"
         clientKey = clientKey as String
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         
         self.checkAndMigrateData(5)
         
-        issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey, migration: false)
+        issueHandler = IssueHandler(folder: docsDir, clientkey: clientKey as NSString, migration: false)
     }
     
     /**
@@ -86,13 +86,13 @@ public class ArticleHandler: NSObject {
     */
     public init(folder: NSString, clientkey: NSString) {
         super.init()
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
-            self.defaultFolder = folderPath
+            let folderPath = folder.replacingOccurrences(of: docsDir as String, with: "/Documents")
+            self.defaultFolder = folderPath as NSString!
         }
         else {
             self.defaultFolder = folder
@@ -100,20 +100,20 @@ public class ArticleHandler: NSObject {
         clientKey = clientkey as String
         
         let defaultRealmPath = "\(folder)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         
         self.checkAndMigrateData(5)
         
-        issueHandler = IssueHandler(folder: folder, clientkey: clientKey, migration: false)
+        issueHandler = IssueHandler(folder: folder, clientkey: clientKey as NSString, migration: false)
         
     }
     
     //Check and migrate Realm data if needed
-    private func checkAndMigrateData(schemaVersion: UInt64) {
+    fileprivate func checkAndMigrateData(_ schemaVersion: UInt64) {
         
-        let config = RLMRealmConfiguration.defaultConfiguration()
+        let config = RLMRealmConfiguration.default()
         config.schemaVersion = schemaVersion
         
         let migrationBlock: (RLMMigration, UInt64) -> Void = { (migration, oldSchemeVersion) in
@@ -141,7 +141,7 @@ public class ArticleHandler: NSObject {
                 for cls in classes {
                     migration.enumerateObjects(cls) { oldObject, newObject in
                         for prop in oldObject!.objectSchema.properties {
-                            if let newProp = newObject!.objectSchema[prop.name] {
+                            if let newProp = newObject!.objectSchema[prop.name as! String] {
                                 // Property does still exist
                                 if prop.optional && !newProp.optional {
                                     // Property was optional, but is now required
@@ -159,20 +159,20 @@ public class ArticleHandler: NSObject {
             }
         }
         config.migrationBlock = migrationBlock
-        RLMRealmConfiguration.setDefaultConfiguration(config)
+        RLMRealmConfiguration.setDefault(config)
         
         do {
-            let _ = try RLMRealm(configuration: RLMRealmConfiguration.defaultConfiguration())
+            let _ = try RLMRealm(configuration: RLMRealmConfiguration.default())
         } catch {
             self.cleanupRealm()
             self.createRealmAgain(schemaVersion)
         }
     }
     
-    private func cleanupRealm() {
+    fileprivate func cleanupRealm() {
         var folderPath = ""
         if defaultFolder == "/Documents" {
-            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let docsDir: String = docPaths[0] as String
             folderPath = docsDir
         }
@@ -180,32 +180,32 @@ public class ArticleHandler: NSObject {
             folderPath = self.defaultFolder as String
         }
         do {
-            let files: NSArray = try NSFileManager.defaultManager().contentsOfDirectoryAtPath(folderPath) as NSArray
-            let realmFiles = files.filteredArrayUsingPredicate(NSPredicate(format: "self BEGINSWITH %@", "default.realm"))
+            let files: NSArray = try FileManager.default.contentsOfDirectory(atPath: folderPath) as NSArray
+            let realmFiles = files.filtered(using: NSPredicate(format: "self BEGINSWITH %@", "default.realm"))
             
             //Delete all files with the given names
             for fileName: String in realmFiles as! [String] {
-                try NSFileManager.defaultManager().removeItemAtPath("\(folderPath)/\(fileName)")
+                try FileManager.default.removeItem(atPath: "\(folderPath)/\(fileName)")
             }
         } catch{
             NSLog("REALM:: Deleting failed")
         }
     }
     
-    private func createRealmAgain(schemaVersion: UInt64) {
+    fileprivate func createRealmAgain(_ schemaVersion: UInt64) {
         var folderPath = self.defaultFolder
         if folderPath == "/Documents" {
-            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let docsDir: NSString = docPaths[0] as NSString
-            folderPath = "\(docsDir)/default.realm"
+            folderPath = "\(docsDir)/default.realm" as NSString?
         }
         else {
-            folderPath = "\(folderPath)/default.realm"
+            folderPath = "\(folderPath)/default.realm" as NSString?
         }
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
+        let realmConfiguration = RLMRealmConfiguration.default()
         realmConfiguration.schemaVersion = schemaVersion
-        realmConfiguration.path = folderPath as String
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: folderPath as! String)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
     }
     
     /**
@@ -215,11 +215,11 @@ public class ArticleHandler: NSObject {
     
     - parameter globalId: The global id for the article
     */
-    public func addArticleFromAPI(globalId: String) {
+    open func addArticleFromAPI(_ globalId: String) {
         let requestURL = "\(baseURL)articles/\(globalId)"
 
         //self.issueHandler.updateStatusDictionary(nil, issueId: globalId, url: requestURL, status: 0)
-        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: globalId)
+        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: globalId as NSCopying)
         
         Article.createIndependentArticle(globalId, delegate: self.issueHandler)
     }
@@ -231,15 +231,15 @@ public class ArticleHandler: NSObject {
     
     - parameter issueId: The global id for the issue
     */
-    public func addArticleFromAPI(globalId: String, issueId: String) {
+    open func addArticleFromAPI(_ globalId: String, issueId: String) {
         let requestURL = "\(baseURL)articles/\(globalId)"
 
         //self.issueHandler.updateStatusDictionary("", issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 0)
-        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: "\(baseURL)issues/\(issueId)"), forKey: issueId)
+        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: "\(baseURL)issues/\(issueId)" as NSCopying), forKey: issueId as NSCopying)
 
         self.issueHandler.updateStatusDictionary("", issueId: issueId, url: requestURL, status: 0)
         if let issue = Issue.getIssue(issueId) {
-            Article.createArticleForId(globalId, issue: issue, placement: 0, delegate: self.issueHandler)
+            Article.createArticleForId(globalId as NSString, issue: issue, placement: 0, delegate: self.issueHandler)
         }
         self.issueHandler.updateStatusDictionary("", issueId: issueId, url: "\(baseURL)issues/\(issueId)", status: 1)
     }
@@ -249,7 +249,7 @@ public class ArticleHandler: NSObject {
     
     - parameter appleId: The Apple id for the article
     */
-    public func addArticleWith(appleId: String) {
+    open func addArticleWith(_ appleId: String) {
         let requestURL = "\(baseURL)articles/sku/\(appleId)"
         
         let networkManager = LRNetworkManager.sharedInstance
@@ -258,19 +258,19 @@ public class ArticleHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let allArticles: NSArray = response.value(forKey: "articles") as! NSArray
                 let articleDetails: NSDictionary = allArticles.firstObject as! NSDictionary
                 //Update article
                 
                 //self.issueHandler.updateStatusDictionary(nil, issueId: articleDetails.objectForKey("id") as! String, url: requestURL, status: 0)
-                self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleDetails.objectForKey("id") as! String)
+                self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: articleDetails.object(forKey: "id" as NSCopying) as! NSCopying)
                 
                 Article.addArticle(articleDetails, delegate: self.issueHandler)
             }
             else if let err = error {
                 print("Error: " + err.description)
                 //Error
-                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -286,14 +286,14 @@ public class ArticleHandler: NSObject {
     
     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addArticlesFor(property: String, value: String, page: Int, limit: Int) {
+    open func addArticlesFor(_ property: String, value: String, page: Int, limit: Int) {
         if Helper.isNilOrEmpty(property) || Helper.isNilOrEmpty(value) {
             self.addAllArticles(page, limit: limit)
             return
         }
         
         //let encodedVal = value.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
-        let encodedVal = value.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
+        let encodedVal = value.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
         var requestURL = "\(baseURL)articles/\(property)/" + encodedVal! + "?limit="
         
         if limit > 0 {
@@ -313,27 +313,28 @@ public class ArticleHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let allArticles: NSArray = response.value(forKey: "articles") as! NSArray
                 if allArticles.count > 0 {
-                    for (_, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! NSString
+                    for (_, articleDict) in allArticles.enumerated() {
+                        let articleDictionary = articleDict as! NSDictionary
+                        let articleId = articleDictionary.value(forKey: "id") as! NSString
                         let requestURL = "\(baseURL)articles/\(articleId)"
 
                         //self.issueHandler.updateStatusDictionary(nil, issueId: articleId as String, url: requestURL, status: 0)
-                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: articleId)
                         
                         Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
                 }
                 else {
                     //No articles, send allDownloadsComplete notif
-                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
                 }
             }
             else if let err = error {
                 print("Error: " + err.description)
                 //Error
-                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -345,7 +346,7 @@ public class ArticleHandler: NSObject {
     
     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addAllArticles(page: Int, limit: Int) {
+    open func addAllArticles(_ page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles?limit="
         
         if limit > 0 {
@@ -365,18 +366,19 @@ public class ArticleHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let allArticles: NSArray = response.value(forKey: "articles") as! NSArray
                 if allArticles.count > 0 {
                     var articleList = ""
-                    for (index, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! String
+                    for (index, articleDict) in allArticles.enumerated() {
+                        let articleDictionary = articleDict as! NSDictionary
+                        let articleId = articleDictionary.value(forKey: "id") as! String
                         articleList += articleId
                         if index < (allArticles.count - 1) {
                             articleList += ","
                         }
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         
-                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: articleId as NSCopying)
                         
                         //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
@@ -386,13 +388,13 @@ public class ArticleHandler: NSObject {
                 }
                 else {
                     //No articles, send allDownloadsComplete notif
-                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
                 }
             }
             else if let err = error {
                 print("Error: " + err.description)
                 //Error
-                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -404,7 +406,7 @@ public class ArticleHandler: NSObject {
      
      - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
      */
-    public func addPreviewArticles(page: Int, limit: Int) {
+    open func addPreviewArticles(_ page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles/preview?limit="
         
         if limit > 0 {
@@ -424,18 +426,19 @@ public class ArticleHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let allArticles: NSArray = response.value(forKey: "articles") as! NSArray
                 if allArticles.count > 0 {
                     var articleList = ""
-                    for (index, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! String
+                    for (index, articleDict) in allArticles.enumerated() {
+                        let articleDictionary = articleDict as! NSDictionary
+                        let articleId = articleDictionary.value(forKey: "id") as! String
                         articleList += articleId
                         if index < (allArticles.count - 1) {
                             articleList += ","
                         }
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         
-                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: articleId as NSCopying)
                         
                         //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
@@ -456,7 +459,7 @@ public class ArticleHandler: NSObject {
     
     - parameter limit: Parameter accepting the number of records to fetch at a time. If this is set to 0, we will fetch 20 records by default
     */
-    public func addAllPublishedArticles(page: Int, limit: Int) {
+    open func addAllPublishedArticles(_ page: Int, limit: Int) {
         var requestURL = "\(baseURL)articles/published?limit="
         
         if limit > 0 {
@@ -476,18 +479,19 @@ public class ArticleHandler: NSObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allArticles: NSArray = response.valueForKey("articles") as! NSArray
+                let allArticles: NSArray = response.value(forKey: "articles") as! NSArray
                 if allArticles.count > 0 {
                     var articleList = ""
-                    for (index, articleDict) in allArticles.enumerate() {
-                        let articleId = articleDict.valueForKey("id") as! String
+                    for (index, articleDict) in allArticles.enumerated() {
+                        let articleDictionary = articleDict as! NSDictionary
+                        let articleId = articleDictionary.value(forKey: "id") as! String
                         articleList += articleId
                         if index < (allArticles.count - 1) {
                             articleList += ","
                         }
                         let requestURL = "\(baseURL)articles/\(articleId)"
                         
-                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: articleId)
+                        self.issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: articleId as NSCopying)
                         
                         //Article.createIndependentArticle(articleId as String, delegate: self.issueHandler)
                     }
@@ -496,13 +500,13 @@ public class ArticleHandler: NSObject {
                 }
                 else {
                     //No articles, send allDownloadsComplete notif
-                    NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
                 }
             }
             else if let err = error {
                 print("Error: " + err.description)
                 //Error
-                NSNotificationCenter.defaultCenter().postNotificationName(ALL_DOWNLOADS_COMPLETE, object: nil, userInfo: ["articles" : ""])
+                NotificationCenter.default.post(name: Notification.Name(rawValue: ALL_DOWNLOADS_COMPLETE), object: nil, userInfo: ["articles" : ""])
             }
         }
     }
@@ -516,19 +520,19 @@ public class ArticleHandler: NSObject {
     
     :return: Array of independent articles (without any issueIds)
     */
-    public func getAllArticles(page: Int, count: Int) -> Array<Article>? {
-        _ = RLMRealm.defaultRealm()
+    open func getAllArticles(_ page: Int, count: Int) -> Array<Article>? {
+        _ = RLMRealm.default()
         
-        let array: Array<Article>? = Article.getArticlesFor("", type: nil, excludeType: nil, count: count, page: page)
+        let array: Array<Article>? = Article.getArticlesFor("", key: "", value: "", count: count, page: page)
         return array
     }
     
-    public func getArticle(articleId: NSString) -> Article? {
+    open func getArticle(_ articleId: NSString) -> Article? {
         
-        _ = RLMRealm.defaultRealm()
+        _ = RLMRealm.default()
         
         let predicate = NSPredicate(format: "globalId = %@", articleId)
-        let articles = Article.objectsWithPredicate(predicate)
+        let articles = Article.objects(with: predicate)
         
         if articles.count > 0 {
             return articles.firstObject() as? Article

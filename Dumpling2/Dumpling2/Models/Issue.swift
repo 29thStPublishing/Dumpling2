@@ -9,58 +9,58 @@
 import UIKit
 
 /** A model object for Issue */
-public class Issue: RLMObject {
+open class Issue: RLMObject {
     /// Global id of an issue - this is unique for each issue
-    dynamic public var globalId = ""
+    dynamic open var globalId = ""
     /// SKU or Apple Id for an issue
-    dynamic public var appleId = ""
+    dynamic open var appleId = ""
     /// Title of the issue
-    dynamic public var title = ""
+    dynamic open var title = ""
     /// Description of the issue
-    dynamic public var issueDesc = "" //description
+    dynamic open var issueDesc = "" //description
     /// Folder saving all the assets for the issue
-    dynamic public var assetFolder = ""
+    dynamic open var assetFolder = ""
     /// Global id of the asset which is the cover image of the issue
-    dynamic public var coverImageId = "" //globalId of asset - for phone
+    dynamic open var coverImageId = "" //globalId of asset - for phone
     /// Global id of the asset for cover image on iPad
-    dynamic public var coverImageiPadId = ""
+    dynamic open var coverImageiPadId = ""
     /// Global id of the asset for cover image on iPad Landscape
-    dynamic public var coverImageiPadLndId = ""
+    dynamic open var coverImageiPadLndId = ""
     /// File URL for the icon image
-    dynamic public var iconImageURL = ""
+    dynamic open var iconImageURL = ""
     /// Published date for the issue
-    dynamic public var publishedDate = NSDate()
+    dynamic open var publishedDate = Date()
     /// Last updated date for the issue
-    dynamic public var lastUpdateDate = ""
+    dynamic open var lastUpdateDate = ""
     /// Display date for an issue
-    dynamic public var displayDate = ""
+    dynamic open var displayDate = ""
     /// Custom metadata of the issue
-    dynamic public var metadata = ""
+    dynamic open var metadata = ""
     ///Global id of the volume to which the issue belongs (can be blank if this is an independent issue)
-    dynamic public var volumeId = ""
+    dynamic open var volumeId = ""
     
-    override public class func primaryKey() -> String {
+    override open class func primaryKey() -> String {
         return "globalId"
     }
     
     //Required for backward compatibility when upgrading to V 0.96.2
-    override public class func requiredProperties() -> Array<String> {
+    override open class func requiredProperties() -> Array<String> {
         return ["globalId", "appleId", "title", "issueDesc", "assetFolder", "coverImageId", "coverImageiPadId", "coverImageiPadLndId", "iconImageURL", "publishedDate", "lastUpdateDate", "displayDate", "metadata", "volumeId"]
     }
     
     // MARK: Private methods
 
     // Delete all issues for a volume - this will delete the issues, their assets, articles and article assets
-    class func deleteIssuesForVolume(volumeId: NSString) {
-        let realm = RLMRealm.defaultRealm()
+    class func deleteIssuesForVolume(_ volumeId: NSString) {
+        let realm = RLMRealm.default()
         
         let predicate = NSPredicate(format: "volumeId = %@", volumeId)
-        let results = Issue.objectsWithPredicate(predicate)
+        let results = Issue.objects(with: predicate)
         
         let issueIds = NSMutableArray()
         for issue in results {
             let singleIssue = issue as! Issue
-            issueIds.addObject(singleIssue.globalId)
+            issueIds.add(singleIssue.globalId)
         }
         
         Article.deleteArticlesForIssues(issueIds)
@@ -87,19 +87,19 @@ public class Issue: RLMObject {
     
     - parameter  appleId: The SKU/Apple id for the issue
     */
-    public class func deleteIssue(appleId: NSString) {
-        let realm = RLMRealm.defaultRealm()
+    open class func deleteIssue(_ appleId: NSString) {
+        let realm = RLMRealm.default()
         
         let predicate = NSPredicate(format: "appleId = %@", appleId)
-        let issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objects(with: predicate)
         
         //Delete all assets and articles for the issue
         if issues.count == 1 {
             //older issue
             let currentIssue = issues.firstObject() as! Issue
             //Delete all articles and assets if the issue already exists
-            Asset.deleteAssetsForIssue(currentIssue.globalId)
-            Article.deleteArticlesFor(currentIssue.globalId)
+            Asset.deleteAssetsForIssue(currentIssue.globalId as NSString)
+            Article.deleteArticlesFor(currentIssue.globalId as NSString)
             
             //Delete issue
             realm.beginWriteTransaction()
@@ -120,10 +120,10 @@ public class Issue: RLMObject {
     
     :return:  Object for most recent issue
     */
-    public class func getNewestIssue() -> Issue? {
-        _ = RLMRealm.defaultRealm()
+    open class func getNewestIssue() -> Issue? {
+        _ = RLMRealm.default()
         
-        let results = Issue.allObjects().sortedResultsUsingProperty("publishedDate", ascending: false)
+        let results = Issue.allObjects().sortedResults(usingProperty: "publishedDate", ascending: false)
         
         if results.count > 0 {
             let newestIssue = results.firstObject() as! Issue
@@ -142,11 +142,11 @@ public class Issue: RLMObject {
     
     :return:  Issue object for the given SKU/Apple id
     */
-    public class func getIssueFor(appleId: String) -> Issue? {
-        _ = RLMRealm.defaultRealm()
+    open class func getIssueFor(_ appleId: String) -> Issue? {
+        _ = RLMRealm.default()
         
         let predicate = NSPredicate(format: "appleId = %@", appleId)
-        let issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objects(with: predicate)
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
@@ -162,13 +162,13 @@ public class Issue: RLMObject {
     
     :return: an array of issues for given volume or all issues if volumeId is nil
     */
-    public class func getIssues(volumeId: String?) -> Array<Issue>? {
-        _ = RLMRealm.defaultRealm()
+    open class func getIssues(_ volumeId: String?) -> Array<Issue>? {
+        _ = RLMRealm.default()
 
-        var issues: RLMResults
+        var issues: RLMResults<RLMObject>
         if let volId = volumeId {
             let predicate = NSPredicate(format: "volumeId = %@", volId)
-            issues = Issue.objectsWithPredicate(predicate)
+            issues = Issue.objects(with: predicate)
         }
         else {
             issues = Issue.allObjects()
@@ -193,11 +193,11 @@ public class Issue: RLMObject {
     
     :return: issue object for the global id. Returns nil if the issue is not found
     */
-    public class func getIssue(issueId: String) -> Issue? {
-        _ = RLMRealm.defaultRealm()
+    open class func getIssue(_ issueId: String) -> Issue? {
+        _ = RLMRealm.default()
         
         let predicate = NSPredicate(format: "globalId = %@", issueId)
-        let issues = Issue.objectsWithPredicate(predicate)
+        let issues = Issue.objects(with: predicate)
         
         if issues.count > 0 {
             return issues.firstObject() as? Issue
@@ -211,22 +211,22 @@ public class Issue: RLMObject {
     /**
     This method downloads articles for the issue
     */
-    public func downloadIssueArticles() {
+    open func downloadIssueArticles() {
         lLog("Download issues articles for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
-            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let docsDir: NSString = docPaths[0] as NSString
             assetFolder = docsDir as String
         }
         else {
-            assetFolder = assetFolder.stringByReplacingOccurrencesOfString("/\(self.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            assetFolder = assetFolder.replacingOccurrences(of: "/\(self.appleId)", with: "", options: NSString.CompareOptions.caseInsensitive, range: nil)
         }
-        let issueHandler = IssueHandler(folder: assetFolder)!
+        let issueHandler = IssueHandler(folder: assetFolder as NSString)!
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         
-        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: self.globalId as NSCopying)
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -234,16 +234,17 @@ public class Issue: RLMObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let allIssues: NSArray = response.value(forKey: "issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Download articles for the issue
-                    let articles = issueDetails.objectForKey("articles") as! NSArray
+                    let articles = issueDetails.object(forKey: "articles") as! NSArray
                     if articles.count > 0 {
                         var articleList = ""
-                        for (index, articleDict) in articles.enumerate() {
+                        for (index, articleDict) in articles.enumerated() {
                             //Insert article
                             //Add article and its assets to Issue dictionary
-                            let articleId = articleDict.valueForKey("id") as! String
+                            let articleDictionary = articleDict as! NSDictionary
+                            let articleId = articleDictionary.value(forKey: "id") as! String
                             articleList += articleId
                             if index < (articles.count - 1) {
                                 articleList += ","
@@ -268,23 +269,23 @@ public class Issue: RLMObject {
     /**
     This method downloads assets for the issue (only issue assets, not article assets)
     */
-    public func downloadIssueAssets() {
+    open func downloadIssueAssets() {
         lLog("Download issues assets for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
-            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let docsDir: NSString = docPaths[0] as NSString
             assetFolder = docsDir as String
         }
         else {
-            assetFolder = assetFolder.stringByReplacingOccurrencesOfString("/\(self.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            assetFolder = assetFolder.replacingOccurrences(of: "/\(self.appleId)", with: "", options: NSString.CompareOptions.caseInsensitive, range: nil)
         }
-        let issueHandler = IssueHandler(folder: assetFolder)!
+        let issueHandler = IssueHandler(folder: assetFolder as NSString)!
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         
         //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
-        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: self.globalId as NSCopying)
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -292,14 +293,15 @@ public class Issue: RLMObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let allIssues: NSArray = response.value(forKey: "issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Download assets for the issue
-                    let issueMedia = issueDetails.objectForKey("media") as! NSArray
+                    let issueMedia = issueDetails.object(forKey: "media") as! NSArray
                     if issueMedia.count > 0 {
                         var assetList = ""
-                        for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! String
+                        for (index, assetDict) in issueMedia.enumerated() {
+                            let assetDictionary = assetDict as! NSDictionary
+                            let assetid = assetDictionary.value(forKey: "id") as! String
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
@@ -322,23 +324,23 @@ public class Issue: RLMObject {
     /**
      This method downloads assets for the issue and its articles
      */
-    public func downloadAllAssets() {
+    open func downloadAllAssets() {
         lLog("Download all assets for \(self.globalId)")
         var assetFolder = self.assetFolder
         if assetFolder.hasPrefix("/Documents") {
-            var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+            var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
             let docsDir: NSString = docPaths[0] as NSString
             assetFolder = docsDir as String
         }
         else {
-            assetFolder = assetFolder.stringByReplacingOccurrencesOfString("/\(self.appleId)", withString: "", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
+            assetFolder = assetFolder.replacingOccurrences(of: "/\(self.appleId)", with: "", options: NSString.CompareOptions.caseInsensitive, range: nil)
         }
-        let issueHandler = IssueHandler(folder: assetFolder)!
+        let issueHandler = IssueHandler(folder: assetFolder as NSString)!
         
         let requestURL = "\(baseURL)issues/\(self.globalId)"
         
         //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: requestURL, status: 0)
-        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(bool: false) , forKey: requestURL), forKey: self.globalId)
+        issueHandler.activeDownloads.setObject(NSDictionary(object: NSNumber(value: false as Bool) , forKey: requestURL as NSCopying), forKey: self.globalId as NSCopying)
         
         let networkManager = LRNetworkManager.sharedInstance
         
@@ -346,14 +348,15 @@ public class Issue: RLMObject {
             (data:AnyObject?, error:NSError?) -> () in
             if data != nil {
                 let response: NSDictionary = data as! NSDictionary
-                let allIssues: NSArray = response.valueForKey("issues") as! NSArray
+                let allIssues: NSArray = response.value(forKey: "issues") as! NSArray
                 if let issueDetails: NSDictionary = allIssues.firstObject as? NSDictionary {
                     //Download assets for the issue
-                    let issueMedia = issueDetails.objectForKey("media") as! NSArray
+                    let issueMedia = issueDetails.object(forKey: "media") as! NSArray
                     if issueMedia.count > 0 {
                         var assetList = ""
-                        for (index, assetDict) in issueMedia.enumerate() {
-                            let assetid = assetDict.valueForKey("id") as! String
+                        for (index, assetDict) in issueMedia.enumerated() {
+                            let assetDictionary = assetDict as! NSDictionary
+                            let assetid = assetDictionary.value(forKey: "id") as! String
                             assetList += assetid
                             if index < (issueMedia.count - 1) {
                                 assetList += ","
@@ -363,9 +366,10 @@ public class Issue: RLMObject {
                         Asset.downloadAndCreateAssetsForIds(assetList, issue: self, articleId: "", delegate: issueHandler)
                     }
                     
-                    if let articles = issueDetails.objectForKey("articles") as? NSArray {
+                    if let articles = issueDetails.object(forKey: "articles") as? NSArray {
                         for articleDict in articles {
-                            let articleId = articleDict.valueForKey("id") as! String
+                            let articleDictionary = articleDict as! NSDictionary
+                            let articleId = articleDictionary.value(forKey: "id") as! String
                             
                             if let article = Article.getArticle(articleId, appleId: nil) {
                                 //issueHandler.updateStatusDictionary(nil, issueId: self.globalId, url: "\(baseURL)articles/\(articleId)", status: 0)
@@ -388,11 +392,11 @@ public class Issue: RLMObject {
     
     :brief: Save an Issue to the database
     */
-    public func saveIssue() {
-        let realm = RLMRealm.defaultRealm()
+    open func saveIssue() {
+        let realm = RLMRealm.default()
         
         realm.beginWriteTransaction()
-        realm.addOrUpdateObject(self)
+        realm.addOrUpdate(self)
         do {
             try realm.commitWriteTransaction()
         } catch let error {
@@ -408,11 +412,11 @@ public class Issue: RLMObject {
     
     :return: an object for the key from the custom metadata (or nil)
     */
-    public func getValue(key: NSString) -> AnyObject? {
+    open func getValue(_ key: NSString) -> AnyObject? {
         
         let metadata: AnyObject? = Helper.jsonFromString(self.metadata)
         if let metadataDict = metadata as? NSDictionary {
-            return metadataDict.valueForKey(key as String)
+            return metadataDict.value(forKey: key as String) as AnyObject?
         }
         
         return nil
@@ -425,11 +429,11 @@ public class Issue: RLMObject {
     
     :return: an array of issues older than the current issue
     */
-    public func getOlderIssues() -> Array<Issue>? {
-        _ = RLMRealm.defaultRealm()
+    open func getOlderIssues() -> Array<Issue>? {
+        _ = RLMRealm.default()
         
-        let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate)
-        let issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        let predicate = NSPredicate(format: "publishedDate < %@", self.publishedDate as CVarArg)
+        let issues: RLMResults = Issue.objects(with: predicate) as RLMResults
         
         if issues.count > 0 {
             var array = Array<Issue>()
@@ -450,11 +454,11 @@ public class Issue: RLMObject {
 
     :return: an array of issues newer than the current issue
     */
-    public func getNewerIssues() -> Array<Issue>? {
-        _ = RLMRealm.defaultRealm()
+    open func getNewerIssues() -> Array<Issue>? {
+        _ = RLMRealm.default()
         
-        let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate)
-        let issues: RLMResults = Issue.objectsWithPredicate(predicate) as RLMResults
+        let predicate = NSPredicate(format: "publishedDate > %@", self.publishedDate as CVarArg)
+        let issues: RLMResults = Issue.objects(with: predicate) as RLMResults
         
         if issues.count > 0 {
             var array = Array<Issue>()

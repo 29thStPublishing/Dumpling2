@@ -20,9 +20,9 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         return Singleton.sharedInstance
     }
     
-    override init(baseURL url: NSURL?) {
+    override init(baseURL url: URL?) {
         super.init(baseURL: url)
-        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+        if let previewApp = Bundle.main.object(forInfoDictionaryKey: "Preview") as? NSNumber {
             self.preview = previewApp.boolValue
         }
     }
@@ -33,12 +33,12 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
 
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
-        if let previewApp = NSBundle.mainBundle().objectForInfoDictionaryKey("Preview") as? NSNumber {
+        if let previewApp = Bundle.main.object(forInfoDictionaryKey: "Preview") as? NSNumber {
             self.preview = previewApp.boolValue
         }
     }
 
-    func requestData(methodType: String, urlString:String, completion:(data:AnyObject?, error:NSError?) -> ()) {
+    func requestData(_ methodType: String, urlString:String, completion:@escaping (_ data:AnyObject?, _ error:NSError?) -> ()) {
         lLog("URL String:\(urlString)")
         //let authorization = "method=apikey,token=\(apiKey)"
         let authorization = "method=clientkey,token=\(clientKey)"
@@ -49,41 +49,41 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
         
         if methodType == "GET" {
         
-            _ = self.GET(urlString,
+            _ = self.get(urlString,
                 parameters: nil,
-                success: { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
-                    completion(data: responseObject, error: nil)
+                success: { (operation: AFHTTPRequestOperation!, responseObject: Any!) in
+                    completion(responseObject as AnyObject, nil)
                 },
-                failure: { (operation: AFHTTPRequestOperation!, error: NSError!) in
-                    completion(data: nil, error: error)
+                failure: { (operation: AFHTTPRequestOperation!, error: Error!) in
+                    completion(nil, error as NSError)
             })
         }
         else if methodType == "POST" {
             
-            _ = self.POST(urlString,
+            _ = self.post(urlString,
                 parameters: nil,
-                success: { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
-                    completion(data: responseObject, error: nil)
+                success: { (operation: AFHTTPRequestOperation!, responseObject: Any!) in
+                    completion(responseObject as AnyObject, nil)
                 },
-                failure: { (operation: AFHTTPRequestOperation!, error: NSError!) in
-                    completion(data: nil, error: error)
+                failure: { (operation: AFHTTPRequestOperation!, error: Error!) in
+                    completion(nil, error as NSError)
             })
         }
     }
     
-    func downloadFile(fromPath: String, toPath: String, completion:(status:AnyObject?, error:NSError?) -> ()) {
+    func downloadFile(_ fromPath: String, toPath: String, completion:@escaping (_ status:AnyObject?, _ error:NSError?) -> ()) {
         lLog("Download file:\(fromPath)")
-        let url = NSURL(string: fromPath)
-        let urlRequest = NSURLRequest(URL: url!)
+        let url = URL(string: fromPath)
+        let urlRequest = URLRequest(url: url!)
         
         let operation = AFHTTPRequestOperation(request: urlRequest)
-        operation.outputStream = NSOutputStream(toFileAtPath: toPath, append: false)
-        operation.setCompletionBlockWithSuccess( { (operation: AFHTTPRequestOperation!, responseObject: AnyObject!) in
+        operation.outputStream = OutputStream(toFileAtPath: toPath, append: false)
+        operation.setCompletionBlockWithSuccess( { (operation: AFHTTPRequestOperation!, responseObject: Any!) in
             
-            completion(status: NSNumber(bool: true), error: nil)
+            completion(NSNumber(value: true as Bool), nil)
             
-            }, failure: { (operation: AFHTTPRequestOperation!, error: NSError!) in
-                completion(status: nil, error: error)
+            }, failure: { (operation: AFHTTPRequestOperation!, error: Error!) in
+                completion(nil, error as NSError)
         
         })
         
@@ -92,7 +92,7 @@ class LRNetworkManager: AFHTTPRequestOperationManager {
     
     func findAllActiveOperations() -> NSArray {
         let operations = self.operationQueue.operations
-        return operations
+        return operations as NSArray
     }
     
 }

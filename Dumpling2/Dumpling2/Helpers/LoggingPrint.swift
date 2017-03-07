@@ -22,9 +22,9 @@ import Foundation
  :param: line     The line number, defaults to the line number within the file that the call is made.
  */
 
-func lLog<T>(@autoclosure object: () -> T, _ file: String = __FILE__, _ function: String = __FUNCTION__, _ line: Int = __LINE__) {
+func lLog<T>(_ object: @autoclosure () -> T, _ file: String = #file, _ function: String = #function, _ line: Int = #line) {
     //If LLOG is present and != 1, return - no logging
-    let environmentVars = NSProcessInfo.processInfo().environment
+    let environmentVars = ProcessInfo.processInfo.environment
     if let logging = environmentVars["LLOG"] {
         if logging != "1" {
             return
@@ -42,9 +42,9 @@ func lLog<T>(@autoclosure object: () -> T, _ file: String = __FILE__, _ function
             fatalError("lLog only works for values that conform to CustomDebugStringConvertible or CustomStringConvertible")
         }
         
-        let fileURL = NSURL(string: file)?.lastPathComponent ?? "Unknown file"
-        let queue = NSThread.isMainThread() ? "UI" : "BG"
+        let fileURL = URL(string: file)?.lastPathComponent ?? "Unknown file"
+        let queue = Thread.isMainThread ? "UI" : "BG"
         
-        print("\(NSDate())::##DUMPLING##<\(queue)> \(fileURL) \(function)[\(line)]: " + stringRepresentation)
+        print("\(Date())::##DUMPLING##<\(queue)> \(fileURL) \(function)[\(line)]: " + stringRepresentation)
     #endif
 }

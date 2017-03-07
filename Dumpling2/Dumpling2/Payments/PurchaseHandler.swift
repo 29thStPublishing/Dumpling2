@@ -9,7 +9,7 @@
 import Foundation
 
 /** Class handling purchases */
-public class PurchaseHandler: NSObject {
+open class PurchaseHandler: NSObject {
     
     var defaultFolder: NSString!
     
@@ -23,26 +23,26 @@ public class PurchaseHandler: NSObject {
     public init?(folder: NSString){
         super.init()
         
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
-            self.defaultFolder = folderPath
+            let folderPath = folder.replacingOccurrences(of: docsDir as String, with: "/Documents")
+            self.defaultFolder = folderPath as NSString!
         }
         else {
             self.defaultFolder = folder
         }
         
         let defaultRealmPath = "\(folder)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
-        let mainBundle = NSBundle.mainBundle()
-        if let key: String = mainBundle.objectForInfoDictionaryKey("ClientKey") as? String {
+        let mainBundle = Bundle.main
+        if let key: String = mainBundle.object(forInfoDictionaryKey: "ClientKey") as? String {
             clientKey = key
         }
         else {
@@ -57,16 +57,16 @@ public class PurchaseHandler: NSObject {
     - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(clientkey: NSString) {
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         self.defaultFolder = "/Documents" //docsDir
         clientKey = clientKey as String
         
         let defaultRealmPath = "\(docsDir)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         //RLMRealm.setDefaultRealmPath(defaultRealmPath)
     }
     
@@ -78,13 +78,13 @@ public class PurchaseHandler: NSObject {
     - parameter clientkey: Client API key to be used for making calls to the Magnet API
     */
     public init(folder: NSString, clientkey: NSString) {
-        var docPaths = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        var docPaths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
         let docsDir: NSString = docPaths[0] as NSString
         
         if folder.hasPrefix(docsDir as String) {
             //Documents directory path - just save the /Documents... in defaultFolder
-            let folderPath = folder.stringByReplacingOccurrencesOfString(docsDir as String, withString: "/Documents")
-            self.defaultFolder = folderPath
+            let folderPath = folder.replacingOccurrences(of: docsDir as String, with: "/Documents")
+            self.defaultFolder = folderPath as NSString!
         }
         else {
             self.defaultFolder = folder
@@ -92,9 +92,9 @@ public class PurchaseHandler: NSObject {
         clientKey = clientkey as String
         
         let defaultRealmPath = "\(folder)/default.realm"
-        let realmConfiguration = RLMRealmConfiguration.defaultConfiguration()
-        realmConfiguration.path = defaultRealmPath
-        RLMRealmConfiguration.setDefaultConfiguration(realmConfiguration)
+        let realmConfiguration = RLMRealmConfiguration.default()
+        realmConfiguration.fileURL = NSURL.fileURL(withPath: defaultRealmPath)
+        RLMRealmConfiguration.setDefault(realmConfiguration)
         //RLMRealm.setDefaultRealmPath(defaultRealmPath)
         
     }
@@ -104,11 +104,11 @@ public class PurchaseHandler: NSObject {
     
     - parameter purchase: The Purchase object
     */
-    public func addPurchase(purchase: Purchase) {
+    open func addPurchase(_ purchase: Purchase) {
         
-        let realm = RLMRealm.defaultRealm()
+        let realm = RLMRealm.default()
         realm.beginWriteTransaction()
-        realm.addOrUpdateObject(purchase)
+        realm.addOrUpdate(purchase)
         do {
             try realm.commitWriteTransaction()
         } catch let error {
@@ -123,14 +123,14 @@ public class PurchaseHandler: NSObject {
     
     - parameter userId: The user identity for which purchases are to be retrieved. Pass nil for returning all purchases
     */
-    public func getPurchases(userId: String?) -> Array<Purchase>? {
-        _ = RLMRealm.defaultRealm()
+    open func getPurchases(_ userId: String?) -> Array<Purchase>? {
+        _ = RLMRealm.default()
         
-        var purchases: RLMResults
+        var purchases: RLMResults<RLMObject>
         
         if let identity = userId {
             let predicate = NSPredicate(format: "userIdentity = %@", identity)
-            purchases = Purchase.objectsWithPredicate(predicate) as RLMResults
+            purchases = Purchase.objects(with: predicate) as RLMResults
         }
         else {
             purchases = Purchase.allObjects() as RLMResults
@@ -164,13 +164,13 @@ public class PurchaseHandler: NSObject {
     
     :return: an array of purchases fulfiling the conditions
     */
-    public class func getPurchasesFor(key: String, value: String, userId: String?) -> Array<Purchase>? {
-        _ = RLMRealm.defaultRealm()
+    open class func getPurchasesFor(_ key: String, value: String, userId: String?) -> Array<Purchase>? {
+        _ = RLMRealm.default()
         
         var subPredicates = Array<NSPredicate>()
         
         let testPurchase = Purchase()
-        let properties: NSArray = testPurchase.objectSchema.properties
+        let properties: NSArray = testPurchase.objectSchema.properties as NSArray
         
         var foundProperty = false
         for property: RLMProperty in properties as! [RLMProperty] {
@@ -199,9 +199,9 @@ public class PurchaseHandler: NSObject {
         
         if subPredicates.count > 0 {
             let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
-            var purchases: RLMResults
+            var purchases: RLMResults<RLMObject>
             
-            purchases = Purchase.objectsWithPredicate(searchPredicate) as RLMResults
+            purchases = Purchase.objects(with: searchPredicate) as RLMResults
             
             if purchases.count > 0 {
                 var array = Array<Purchase>()
@@ -224,8 +224,8 @@ public class PurchaseHandler: NSObject {
     
     :return: corresponding volume, issue or article object or nil if none found
     */
-    public class func getPurchase(purchase: Purchase) -> AnyObject? {
-        _ = RLMRealm.defaultRealm()
+    open class func getPurchase(_ purchase: Purchase) -> AnyObject? {
+        _ = RLMRealm.default()
         
         let globalId = purchase.globalId
         let type = purchase.type
